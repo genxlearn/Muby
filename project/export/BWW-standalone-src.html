@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baby Wonder Weeks v3 — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles/tokens.css" />
+
+<template id="__bundler_thumbnail" data-bg-color="#FAF6EE">
+  <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="400" fill="#FAF6EE"/>
+    <g transform="translate(200,110)">
+      <ellipse cx="0" cy="-22" rx="13" ry="17" fill="#D4A540" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-22" rx="13" ry="17" fill="#D4A540" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-22" rx="13" ry="17" fill="#D4A540" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-22" rx="13" ry="17" fill="#D4A540" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-22" rx="13" ry="17" fill="#D4A540" transform="rotate(288)"/>
+      <circle cx="0" cy="0" r="9" fill="#FAF6EE"/>
+    </g>
+    <ellipse cx="200" cy="235" rx="55" ry="52" fill="#FBE0CB"/>
+    <path d="M200,185 C200,173 190,171 193,163 C195,159 202,160 201,167" stroke="#2A1A14" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <ellipse cx="185" cy="248" rx="8" ry="5" fill="#F19F8B" opacity="0.5"/>
+    <ellipse cx="215" cy="248" rx="8" ry="5" fill="#F19F8B" opacity="0.5"/>
+    <circle cx="190" cy="235" r="5" fill="#2A1A14"/>
+    <circle cx="210" cy="235" r="5" fill="#2A1A14"/>
+    <path d="M193,255 Q200,265 207,255" stroke="#B85450" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M160,275 Q160,265 175,264 L225,264 Q240,265 240,275 L242,320 Q242,332 230,332 L170,332 Q158,332 158,320 Z" fill="#D87242"/>
+    <text x="200" y="370" text-anchor="middle" font-family="Georgia,serif" font-size="18" fill="#2A1A14" font-weight="600">Baby Wonder Weeks</text>
+  </svg>
+</template>
+
+<style>
+  html, body { height: 100%; }
+  body { background: var(--bg-canvas); overflow: hidden; }
+  #root { height: 100vh; }
+  select:focus, button:focus { outline: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="../screens/bong.jsx"></script>
+<script type="text/babel" src="../screens/data.jsx"></script>
+<script type="text/babel" src="../screens/components.jsx"></script>
+<script type="text/babel" src="../screens/today.jsx"></script>
+<script type="text/babel" src="../screens/auth.jsx"></script>
+<script type="text/babel" src="../screens/leap.jsx"></script>
+<script type="text/babel" src="../screens/growth.jsx"></script>
+<script type="text/babel" src="../screens/me.jsx"></script>
+<script type="text/babel" src="../screens/app.jsx"></script>
+</body>
+</html>

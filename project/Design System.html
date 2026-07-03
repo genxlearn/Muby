@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BWW v3 — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles/tokens.css" />
+<style>
+  body { background: var(--bg-canvas); color: var(--text-primary); transition: background .3s; }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 40px 32px 120px; }
+  .ds-h1 { font-size: 56px; font-weight: 600; line-height: 1; margin: 0; letter-spacing: -1px; }
+  .ds-sub { font-size: 17px; color: var(--text-secondary); margin-top: 10px; max-width: 560px; line-height: 1.5; }
+  .sec { margin-top: 64px; }
+  .sec-label { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent-primary); margin-bottom: 4px; }
+  .sec-title { font-size: 30px; font-weight: 600; margin: 0 0 24px; }
+  .panel { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--r-xl); padding: 28px; box-shadow: var(--shadow-2); }
+  .grid { display: grid; gap: 16px; }
+  .swatch { border-radius: var(--r-md); padding: 14px; height: 88px; display: flex; flex-direction: column; justify-content: flex-end; border: 1px solid var(--border-subtle); }
+  .swatch .n { font-size: 12.5px; font-weight: 700; }
+  .swatch .h { font-size: 11px; font-family: ui-monospace, monospace; opacity: 0.75; }
+  .toolbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: color-mix(in srgb, var(--bg-canvas) 86%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-subtle); }
+  .toggle { display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: var(--bg-elevated); border: 1px solid var(--border-default); font-weight: 600; font-size: 14px; color: var(--text-primary); cursor: pointer; }
+  .emo-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px; background: var(--bg-sunken); border-radius: var(--r-md); }
+  .emo-cell .lbl { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+  .mono { font-family: ui-monospace, monospace; font-size: 11px; color: var(--text-muted); }
+  .type-row { display: flex; align-items: baseline; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--border-subtle); }
+  .type-row:last-child { border-bottom: none; }
+  .row-flex { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div style="font-weight:700; display:flex; align-items:center; gap:10px;">
+    <span id="brandflower"></span> Muby <span style="color:var(--text-muted); font-weight:600;">· Design System v1.0</span>
+  </div>
+  <button class="toggle" id="themeBtn">🌙 Dark</button>
+</div>
+<div class="wrap">
+  <div class="sec" style="margin-top:24px;">
+    <div class="sec-label">Screen 0 · Foundation</div>
+    <h1 class="ds-h1 serif">Một người chị<br/>thân thiết.</h1>
+    <p class="ds-sub">Hệ thống thiết kế cho mẹ Việt mới sinh — ấm áp, trấn an, dịu dàng. Mọi màu, mọi chữ, mọi component dưới đây hoạt động ở cả hai chế độ sáng và tối.</p>
+  </div>
+
+  <div id="ds-root"></div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="screens/bong.jsx"></script>
+<script type="text/babel" src="screens/data.jsx"></script>
+<script type="text/babel" src="screens/components.jsx"></script>
+<script type="text/babel">
+const { useState } = React;
+
+function Section({ label, title, children }) {
+  return (
+    <div className="sec">
+      <div className="sec-label">{label}</div>
+      <h2 className="sec-title serif">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+const SURFACES = [
+  ['--bg-canvas','Canvas'], ['--bg-elevated','Elevated'], ['--bg-sunken','Sunken'], ['--bg-accent-soft','Accent soft'],
+];
+const TEXTS = [
+  ['--text-primary','Primary','#FAF6EE'], ['--text-secondary','Secondary','#FAF6EE'], ['--text-muted','Muted','#FAF6EE'], ['--accent-primary','Accent','#fff'],
+];
+const SEM = [['--success','Success'],['--warning','Warning'],['--danger','Danger']];
+const EMO = ['happy','blissful','curious','excited','fussy','snug','eating','surprise','uncertain','crying','sleeping'];
+
+function DS() {
+  return (
+    <div>
+      {/* COLORS */}
+      <Section label="Tokens" title="Bảng màu">
+        <div className="panel">
+          <div className="mono" style={{marginBottom:12}}>SURFACES</div>
+          <div className="grid" style={{gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))'}}>
+            {SURFACES.map(([v,n]) => (
+              <div className="swatch" key={v} style={{background:`var(${v})`}}>
+                <div className="n">{n}</div><div className="h mono">{v}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mono" style={{margin:'24px 0 12px'}}>TEXT & ACCENT</div>
+          <div className="grid" style={{gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))'}}>
+            {TEXTS.map(([v,n,fg]) => (
+              <div className="swatch" key={v} style={{background:`var(${v})`, color:fg}}>
+                <div className="n">{n}</div><div className="h mono">{v}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mono" style={{margin:'24px 0 12px'}}>SEMANTIC</div>
+          <div className="grid" style={{gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))'}}>
+            {SEM.map(([v,n]) => (
+              <div className="swatch" key={v} style={{background:`var(${v})`, color:'#fff'}}>
+                <div className="n">{n}</div><div className="h mono">{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* INTENSITY */}
+      <Section label="Hệ thống cốt lõi" title="5 mức cảm xúc — bảng màu chuyển sắc">
+        <div className="panel">
+          <p style={{color:'var(--text-secondary)', margin:'0 0 20px', fontSize:14.5, maxWidth:620}}>
+            Không chỉ đổi độ sáng — mỗi mức là một <b>sắc màu riêng</b> (xanh lá → kem → hổ phách → cam → gạch nung), để mẹ phân biệt được ngay cả lúc 3 giờ sáng.
+          </p>
+          <div className="grid" style={{gridTemplateColumns:'repeat(5,1fr)', gap:12}}>
+            {[1,2,3,4,5].map(l => (
+              <div key={l} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:10}}>
+                <div style={{width:'100%',height:96,borderRadius:'var(--r-md)',background:`var(--intensity-${l})`,display:'grid',placeItems:'center',color:`var(--intensity-${l}-ink)`,fontWeight:700,fontSize:30}} className="serif">{l}</div>
+                <BongIntensity level={l} size={66} />
+                <div className="mono">--intensity-{l}</div>
+              </div>
+            ))}
+          </div>
+          <div className="row-flex" style={{marginTop:24}}>
+            <IntensityBadge level={1} size="sm" />
+            <IntensityBadge level={2} size="md" />
+            <IntensityBadge level={3} size="md" />
+            <IntensityBadge level={4} size="lg" />
+            <IntensityBadge level={5} size="lg" />
+          </div>
+        </div>
+      </Section>
+
+      {/* BONG */}
+      <Section label="Nhân vật" title="Bống — 11 cảm xúc">
+        <div className="panel">
+          <div className="grid" style={{gridTemplateColumns:'repeat(auto-fill,minmax(120px,1fr))'}}>
+            {EMO.map(e => (
+              <div className="emo-cell" key={e}>
+                <Bong emotion={e} onesie="orange" size={92} />
+                <div className="lbl">{e}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mono" style={{margin:'24px 0 12px'}}>ONESIE — orange · sage · cream · lavender</div>
+          <div className="row-flex" style={{justifyContent:'space-around', background:'var(--bg-sunken)', borderRadius:'var(--r-md)', padding:16}}>
+            {['orange','sage','cream','lavender'].map(o => <Bong key={o} emotion="happy" onesie={o} size={96} />)}
+          </div>
+        </div>
+      </Section>
+
+      {/* TYPE */}
+      <Section label="Tokens" title="Kiểu chữ">
+        <div className="panel">
+          <div className="type-row"><div style={{width:140}} className="mono">Fraunces · Display</div><div className="serif" style={{fontSize:40,fontWeight:600}}>Chào buổi sáng, mama</div></div>
+          <div className="type-row"><div style={{width:140}} className="mono">Fraunces · Title</div><div className="serif" style={{fontSize:26,fontWeight:600}}>Thế giới sự kiện</div></div>
+          <div className="type-row"><div style={{width:140}} className="mono">Inter · Body</div><div style={{fontSize:16.5}}>Bé cần thêm hơi ấm. Ôm nhiều hơn chút nhé.</div></div>
+          <div className="type-row"><div style={{width:140}} className="mono">Inter · Caption</div><div style={{fontSize:13,color:'var(--text-muted)'}}>Đã ghi rồi · 1 giờ trước</div></div>
+        </div>
+      </Section>
+
+      {/* COMPONENTS */}
+      <Section label="Thư viện" title="Components">
+        <div className="grid" style={{gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))'}}>
+          <div className="panel">
+            <div className="mono" style={{marginBottom:14}}>BUTTONS</div>
+            <div style={{display:'flex',flexDirection:'column',gap:12}}>
+              <ButtonPrimary>Tạo tài khoản</ButtonPrimary>
+              <ButtonSecondary>Để sau cũng được</ButtonSecondary>
+              <ButtonPrimary disabled>Disabled</ButtonPrimary>
+              <ButtonText>Khôi phục mật khẩu?</ButtonText>
+            </div>
+          </div>
+          <div className="panel">
+            <div className="mono" style={{marginBottom:14}}>INPUT · CHIP</div>
+            <Input label="Số điện thoại" prefix="+84" placeholder="912 345 678" />
+            <div className="row-flex" style={{marginTop:16}}>
+              <Chip active>Tất cả</Chip><Chip>Cữ ăn</Chip><Chip>Giấc ngủ</Chip>
+            </div>
+          </div>
+          <div className="panel">
+            <div className="mono" style={{marginBottom:14}}>EASY (educational) · CURVE</div>
+            <div style={{display:'flex',gap:8}}>
+              {[
+                { k:'E', label:'Ăn', icon:'🍼', time:'', done:true },
+                { k:'A', label:'Chơi', icon:'✨', time:'', done:true },
+                { k:'S', label:'Ngủ', icon:'🌙', time:'', current:true },
+                { k:'Y', label:'Mama', icon:'☕', time:'', done:false },
+              ].map((b,i) => <EasyBlock key={i} block={b} current={b.current} />)}
+            </div>
+            <div style={{marginTop:18,display:'flex',alignItems:'center',gap:12}}>
+              <MiniIntensityCurve w={120} h={40} />
+              <span className="mono">MiniIntensityCurve</span>
+            </div>
+          </div>
+          <div className="panel">
+            <div className="mono" style={{marginBottom:14}}>BANNER · TOAST</div>
+            <Banner icon="☁️">Bé đang trong leap — có thể ăn thêm hoặc ngủ sớm 30 phút.</Banner>
+            <div style={{marginTop:14, position:'relative', height:48}}>
+              <div style={{display:'inline-flex',alignItems:'center',gap:9,padding:'11px 18px',background:'var(--text-primary)',color:'var(--bg-canvas)',borderRadius:'var(--r-full)',fontSize:14.5,fontWeight:600}}>Đã ghi rồi. Bạn đang làm rất tốt ❤️</div>
+            </div>
+          </div>
+          <div className="panel">
+            <div className="mono" style={{marginBottom:14}}>WEEK CELLS · LỊCH</div>
+            <div className="row-flex">
+              {[1,2,3,4,5].map(n => <WeekCell key={n} w={n*8} n={n} current={n===4} />)}
+            </div>
+          </div>
+          <div className="panel">
+            <div className="mono" style={{marginBottom:14}}>FLOWER MOTIFS</div>
+            <div className="row-flex">
+              <Flower size={48} color="var(--warning)" />
+              <Flower size={40} color="var(--success)" />
+              <Flower size={56} color="var(--accent-primary)" />
+              <Flower size={36} color="var(--onesie-lavender)" />
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <div style={{marginTop:80, textAlign:'center', color:'var(--text-muted)', fontSize:13}} className="mono">
+        BABY WONDER WEEKS · MUBY DESIGN SYSTEM v1.0 — MVP BUILD · semi-3D Bống · Untitled UI 3-layer tokens
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('ds-root')).render(<DS/>);
+
+// brand flower in toolbar
+ReactDOM.createRoot(document.getElementById('brandflower')).render(<Flower size={22} color="var(--accent-primary)" />);
+
+// theme toggle
+const btn = document.getElementById('themeBtn');
+btn.onclick = () => {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  document.documentElement.dataset.theme = dark ? '' : 'dark';
+  btn.textContent = dark ? '🌙 Dark' : '☀️ Light';
+};
+</script>
+</body>
+</html>

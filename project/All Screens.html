@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BWW v3 — All Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles/tokens.css" />
+<style>
+  body { background: #ddd5c7; }
+  [data-theme="dark"] body, body.darkpage { background: #0f0b08; }
+  .top { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 16px 28px; background: rgba(221,213,199,0.85); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.06); }
+  body.darkpage .top { background: rgba(15,11,8,0.85); border-color: rgba(255,255,255,0.08); }
+  .title { font-weight: 700; font-size: 16px; color: #2A1A14; display: flex; align-items: center; gap: 10px; }
+  body.darkpage .title { color: #F5EFE2; }
+  .btn { padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.12); background: #FAF6EE; font-weight: 600; font-size: 13.5px; cursor: pointer; color: #2A1A14; }
+  body.darkpage .btn { background: #241D17; color: #F5EFE2; border-color: rgba(255,255,255,0.12); }
+  .wrap { padding: 36px; }
+  .sec { margin-bottom: 14px; }
+  .sec h2 { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; color: #2A1A14; margin: 32px 0 6px; }
+  body.darkpage .sec h2 { color: #F5EFE2; }
+  .sec p { font-size: 13.5px; color: #6B5B52; margin: 0 0 18px; }
+  body.darkpage .sec p { color: #B8AC9B; }
+  .row { display: flex; flex-wrap: wrap; gap: 28px; }
+  .frame-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .frame-label { font-size: 13px; font-weight: 700; color: #2A1A14; }
+  body.darkpage .frame-label { color: #F5EFE2; }
+  .frame-label span { color: #9b8d7d; font-weight: 500; }
+  .frame { width: 393px; background: var(--bg-canvas); border-radius: 20px; overflow: visible; position: relative; box-shadow: 0 4px 24px rgba(0,0,0,0.10); border: 1px solid rgba(0,0,0,0.06); }
+  body.darkpage .frame { box-shadow: 0 4px 24px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.06); }
+  .frame > .inner { display: flex; flex-direction: column; }
+  .island { display: none; }
+  /* Override inner scroll containers to show all content */
+  .frame .screen-scroll, .frame .no-sb { overflow: visible !important; max-height: none !important; height: auto !important; flex: none !important; }
+  .frame [style*="overflowY"] { overflow: visible !important; }
+  .frame [style*="overflow"] { overflow: visible !important; }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="title"><span id="bf"></span> Baby Wonder Weeks v4 — Toàn bộ màn hình</div>
+  <button class="btn" id="themeBtn">🌙 Xem chế độ tối</button>
+</div>
+<div class="wrap"><div id="root"></div></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="screens/bong.jsx"></script>
+<script type="text/babel" src="screens/data.jsx"></script>
+<script type="text/babel" src="screens/components.jsx"></script>
+<script type="text/babel" src="screens/today.jsx"></script>
+<script type="text/babel" src="screens/auth.jsx"></script>
+<script type="text/babel" src="screens/leap.jsx"></script>
+<script type="text/babel" src="screens/growth.jsx"></script>
+<script type="text/babel" src="screens/me.jsx"></script>
+<script type="text/babel">
+const { useState } = React;
+function mkCtx(o = {}) {
+  const noop = () => {};
+  return {
+    theme: 'light', intensity: 2, empty: false, premium: false,
+    route: { flow: 'app', tab: 'today', stack: null }, sheet: null, paywall: null, toastVal: null,
+    setTab: noop, go: noop, back: noop, goFlow: noop, setRoute: noop, openSheet: noop, closeSheet: noop,
+    setIntensity: noop, setEmpty: noop, setPremium: noop, setTheme: noop, openPaywall: noop, closePaywall: noop, toast: noop,
+    ...o,
+  };
+}
+
+function Frame({ label, note, nav, children }) {
+  return (
+    <div className="frame-wrap">
+      <div className="frame-label">{label} {note && <span>· {note}</span>}</div>
+      <div className="frame">
+        <div className="inner">
+          <div style={{ display: 'flex', flexDirection: 'column' }}>{children}</div>
+          {nav && <BottomNav active={nav} onNav={() => {}} onFab={() => {}} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, desc, children }) {
+  return (
+    <div className="sec">
+      <h2>{title}</h2>
+      {desc && <p>{desc}</p>}
+      <div className="row">{children}</div>
+    </div>
+  );
+}
+
+function Canvas() {
+  return (
+    <div>
+      <Section title="Auth · A1–A6" desc="Cổng vào — giọng văn của một người chị thân thiết, không bao giờ trách mẹ.">
+        <Frame label="A1" note="Welcome"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A1' } })} /></Frame>
+        <Frame label="A2" note="Đăng ký"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A2' } })} /></Frame>
+        <Frame label="A3" note="Đăng nhập"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A3' } })} /></Frame>
+        <Frame label="A4" note="OTP"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A4' } })} /></Frame>
+        <Frame label="A5" note="Khôi phục mật khẩu"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A5' } })} /></Frame>
+        <Frame label="A6" note="Đặt lại mật khẩu"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A6' } })} /></Frame>
+      </Section>
+
+      <Section title="Onboarding · 10A–10C" desc="Sau khi đăng nhập — thêm bé, mời bố.">
+        <Frame label="10A" note="Chào mừng"><OnboardFlow ctx={mkCtx({ route: { flow: 'onboard', obStep: 'ob1' } })} /></Frame>
+        <Frame label="10B" note="Thêm bé"><OnboardFlow ctx={mkCtx({ route: { flow: 'onboard', obStep: 'ob2' } })} /></Frame>
+        <Frame label="10C" note="Mời bố"><OnboardFlow ctx={mkCtx({ route: { flow: 'onboard', obStep: 'ob3' } })} /></Frame>
+      </Section>
+
+      <Section title="1 · Hôm nay" desc="3 trạng thái: tuần nắng đẹp, tuần khó, và khi chưa có ghi chép.">
+        <Frame label="1" note="Nắng (mức 2)" nav="today"><TodayScreen ctx={mkCtx({ intensity: 2 })} /></Frame>
+        <Frame label="1" note="Khó (mức 4)" nav="today"><TodayScreen ctx={mkCtx({ intensity: 4 })} /></Frame>
+        <Frame label="1" note="Trống" nav="today"><TodayScreen ctx={mkCtx({ empty: true })} /></Frame>
+      </Section>
+
+      <Section title="2 · Ghi nhanh & Dỗ bé" desc="Một chạm là xong. Soothing sheet với tiếng ồn trắng.">
+        <Frame label="2" note="Ghi nhanh" nav="today"><TodayScreen ctx={mkCtx({ intensity: 2 })} /><QuickLogSheet ctx={mkCtx()} open={true} /></Frame>
+        <Frame label="2B" note="Dỗ bé (Free)" nav="today"><TodayScreen ctx={mkCtx({ intensity: 4 })} /><SoothingSheet ctx={mkCtx({ intensity: 4 })} open={true} /></Frame>
+      </Section>
+
+      <Section title="3 · Leap" desc="3 sub-tab: Hôm nay · Hành trình · Lịch (77 tuần, màu chuyển sắc).">
+        <Frame label="3A" note="Hôm nay" nav="leap"><LeapScreen ctx={mkCtx({ intensity: 4 })} initialSub="today" /></Frame>
+        <Frame label="3B" note="Hành trình" nav="leap"><LeapScreen ctx={mkCtx({ intensity: 4 })} initialSub="journey" /></Frame>
+        <Frame label="3C" note="Lịch" nav="leap"><LeapScreen ctx={mkCtx({ intensity: 4 })} initialSub="cal" /></Frame>
+        <Frame label="4" note="Leap chi tiết"><LeapDetailScreen ctx={mkCtx({ intensity: 4 })} /></Frame>
+      </Section>
+
+      <Section title="5–8 · Tăng trưởng, Nhật ký, Thư viện">
+        <Frame label="5" note="Tăng trưởng" nav="growth"><GrowthScreen ctx={mkCtx()} /></Frame>
+        <Frame label="6" note="Thêm đo lường"><MeasureScreen ctx={mkCtx()} /></Frame>
+        <Frame label="7" note="Nhật ký"><HistoryScreen ctx={mkCtx()} /></Frame>
+        <Frame label="8" note="Thư viện"><LibraryScreen ctx={mkCtx()} /></Frame>
+      </Section>
+
+      <Section title="9 · Thông báo · Tôi · Premium">
+        <Frame label="9A" note="Thông báo"><NotificationsScreen ctx={mkCtx()} /></Frame>
+        <Frame label="9B" note="Tôi (Free)" nav="me"><MeScreen ctx={mkCtx()} /></Frame>
+        <Frame label="9B" note="Tôi (Premium)" nav="me"><MeScreen ctx={mkCtx({ premium: true })} /></Frame>
+        <Frame label="—" note="Paywall (soft gate)"><MeScreen ctx={mkCtx()} /><Paywall ctx={mkCtx({ paywall: { title: 'Mở khóa Wonder Premium' } })} /></Frame>
+      </Section>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Canvas />);
+ReactDOM.createRoot(document.getElementById('bf')).render(<Flower size={22} color="var(--accent-primary)" />);
+
+const btn = document.getElementById('themeBtn');
+btn.onclick = () => {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  document.documentElement.dataset.theme = dark ? '' : 'dark';
+  document.body.classList.toggle('darkpage', !dark);
+  btn.textContent = dark ? '🌙 Xem chế độ tối' : '☀️ Xem chế độ sáng';
+};
+</script>
+</body>
+</html>
