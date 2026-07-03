@@ -49,18 +49,15 @@ function AppFlow({ ctx }) {
 function Phone({ ctx }) {
   return (
     <div style={{
-      width: 393, height: 852, borderRadius: 54, background: 'var(--bg-canvas)', position: 'relative',
-      boxShadow: '0 0 0 13px #1c1714, 0 0 0 15px #2c2420, 0 30px 80px rgba(0,0,0,0.35)', overflow: 'hidden',
-      display: 'flex', flexDirection: 'column', flexShrink: 0, transition: 'background .3s',
+      width: 393, height: 852, background: 'var(--bg-canvas)', position: 'relative',
+      overflow: 'hidden', display: 'flex', flexDirection: 'column', flexShrink: 0, transition: 'background .3s',
     }}>
-      <div style={{ position: 'absolute', top: 11, left: '50%', transform: 'translateX(-50%)', width: 122, height: 35, background: '#000', borderRadius: 20, zIndex: 40 }} />
       <StatusBar />
       <AppFlow ctx={ctx} />
       <QuickLogSheet ctx={ctx} open={ctx.sheet === 'quicklog'} />
       {window.SoothingSheet && <SoothingSheet ctx={ctx} open={ctx.sheet === 'soothing'} />}
       {window.Paywall && <Paywall ctx={ctx} />}
       <Toast toast={ctx.toastVal} />
-      <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', width: 134, height: 5, borderRadius: 3, background: 'var(--text-primary)', opacity: 0.25, zIndex: 45 }} />
     </div>
   );
 }
@@ -104,7 +101,7 @@ function App() {
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', display: 'grid', placeItems: 'center', background: '#1a1410', overflow: 'hidden' }}>
+    <div style={{ width: '100vw', height: '100vh', display: 'grid', placeItems: 'center', background: 'var(--bg-canvas)', overflow: 'hidden' }}>
       <div id="phoneScale" style={{ transformOrigin: 'top left' }}>
         <Phone ctx={ctx} />
       </div>
