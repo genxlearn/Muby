@@ -56,28 +56,34 @@ export function BottomNav({ active, onNav }: { active: Tab; onNav: (t: Tab) => v
                 accessibilityLabel={it.label}
                 style={[
                   {
+                    // flex ratios (not content width) so the 4 items always sum
+                    // exactly to the pill's width — nothing can overflow it
+                    flex: on ? 2 : 1,
+                    minWidth: 0,
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 7,
+                    gap: 6,
                     minHeight: 48,
                     borderRadius: 999,
-                    paddingHorizontal: on ? 18 : 6,
+                    paddingHorizontal: on ? 10 : 4,
                     backgroundColor: on ? colors.accentPrimary : 'transparent',
                   },
-                  on
-                    ? {
-                        shadowColor: '#F96B26',
-                        shadowOffset: { width: 0, height: 6 },
-                        shadowOpacity: 0.35,
-                        shadowRadius: 16,
-                        elevation: 5,
-                      }
-                    : { flex: 1 },
+                  on && {
+                    shadowColor: '#F96B26',
+                    shadowOffset: { width: 0, height: 6 },
+                    shadowOpacity: 0.35,
+                    shadowRadius: 16,
+                    elevation: 5,
+                  },
                 ]}
               >
                 <Ic name={it.icon} size={23} sw={on ? 2.4 : 1.8} color={on ? '#fff' : colors.textMuted} />
-                {on ? <Txt style={{ fontSize: 13, fontWeight: '700', color: '#fff' }}>{it.label}</Txt> : null}
+                {on ? (
+                  <Txt numberOfLines={1} style={{ fontSize: 13, fontWeight: '700', color: '#fff', flexShrink: 1 }}>
+                    {it.label}
+                  </Txt>
+                ) : null}
               </Pressable>
             );
           })}
