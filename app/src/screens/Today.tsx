@@ -28,6 +28,7 @@ import {
 import * as D from '../data/sampleData';
 import { Bong, BongFace, BongIntensity, Emotion } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
+import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
 import { BabyAvatar, EasyEducationCard, ForecastStrip, SymptomSheet } from './shared';
@@ -40,11 +41,12 @@ const CARD_GAP = 12;
 function GreetRow() {
   const { colors } = useTheme();
   const ctx = useApp();
+  const { state } = useBaby();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
       <View>
         <Txt style={{ fontSize: 13.5, color: colors.textMuted, fontWeight: '600' }}>Chào buổi sáng, mama 💛</Txt>
-        <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, lineHeight: 26, marginTop: 2 }}>{D.BABY.ageLabel}</Txt>
+        <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, lineHeight: 26, marginTop: 2 }}>{state.ageLabel}</Txt>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <Pressable
@@ -70,8 +72,10 @@ export function TodayScreen() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
   const { intensity, empty } = ctx;
-  const { CURRENT_LEAP, LEAP_DAY, LEAP_TOTAL } = D;
-  const PHASE = D.leapPhase(LEAP_DAY, LEAP_TOTAL);
+  const { state: st } = useBaby();
+  const CURRENT_LEAP = st.leap;
+  const inLeap = st.status === 'in-leap';
+  const PHASE = D.leapPhase(Math.max(1, st.leapDay), st.leapTotal);
   const [loading, setLoading] = useState(!_todayLoaded);
   const [symptomPick, setSymptomPick] = useState<string | null>(null);
   const [actionIdx, setActionIdx] = useState(0);
@@ -125,16 +129,30 @@ export function TodayScreen() {
         <HeroCard pad={0}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, paddingHorizontal: 20 }}>
             <Txt style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1.2, color: colors.textOnHero, opacity: 0.65 }}>DỰ BÁO HÔM NAY</Txt>
-            <Txt style={{ fontSize: 11.5, fontWeight: '600', color: colors.textOnHero, opacity: 0.75 }}>Ngày {LEAP_DAY}/{LEAP_TOTAL} · còn ~{LEAP_TOTAL - LEAP_DAY} ngày</Txt>
+            <Txt style={{ fontSize: 11.5, fontWeight: '600', color: colors.textOnHero, opacity: 0.75 }}>
+              {inLeap
+                ? `Ngày ${st.leapDay}/${st.leapTotal} · còn ~${st.leapTotal - st.leapDay} ngày`
+                : st.status === 'after-all'
+                  ? 'Đã qua 10 leaps 🎉'
+                  : `Leap ${CURRENT_LEAP.n} sau ~${st.daysUntilLeap} ngày`}
+            </Txt>
           </View>
           <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 20, paddingRight: 14, gap: 6 }}>
             <View style={{ flex: 1, minWidth: 0 }}>
               <IntensityBadge level={intensity} size="sm" />
               <Txt serif style={{ fontSize: 20, fontWeight: '600', lineHeight: 25, marginTop: 10, color: colors.textOnHero }}>
-                Bé đang ở {PHASE.name} của Leap {CURRENT_LEAP.n}
+                {inLeap
+                  ? `Bé đang ở ${PHASE.name} của Leap ${CURRENT_LEAP.n}`
+                  : st.status === 'after-all'
+                    ? 'Bé đã đi qua 10 leaps kỳ diệu'
+                    : 'Bé đang giữa hai leap — tuần nắng 🌼'}
               </Txt>
               <Txt style={{ fontSize: 13, color: colors.textOnHero, opacity: 0.85, lineHeight: 20, marginTop: 6 }}>
-                {PHASE.desc}
+                {inLeap
+                  ? PHASE.desc
+                  : st.status === 'after-all'
+                    ? 'Hành trình Wonder Weeks đã trọn vẹn. Giờ là lúc tận hưởng từng khoảnh khắc lớn khôn của con.'
+                    : `Tranh thủ nghỉ ngơi và chơi cùng con nhé. Leap ${CURRENT_LEAP.n} · ${CURRENT_LEAP.world} dự kiến bắt đầu trong ~${st.daysUntilLeap} ngày.`}
               </Txt>
               {intensity >= 4 ? (
                 <Pressable
@@ -149,16 +167,18 @@ export function TodayScreen() {
               <BongIntensity level={intensity} size={100} float />
             </View>
           </View>
-          {/* thin progress */}
-          <View style={{ paddingTop: 10, paddingHorizontal: 20 }}>
-            <View style={{ height: 4, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.22)' }}>
-              <View style={{ width: `${Math.round((LEAP_DAY / LEAP_TOTAL) * 100)}%`, height: '100%', borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.9)' }} />
+          {/* thin progress (only meaningful inside a leap) */}
+          {inLeap ? (
+            <View style={{ paddingTop: 10, paddingHorizontal: 20 }}>
+              <View style={{ height: 4, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.22)' }}>
+                <View style={{ width: `${Math.round((st.leapDay / st.leapTotal) * 100)}%`, height: '100%', borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.9)' }} />
+              </View>
             </View>
-          </View>
+          ) : null}
           {/* 7 days — inset panel at the hero's bottom */}
           <View style={{ marginTop: 12, marginHorizontal: 6, marginBottom: 6, backgroundColor: colors.bgElevated, borderRadius: radii.xl - 6, paddingTop: 10, paddingHorizontal: 10, paddingBottom: 6 }}>
             <Txt style={{ fontSize: 11.5, fontWeight: '700', color: colors.textMuted, marginHorizontal: 6, marginBottom: 6 }}>7 ngày tới</Txt>
-            <ForecastStrip data={D.FORECAST} onPick={() => ctx.setTab('leap')} />
+            <ForecastStrip data={st.forecast} onPick={() => ctx.setTab('leap')} />
           </View>
         </HeroCard>
 
@@ -312,6 +332,7 @@ const EASY_STEPS = [
 export function EasyScreen() {
   const { colors } = useTheme();
   const ctx = useApp();
+  const { state: st } = useBaby();
   const info = D.EASY_INFO;
   return (
     <View style={{ flex: 1 }}>
@@ -342,9 +363,9 @@ export function EasyScreen() {
 
         <Card pad={16} style={{ backgroundColor: colors.bgAccentSoft, marginBottom: 24 }}>
           <Txt style={{ fontSize: 13, fontWeight: '700', color: colors.accentPrimary, marginBottom: 6 }}>
-            {info.variant} — DÀNH CHO BÉ {D.BABY.ageLabel.toUpperCase()}
+            {st.easyVariant} — DÀNH CHO BÉ {st.ageLabel.toUpperCase()}
           </Txt>
-          <Txt style={{ fontSize: 14, color: colors.textPrimary, lineHeight: 22 }}>{info.detail}</Txt>
+          <Txt style={{ fontSize: 14, color: colors.textPrimary, lineHeight: 22 }}>{st.easyDetail}</Txt>
         </Card>
 
         <Banner icon="☁️" tone="soft" style={{ marginBottom: 24 }}>{info.note}</Banner>

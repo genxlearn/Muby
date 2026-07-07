@@ -24,6 +24,7 @@ import * as D from '../data/sampleData';
 import { LeapAction } from '../data/sampleData';
 import { BongFace, BongIntensity } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
+import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
 import { ActionCard, ForecastStrip, SunnyPlaySection, SymptomPills } from './shared';
@@ -44,8 +45,10 @@ function LeapToday() {
   const { colors } = useTheme();
   const ctx = useApp();
   const { intensity } = ctx;
-  const { CURRENT_LEAP, LEAP_DAY, LEAP_TOTAL } = D;
-  const PHASE = D.leapPhase(LEAP_DAY, LEAP_TOTAL);
+  const { state: st } = useBaby();
+  const CURRENT_LEAP = st.leap;
+  const inLeap = st.status === 'in-leap';
+  const PHASE = D.leapPhase(Math.max(1, st.leapDay), st.leapTotal);
   const sunny = intensity <= 2;
   const actions = CURRENT_LEAP.actions;
 
@@ -59,13 +62,25 @@ function LeapToday() {
             <View style={{ flex: 1, minWidth: 0 }}>
               <IntensityBadge level={intensity} size="md" />
               <Txt serif style={{ fontSize: 21, fontWeight: '600', lineHeight: 26, marginTop: 12, color: colors.textPrimary }}>
-                Bé đang ở {PHASE.name} của Leap {CURRENT_LEAP.n}
+                {inLeap
+                  ? `Bé đang ở ${PHASE.name} của Leap ${CURRENT_LEAP.n}`
+                  : st.status === 'after-all'
+                    ? 'Bé đã đi qua 10 leaps kỳ diệu'
+                    : `Leap ${CURRENT_LEAP.n} · ${CURRENT_LEAP.world} sắp tới`}
               </Txt>
               <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20, marginTop: 6 }}>
-                {PHASE.desc}
+                {inLeap
+                  ? PHASE.desc
+                  : st.status === 'after-all'
+                    ? 'Hành trình Wonder Weeks đã trọn vẹn. Tận hưởng từng khoảnh khắc lớn khôn của con nhé.'
+                    : 'Bé đang ở tuần nắng giữa hai leap — thời điểm tuyệt vời để chơi và nghỉ ngơi cùng con.'}
               </Txt>
               <Txt style={{ fontSize: 12, color: colors.textMuted, fontWeight: '600', marginTop: 8 }}>
-                Ngày {LEAP_DAY}/{LEAP_TOTAL} · còn ~{LEAP_TOTAL - LEAP_DAY} ngày
+                {inLeap
+                  ? `Ngày ${st.leapDay}/${st.leapTotal} · còn ~${st.leapTotal - st.leapDay} ngày`
+                  : st.status === 'after-all'
+                    ? `Bé ${st.ageLabel}`
+                    : `Dự kiến bắt đầu trong ~${st.daysUntilLeap} ngày`}
               </Txt>
             </View>
             <View style={{ alignSelf: 'flex-end' }}>
@@ -77,7 +92,7 @@ function LeapToday() {
         {/* FORECAST — swipeable strip */}
         <Card pad={14}>
           <Txt style={{ fontSize: 13.5, fontWeight: '700', color: colors.textSecondary, marginBottom: 12 }}>7 ngày tới</Txt>
-          <ForecastStrip data={D.FORECAST} />
+          <ForecastStrip data={st.forecast} />
         </Card>
 
         {/* "ĐANG XẢY RA GÌ?" — tap to open detail */}
@@ -138,15 +153,16 @@ function LeapToday() {
 function LeapJourney() {
   const { colors } = useTheme();
   const ctx = useApp();
-  const { LEAPS, CURRENT_LEAP, BABY } = D;
+  const { LEAPS } = D;
+  const { state: st } = useBaby();
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
       <View style={{ paddingTop: 16, paddingHorizontal: 20, position: 'relative' }}>
         {/* vertical line behind nodes */}
         <View style={{ position: 'absolute', left: 43, top: 24, bottom: 24, width: 2.5, backgroundColor: colors.borderSubtle }} />
         {LEAPS.map((lp) => {
-          const past = lp.range[1] < BABY.ageWeeks;
-          const current = lp.n === CURRENT_LEAP.n;
+          const past = lp.range[1] < st.ageWeeksFrac;
+          const current = lp.n === st.leap.n && st.status === 'in-leap';
           return (
             <View key={lp.n} style={{ flexDirection: 'row', gap: 16, marginBottom: current ? 8 : 18 }}>
               <View
@@ -202,7 +218,8 @@ function LeapJourney() {
 /* ---- 3C Lịch (calendar) ---- */
 function LeapCalendar() {
   const { colors } = useTheme();
-  const weeks = D.buildCalendar();
+  const { state: st } = useBaby();
+  const weeks = D.buildCalendar(Math.min(77, Math.max(1, st.ageWeeks)));
   const [pick, setPick] = useState<D.CalendarWeek | null>(null);
   const [legend, setLegend] = useState(true);
   return (
@@ -302,9 +319,10 @@ export function LeapDetailScreen() {
   const { colors } = useTheme();
   const ctx = useApp();
   const [tab, setTab] = useState<DetailTab>('now');
-  const { CURRENT_LEAP } = D;
+  const { state: st } = useBaby();
+  const CURRENT_LEAP = st.leap;
   const locked = CURRENT_LEAP.n >= 4 && !ctx.premium;
-  const pastLeaps = D.LEAPS.filter((lp) => lp.range[1] < D.BABY.ageWeeks);
+  const pastLeaps = D.LEAPS.filter((lp) => lp.range[1] < st.ageWeeksFrac);
 
   return (
     <View style={{ flex: 1 }}>
@@ -334,7 +352,9 @@ export function LeapDetailScreen() {
           <Card pad={14} style={{ marginBottom: 24 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <Txt style={{ fontSize: 13, fontWeight: '700', color: colors.textSecondary }}>Bạn đang ở đây</Txt>
-              <Txt style={{ fontSize: 12, color: colors.textMuted }}>Ngày {D.LEAP_DAY}/{D.LEAP_TOTAL}</Txt>
+              <Txt style={{ fontSize: 12, color: colors.textMuted }}>
+                {st.status === 'in-leap' ? `Ngày ${st.leapDay}/${st.leapTotal}` : `Sau ~${st.daysUntilLeap} ngày`}
+              </Txt>
             </View>
             <MiniIntensityCurve w={300} h={56} />
           </Card>

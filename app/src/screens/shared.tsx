@@ -10,6 +10,7 @@ import * as D from '../data/sampleData';
 import { LeapAction, Leap } from '../data/sampleData';
 import { BongFace } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
+import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
 
@@ -136,14 +137,14 @@ const EASY_BLOCKS = [
 export function EasyEducationCard() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
-  const info = D.EASY_INFO;
+  const { state: st } = useBaby();
   return (
     <Card pad={16} onPress={() => ctx.go('easy')}>
       <View style={{ gap: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <View style={{ flex: 1 }}>
             <Txt style={{ fontSize: 14.5, fontWeight: '700', color: colors.textPrimary }}>Nhịp sinh hoạt EASY</Txt>
-            <Txt style={{ fontSize: 12.5, color: colors.textMuted, marginTop: 2 }}>{info.variant} · phù hợp bé {D.BABY.ageLabel}</Txt>
+            <Txt style={{ fontSize: 12.5, color: colors.textMuted, marginTop: 2 }}>{st.easyVariant} · phù hợp bé {st.ageLabel}</Txt>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
             <Txt style={{ fontSize: 12.5, color: colors.accentPrimary, fontWeight: '700' }}>Tìm hiểu</Txt>

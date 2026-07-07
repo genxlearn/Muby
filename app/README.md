@@ -15,6 +15,25 @@ dedicated EASY explainer screen, Growth with 5 metrics + typical-range
 comparison, in-app sheets for baby info / invite / units / terms, and a Market
 "coming soon" tab.
 
+## Dynamic data & phone auth
+
+Everything age-dependent is computed from the baby's **real date of birth**
+(`src/data/leapEngine.ts`): age label, the leap in progress (or upcoming /
+between-leaps / all-done states), leap day & progress, today's intensity, the
+7-day forecast with real weekday names, the 77-week calendar position, the
+EASY variant, and typical daily ranges per age bracket. The profile entered in
+onboarding (name · DOB · gender) is persisted per account
+(`src/state/BabyContext.tsx`) and editable from Mama → baby card.
+
+Phone sign-in is real (`src/auth/`): register with OTP verification, login
+with phone + password, password reset via OTP, session persistence (the app
+reopens signed-in), and logout. Two backends:
+
+- **demo** (default, zero setup): accounts stored on-device with SHA-256
+  password hashing; the OTP is displayed inside the app since no SMS is sent.
+- **supabase**: real SMS OTP via Supabase Auth (Twilio/Vonage phone provider).
+  Fill in `src/auth/config.ts` and switch `mode` to `'supabase'`.
+
 ## Stack
 
 - **Expo SDK 57** · React Native 0.86 · React 19 · TypeScript (strict)

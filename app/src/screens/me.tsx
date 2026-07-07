@@ -17,9 +17,12 @@ import {
   Sheet,
   Toggle,
 } from '../components';
+import { useAuth } from '../auth/AuthContext';
 import * as D from '../data/sampleData';
+import { formatDobDisplay, parseDobInput } from '../data/leapEngine';
 import { Bong, BongFace } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
+import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
 
@@ -149,13 +152,35 @@ function SettingRow({
 export function MeScreen() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
+  const auth = useAuth();
+  const { baby, displayName, state: st, saveBaby } = useBaby();
   const [reminders, setReminders] = useState(true);
   const [sheet, setSheet] = useState<null | 'baby' | 'invite' | 'units' | 'terms'>(null);
   const [units, setUnits] = useState('kg · cm');
   const [inviteMail, setInviteMail] = useState('');
-  const [babyName, setBabyName] = useState(D.BABY.name);
-  const [babyDob, setBabyDob] = useState('23/03/2026');
+  const [babyName, setBabyName] = useState(displayName);
+  const [babyDob, setBabyDob] = useState(baby ? formatDobDisplay(baby.dob) : '');
   const dark = ctx.theme === 'dark';
+  const dobOk = parseDobInput(babyDob);
+
+  const openBabySheet = () => {
+    setBabyName(baby?.name || displayName);
+    setBabyDob(baby ? formatDobDisplay(baby.dob) : '');
+    setSheet('baby');
+  };
+
+  const saveBabySheet = async () => {
+    const dobIso = parseDobInput(babyDob);
+    if (!dobIso) return;
+    await saveBaby({ name: babyName.trim(), dob: dobIso, gender: baby?.gender ?? '' });
+    setSheet(null);
+    ctx.toast('Đã lưu thông tin bé 💚');
+  };
+
+  const logout = async () => {
+    await auth.signOut();
+    ctx.goFlow('auth', { authStep: 'A1' });
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -214,11 +239,11 @@ export function MeScreen() {
 
       {/* Baby card */}
       <Card pad={16} style={{ marginBottom: 24 }}>
-        <Pressable onPress={() => setSheet('baby')} style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', gap: 14, opacity: pressed ? 0.7 : 1 }]}>
+        <Pressable onPress={openBabySheet} style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', gap: 14, opacity: pressed ? 0.7 : 1 }]}>
           <BongFace emotion="happy" size={54} ring />
           <View style={{ flex: 1 }}>
-            <Txt style={{ fontSize: 17, fontWeight: '700', color: colors.textPrimary }}>{D.BABY.name}</Txt>
-            <Txt style={{ fontSize: 13, color: colors.textMuted, marginTop: 2 }}>{D.BABY.gender} · {D.BABY.ageLabel}</Txt>
+            <Txt style={{ fontSize: 17, fontWeight: '700', color: colors.textPrimary }}>{displayName}</Txt>
+            <Txt style={{ fontSize: 13, color: colors.textMuted, marginTop: 2 }}>{(baby?.gender || 'Chưa rõ')} · {st.ageLabel}</Txt>
           </View>
           <Ic name="chevron" size={18} color={colors.textMuted} />
         </Pressable>
@@ -248,7 +273,7 @@ export function MeScreen() {
       </SettingsGroup>
 
       <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
-        <Pressable onPress={() => ctx.goFlow('auth', { authStep: 'A1' })} style={{ padding: 10 }}>
+        <Pressable onPress={logout} style={{ padding: 10 }}>
           <Txt style={{ color: colors.danger, fontWeight: '600', fontSize: 14.5 }}>Đăng xuất</Txt>
         </Pressable>
       </View>
@@ -258,14 +283,21 @@ export function MeScreen() {
     </ScrollView>
 
     {/* --- Sheets --- */}
-    <Sheet open={sheet === 'baby'} onClose={() => setSheet(null)} height="52%" title={D.BABY.name} sub="Thông tin bé">
+    <Sheet open={sheet === 'baby'} onClose={() => setSheet(null)} height="52%" title={displayName} sub="Thông tin bé">
       <View style={{ gap: 14, paddingTop: 6 }}>
         <View style={{ alignItems: 'center' }}>
           <BongFace emotion="happy" size={72} ring />
         </View>
-        <Input label="Tên bé" value={babyName} onChange={setBabyName} />
-        <Input label="Ngày sinh" value={babyDob} onChange={setBabyDob} />
-        <ButtonPrimary onPress={() => { setSheet(null); ctx.toast('Đã lưu thông tin bé 💚'); }}>Lưu thay đổi</ButtonPrimary>
+        <Input label="Tên bé" value={babyName} onChange={setBabyName} placeholder="VD: Bống" />
+        <Input
+          label="Ngày sinh"
+          value={babyDob}
+          onChange={setBabyDob}
+          type="tel"
+          placeholder="DD/MM/YYYY"
+          error={babyDob.length >= 8 && !dobOk ? 'Ngày sinh chưa đúng — nhập dạng DD/MM/YYYY nhé' : ''}
+        />
+        <ButtonPrimary disabled={!dobOk} onPress={saveBabySheet}>Lưu thay đổi</ButtonPrimary>
       </View>
     </Sheet>
 

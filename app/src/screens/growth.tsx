@@ -23,6 +23,7 @@ import {
 import * as D from '../data/sampleData';
 import { Bong, BongFace } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
+import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
 
@@ -115,6 +116,7 @@ export function GrowthScreen() {
   const ctx = useApp();
   const [metric, setMetric] = useState<Metric>('weight');
   const { BABY } = D;
+  const { state: st } = useBaby();
   const META: Record<Metric, { latest: string; sub: string; band: string }> = {
     weight: { latest: `${BABY.weight} kg`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
     height: { latest: `${BABY.height} cm`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
@@ -123,7 +125,10 @@ export function GrowthScreen() {
     diaper: { latest: '6 tã/ngày', sub: 'Tã ướt đều đặn = bé bú đủ 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
   };
   const m = META[metric];
-  const stat = D.DAILY_STATS.find((s) => s.id === metric);
+  // sample "today" logs merged with the typical range for THIS baby's real age
+  const baseStat = D.DAILY_STATS.find((s) => s.id === metric);
+  const ageRange = baseStat ? st.statRanges[metric as 'feed' | 'sleep' | 'diaper'] : null;
+  const stat = baseStat && ageRange ? { ...baseStat, lo: ageRange.lo, hi: ageRange.hi, range: ageRange.range } : undefined;
   const inRange = stat ? stat.num >= stat.lo && stat.num <= stat.hi : false;
   const pos = stat ? Math.min(100, Math.max(0, ((stat.num - stat.lo) / (stat.hi - stat.lo)) * 60 + 20)) : 0;
   const dailyLog = stat
@@ -215,7 +220,7 @@ export function GrowthScreen() {
           <GrowthChart metric={metric} />
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingHorizontal: 2 }}>
             <Txt style={{ fontSize: 11.5, color: colors.textMuted, fontWeight: '600' }}>Mới sinh</Txt>
-            <Txt style={{ fontSize: 11.5, color: colors.textMuted, fontWeight: '600' }}>Hiện tại · {BABY.ageLabel}</Txt>
+            <Txt style={{ fontSize: 11.5, color: colors.textMuted, fontWeight: '600' }}>Hiện tại · {st.ageLabel}</Txt>
           </View>
         </Card>
 

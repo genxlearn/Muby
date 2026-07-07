@@ -64,13 +64,17 @@ export function useApp(): AppCtx {
 export function AppProvider({
   themeMode,
   setThemeMode,
+  initialRoute,
   children,
 }: {
   themeMode: ThemeMode;
   setThemeMode: (m: ThemeMode) => void;
+  initialRoute?: Route;
   children: React.ReactNode;
 }) {
-  const [route, setRoute] = useState<Route>({ flow: 'auth', tab: 'today', stack: null, authStep: 'A1' });
+  const [route, setRoute] = useState<Route>(
+    initialRoute ?? { flow: 'auth', tab: 'today', stack: null, authStep: 'A1' }
+  );
   const [sheet, setSheet] = useState<Sheet>(null);
   const [toastVal, setToastVal] = useState<Toast | null>(null);
   const [intensity, setIntensity] = useState(2);

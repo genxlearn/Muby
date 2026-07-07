@@ -209,7 +209,7 @@ export const LOG_HISTORY: LogGroup[] = [
 ];
 
 export interface CalendarWeek { w: number; n: number; current: boolean }
-export function buildCalendar(): CalendarWeek[] {
+export function buildCalendar(currentWeek: number = BABY.ageWeeks): CalendarWeek[] {
   const weeks: CalendarWeek[] = [];
   for (let w = 1; w <= 77; w++) {
     let n = 1;
@@ -219,7 +219,7 @@ export function buildCalendar(): CalendarWeek[] {
         n = Math.max(2, 5 - Math.round(Math.abs(w - mid) * 1.3));
       }
     }
-    weeks.push({ w, n, current: w === BABY.ageWeeks });
+    weeks.push({ w, n, current: w === currentWeek });
   }
   return weeks;
 }
