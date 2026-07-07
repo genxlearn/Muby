@@ -16,29 +16,30 @@ const NAV_ITEMS: { id: Tab; icon: IconName; label: string }[] = [
 ];
 
 /** Height the floating nav needs at the bottom of scrollable tab content. */
-export const NAV_CLEARANCE = 118;
+export const NAV_CLEARANCE = 142;
 
 export function BottomNav({ active, onNav }: { active: Tab; onNav: (t: Tab) => void }) {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
-  // hex canvas + alpha — approximates the CSS color-mix fade above the pill
+  // content fades into the canvas color right above the pill
+  // (RN has no backdrop blur, so the pill itself must be opaque)
   const fadeTop = colors.bgCanvas + '00';
-  const fadeBottom = colors.bgCanvas + 'E0';
   return (
     <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
       <LinearGradient
         pointerEvents="none"
-        colors={[fadeTop, fadeBottom]}
+        colors={[fadeTop, colors.bgCanvas, colors.bgCanvas]}
+        locations={[0, 0.45, 1]}
         style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
       />
-      <View style={{ paddingTop: 28, paddingHorizontal: 18, paddingBottom: Math.max(insets.bottom, 14) + 8 }}>
+      <View pointerEvents="box-none" style={{ paddingTop: 34, paddingHorizontal: 18, paddingBottom: Math.max(insets.bottom, 14) + 8 }}>
         <View
           style={[
             {
               flexDirection: 'row',
               alignItems: 'center',
               gap: 4,
-              backgroundColor: colors.bgElevated + 'F0',
+              backgroundColor: colors.bgElevated,
               borderWidth: 1,
               borderColor: colors.borderSubtle,
               borderRadius: 999,
