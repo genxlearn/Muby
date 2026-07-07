@@ -37,7 +37,7 @@ function A1({ go, ctx }) {
         <div className="serif" style={{ fontSize: 38, fontWeight: 600, lineHeight: 1.05, marginTop: 18, color: 'var(--text-primary)' }}>Baby<br />Wonder Weeks</div>
         <div style={{ fontSize: 15.5, color: 'var(--text-secondary)', marginTop: 14, maxWidth: 280, lineHeight: 1.5 }}>Người chị thân thiết đồng hành cùng mama qua từng tuần của bé 💛</div>
       </div>
-      <div style={{ padding: '0 24px 30px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ padding: '0 24px 48px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         <ButtonPrimary onClick={() => go('A2')}>Đăng ký</ButtonPrimary>
         <ButtonSecondary onClick={() => go('A3')}>Đã có tài khoản? Đăng nhập</ButtonSecondary>
       </div>
@@ -59,7 +59,7 @@ function A2({ go }) {
     <AuthScaffold flowers={false}>
       <AppBar title="Tạo tài khoản" onBack={() => go('A1')} />
       <div style={{ padding: '0 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <Bong emotion="happy" onesie="sage" size={78} />
           <div className="serif" style={{ fontSize: 20, fontWeight: 600 }}>Chỉ mất 1 phút thôi.</div>
         </div>
@@ -78,7 +78,7 @@ function A2({ go }) {
             error={pw2 && !matchOk ? 'Mật khẩu chưa khớp 🤍' : ''} />
         </div>
         <div style={{ flex: 1 }} />
-        <div style={{ padding: '20px 0 16px' }}>
+        <div style={{ padding: '20px 0 44px' }}>
           <ButtonPrimary disabled={!valid} onClick={() => go('A4')}>Tạo tài khoản</ButtonPrimary>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', marginTop: 14, lineHeight: 1.5 }}>
             Khi tiếp tục, bạn đồng ý với <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Điều khoản</span> & <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Quyền riêng tư</span>.
@@ -112,7 +112,7 @@ function A3({ go, ctx }) {
           <ButtonText onClick={() => go('A5')} style={{ padding: 0 }}>Khôi phục mật khẩu?</ButtonText>
         </div>
         <div style={{ flex: 1 }} />
-        <div style={{ padding: '12px 0 16px' }}>
+        <div style={{ padding: '12px 0 44px' }}>
           <ButtonPrimary onClick={submit}>Đăng nhập</ButtonPrimary>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
             <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
@@ -200,14 +200,14 @@ function A5({ go }) {
     <AuthScaffold flowers={false}>
       <AppBar title="Khôi phục mật khẩu" onBack={() => go('A3')} />
       <div style={{ padding: '0 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <Bong emotion="snug" onesie="lavender" size={76} />
           <div style={{ fontSize: 14.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>Nhập số điện thoại, mình gửi mã để bạn đặt lại nhé.</div>
         </div>
         <Input label="Số điện thoại" prefix="+84" type="tel" value={phone} onChange={(v) => { setPhone(v); setErr(false); }} placeholder="912 345 678" />
         {err && <Banner icon="🤍" style={{ marginTop: 14 }}>SĐT chưa đăng ký. <span onClick={() => go('A2')} style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>Bạn muốn tạo tài khoản mới?</span></Banner>}
         <div style={{ flex: 1 }} />
-        <div style={{ padding: '12px 0 16px' }}>
+        <div style={{ padding: '12px 0 44px' }}>
           <ButtonPrimary disabled={!ok} onClick={() => phone.includes('000') ? setErr(true) : go('A6')}>Gửi mã xác nhận</ButtonPrimary>
         </div>
       </div>
@@ -239,7 +239,7 @@ function A6({ go, ctx }) {
     <AuthScaffold flowers={false}>
       <AppBar title="Đặt lại mật khẩu" onBack={() => go('A5')} />
       <div style={{ padding: '0 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontSize: 14.5, color: 'var(--text-secondary)', marginBottom: 18 }}>Nhập mã xác nhận vừa gửi tới máy bạn.</div>
+        <div style={{ fontSize: 14.5, color: 'var(--text-secondary)', marginBottom: 24 }}>Nhập mã xác nhận vừa gửi tới máy bạn.</div>
         <OtpBoxes value={otp} onChange={setOtp} success={otpOk} />
         <div style={{
           maxHeight: otpOk ? 320 : 0, opacity: otpOk ? 1 : 0, overflow: 'hidden',
@@ -252,7 +252,7 @@ function A6({ go, ctx }) {
           </div>
         </div>
         <div style={{ flex: 1 }} />
-        <div style={{ padding: '12px 0 16px' }}>
+        <div style={{ padding: '12px 0 44px' }}>
           <ButtonPrimary disabled={!valid} onClick={() => setDone(true)}>Lưu mật khẩu mới</ButtonPrimary>
         </div>
       </div>
@@ -280,7 +280,7 @@ function OB1({ go }) {
         <div className="serif" style={{ fontSize: 34, fontWeight: 600, lineHeight: 1.08, marginTop: 16 }}>Mừng mama<br />đã đến!</div>
         <div style={{ fontSize: 15, color: 'var(--text-secondary)', marginTop: 12, maxWidth: 290, lineHeight: 1.5 }}>Cùng nhau, mình sẽ hiểu bé hơn mỗi ngày — nhẹ nhàng và không vội vã.</div>
       </div>
-      <div style={{ padding: '0 24px 30px' }}><ButtonPrimary onClick={() => go('ob2')}>Bắt đầu</ButtonPrimary></div>
+      <div style={{ padding: '0 24px 48px' }}><ButtonPrimary onClick={() => go('ob2')}>Bắt đầu</ButtonPrimary></div>
     </AuthScaffold>
   );
 }
@@ -292,7 +292,7 @@ function OB2({ go }) {
     <AuthScaffold flowers={false}>
       <AppBar title="Chào bé yêu!" onBack={() => go('ob1')} />
       <div style={{ padding: '0 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}><Bong emotion="curious" onesie="sage" size={104} /></div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}><Bong emotion="curious" onesie="sage" size={104} /></div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Input label="Tên bé (không bắt buộc)" value={name} onChange={setName} placeholder="VD: Bống" />
           <Input label="Ngày sinh" value={dob} onChange={setDob} placeholder="DD / MM / YYYY" type="tel" rightSlot={<Ic name="cal" size={20} stroke="var(--text-muted)" />} />
@@ -305,7 +305,7 @@ function OB2({ go }) {
         </div>
         <Banner icon="💛" tone="soft" style={{ marginTop: 18 }}>Chỉ ngày sinh là cần thiết — còn lại để sau cũng được.</Banner>
         <div style={{ flex: 1 }} />
-        <div style={{ padding: '12px 0 16px' }}><ButtonPrimary disabled={!dob} onClick={() => go('ob3')}>Tiếp tục</ButtonPrimary></div>
+        <div style={{ padding: '12px 0 44px' }}><ButtonPrimary disabled={!dob} onClick={() => go('ob3')}>Tiếp tục</ButtonPrimary></div>
       </div>
     </AuthScaffold>
   );
@@ -324,7 +324,7 @@ function OB3({ go, ctx }) {
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', textAlign: 'center', marginBottom: 22, lineHeight: 1.5 }}>Mọi ghi chép sẽ được đồng bộ cho cả nhà.</div>
         <Input label="Email của bố" type="email" value={email} onChange={setEmail} placeholder="bo@email.com" />
         <div style={{ flex: 1 }} />
-        <div style={{ padding: '12px 0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ padding: '12px 0 44px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <ButtonPrimary onClick={() => { ctx.goFlow('app'); ctx.setTab('today'); }}>Gửi lời mời</ButtonPrimary>
           <ButtonText onClick={() => { ctx.goFlow('app'); ctx.setTab('today'); }} style={{ textAlign: 'center' }}>Để sau cũng được</ButtonText>
         </div>

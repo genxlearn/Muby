@@ -9,7 +9,9 @@ function GrowthChart({ metric }) {
   const sets = {
     weight: { lo: [3.0, 4.0, 4.8, 5.4, 5.9, 6.3, 6.6], hi: [4.2, 5.4, 6.4, 7.1, 7.7, 8.2, 8.6], user: [3.3, 4.3, 5.2, 5.8, 6.1, 6.4], unit: 'kg', max: 9, min: 2.5 },
     height: { lo: [49, 53, 56, 58, 60, 61.5, 63], hi: [53, 57, 60, 62.5, 64.5, 66, 67.5], user: [50, 54, 57, 59, 60.5, 61], unit: 'cm', max: 70, min: 47 },
-    head: { lo: [33, 35.5, 37, 38.5, 39.5, 40.3, 41], hi: [36, 38.5, 40, 41.5, 42.5, 43.3, 44], user: [34, 36.5, 38, 39.2, 39.8, 40.2], unit: 'cm', max: 45, min: 32 },
+    feed:   { lo: [560, 600, 640, 680, 700, 720, 720], hi: [900, 950, 1000, 1000, 1000, 1000, 1000], user: [580, 650, 720, 780, 700, 640], unit: 'ml/ngày', max: 1100, min: 450 },
+    sleep:  { lo: [14, 13.5, 13, 12.5, 12, 12, 12], hi: [17, 17, 16.5, 16.5, 16, 16, 16], user: [16, 15.5, 15, 14.5, 13.5, 14], unit: 'giờ/ngày', max: 18.5, min: 10.5 },
+    diaper: { lo: [6, 6, 5.5, 5, 5, 5, 5], hi: [10, 9.5, 9, 8.5, 8, 8, 8], user: [8, 7.5, 7, 6.5, 6, 6], unit: 'tã/ngày', max: 11, min: 3.5 },
   };
   const d = sets[metric];
   const n = d.hi.length;
@@ -35,40 +37,129 @@ function GrowthChart({ metric }) {
 function GrowthScreen({ ctx }) {
   const [metric, setMetric] = useState('weight');
   const { BABY } = BWW_DATA;
-  const latest = { weight: `${BABY.weight} kg`, height: `${BABY.height} cm`, head: `${BABY.head} cm` }[metric];
+  const META = {
+    weight: { latest: `${BABY.weight} kg`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
+    height: { latest: `${BABY.height} cm`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
+    feed: { latest: '640 ml/ngày', sub: 'Bé đang bú đủ — yên tâm nhé mama 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
+    sleep: { latest: '14 giờ/ngày', sub: 'Ngủ ít hơn chút trong leap là bình thường 💛', band: 'Khoảng thường gặp ở bé cùng tuổi' },
+    diaper: { latest: '6 tã/ngày', sub: 'Tã ướt đều đặn = bé bú đủ 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
+  };
+  const m = META[metric];
+  const stat = BWW_DATA.DAILY_STATS.find((s) => s.id === metric);
+
+  // nhật ký theo từng tab
+  const TYPE_MAP = { feed: 'feed', sleep: 'sleep', diaper: 'diaper' };
+  const MEASURE_LOG = [
+    { date: 'Hôm nay · 04/07', label: '6.4 kg · 61 cm' },
+    { date: '20/06', label: '6.1 kg · 60.5 cm' },
+    { date: '05/06', label: '5.8 kg · 59 cm' },
+  ];
+  const dailyLog = TYPE_MAP[metric]
+    ? BWW_DATA.LOG_HISTORY.map((g) => ({ date: g.date, items: g.items.filter((it) => it.type === TYPE_MAP[metric]) })).filter((g) => g.items.length)
+    : null;
+
   return (
     <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto' }}>
       <div style={{ padding: '6px 20px 0' }}>
-        <div className="serif" style={{ fontSize: 24, fontWeight: 600, marginBottom: 14 }}>Bé lớn lên</div>
-        <div style={{ display: 'flex', gap: 4, background: 'var(--bg-sunken)', borderRadius: 'var(--r-full)', padding: 4, marginBottom: 16 }}>
-          {[{ id: 'weight', label: 'Cân nặng' }, { id: 'height', label: 'Chiều cao' }, { id: 'head', label: 'Vòng đầu' }].map(t => (
-            <button key={t.id} onClick={() => setMetric(t.id)} style={{
-              flex: 1, padding: '9px 4px', borderRadius: 'var(--r-full)', fontSize: 13.5, fontWeight: 600,
-              background: metric === t.id ? 'var(--bg-elevated)' : 'transparent', color: metric === t.id ? 'var(--text-primary)' : 'var(--text-muted)',
-              boxShadow: metric === t.id ? 'var(--shadow-1)' : 'none',
-            }}>{t.label}</button>
+        <div className="serif" style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>Bé lớn lên</div>
+
+        <div style={{ fontSize: 15.5, fontWeight: 700, marginBottom: 12, padding: '0 2px' }}>Đường lớn của bé</div>
+        <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '-6px -20px 18px', padding: '6px 20px 10px' }}>
+          {[{ id: 'weight', label: 'Cân nặng' }, { id: 'height', label: 'Chiều cao' }, { id: 'feed', label: 'Cữ ăn' }, { id: 'sleep', label: 'Giấc ngủ' }, { id: 'diaper', label: 'Tã' }].map(t => (
+            <Chip key={t.id} active={metric === t.id} onClick={() => setMetric(t.id)}>{t.label}</Chip>
           ))}
         </div>
-        <Card pad={14} style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <span style={{ width: 14, height: 14, borderRadius: 4, background: 'var(--intensity-1)', opacity: 0.7 }} />
-            <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', fontWeight: 600 }}>Vùng khoẻ mạnh theo WHO</span>
-            <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--accent-primary)', fontWeight: 600 }}><span style={{ width: 16, height: 3, borderRadius: 2, background: 'var(--accent-primary)' }} />Bé</span>
-          </div>
-          <GrowthChart metric={metric} />
-        </Card>
+
+        {/* HÔM NAY — chỉ số đối chiếu của tab đang chọn (cữ ăn / ngủ / tã) */}
+        {stat && (() => {
+          const inRange = stat.num >= stat.lo && stat.num <= stat.hi;
+          const pos = Math.min(100, Math.max(0, ((stat.num - stat.lo) / (stat.hi - stat.lo)) * 60 + 20));
+          return (
+            <Card pad={16} style={{ marginBottom: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 'var(--r-md)', background: 'var(--bg-sunken)', display: 'grid', placeItems: 'center', fontSize: 20, flexShrink: 0 }}>{stat.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{stat.label}</div>
+                  <div style={{ fontSize: 16.5, fontWeight: 700, marginTop: 2 }}>{stat.value}</div>
+                </div>
+                {inRange &&
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 11px', borderRadius: 'var(--r-full)', background: 'var(--success-soft)', color: 'var(--success)', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                    <Ic name="check" size={13} sw={3} /> Trong khoảng
+                  </span>
+                }
+              </div>
+              <div style={{ marginTop: 14 }}>
+                <div style={{ position: 'relative', height: 8, borderRadius: 4, background: 'var(--bg-sunken)' }}>
+                  <div style={{ position: 'absolute', left: '20%', right: '20%', top: 0, bottom: 0, borderRadius: 4, background: 'var(--success-soft)' }} />
+                  <div style={{ position: 'absolute', left: `${pos}%`, top: -3, width: 14, height: 14, borderRadius: '50%', background: 'var(--accent-primary)', border: '2.5px solid var(--bg-elevated)', boxShadow: 'var(--shadow-1)', transform: 'translateX(-50%)' }} />
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.45 }}>{stat.range}</div>
+              </div>
+              <Banner icon="💛" tone="soft" style={{ marginTop: 12, fontSize: 12.5 }}>{stat.note}</Banner>
+            </Card>
+          );
+        })()}
+
+        {/* Số mới nhất — cho cân nặng / chiều cao */}
+        {!stat &&
         <Card pad={16} style={{ marginBottom: 24, background: 'var(--bg-accent-soft)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <BongFace emotion="blissful" size={56} ring />
             <div>
-              <div className="serif" style={{ fontSize: 26, fontWeight: 600 }}>{latest}</div>
-              <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 2 }}>Bé đang phát triển khoẻ mạnh 💚</div>
+              <div className="serif" style={{ fontSize: 26, fontWeight: 600 }}>{m.latest}</div>
+              <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 2 }}>{m.sub}</div>
             </div>
           </div>
         </Card>
+        }
+
+        {/* CHART */}
+        <Card pad={14} style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <span style={{ width: 14, height: 14, borderRadius: 4, background: 'var(--intensity-1)', opacity: 0.7 }} />
+            <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', fontWeight: 600 }}>{m.band}</span>
+            <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--accent-primary)', fontWeight: 600 }}><span style={{ width: 16, height: 3, borderRadius: 2, background: 'var(--accent-primary)' }} />Bé</span>
+          </div>
+          <GrowthChart metric={metric} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: 'var(--text-muted)', fontWeight: 600, marginTop: 6, padding: '0 2px' }}>
+            <span>Mới sinh</span><span>Hiện tại · {BWW_DATA.BABY.ageLabel}</span>
+          </div>
+        </Card>
+
+        {/* NHẬT KÝ theo tab */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, padding: '0 2px' }}>
+            <div style={{ fontSize: 15.5, fontWeight: 700 }}>Nhật ký {({ weight: 'đo lường', height: 'đo lường', feed: 'cữ ăn', sleep: 'giấc ngủ', diaper: 'tã' })[metric]}</div>
+            <ButtonText onClick={() => ctx.go('history')} style={{ padding: 0 }}>Xem tất cả →</ButtonText>
+          </div>
+          {dailyLog ? (
+            dailyLog.length ? dailyLog.map((g, gi) => (
+              <div key={gi} style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-muted)', margin: '0 2px 8px' }}>{g.date}</div>
+                <Card pad={6}>
+                  {g.items.map((it, i) => (
+                    <div key={i} style={{ borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
+                      <ListRow icon={it.icon} title={it.label} right={<span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{it.time}</span>} />
+                    </div>
+                  ))}
+                </Card>
+              </div>
+            )) : (
+              <Card pad={16}><div style={{ fontSize: 13.5, color: 'var(--text-muted)', textAlign: 'center' }}>Chưa có ghi chép hôm nay. Cứ thong thả mama 💛</div></Card>
+            )
+          ) : (
+            <Card pad={6}>
+              {MEASURE_LOG.map((r, i) => (
+                <div key={i} style={{ borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
+                  <ListRow icon="📏" title={r.label} sub={r.date} right={<Ic name="chevron" size={16} stroke="var(--text-muted)" />} />
+                </div>
+              ))}
+            </Card>
+          )}
+        </div>
       </div>
       <div style={{ padding: '0 20px 16px' }}>
-        <ButtonPrimary onClick={() => ctx.go('measure')}>+ Thêm đo lường</ButtonPrimary>
+        <ButtonPrimary onClick={() => metric === 'weight' || metric === 'height' ? ctx.go('measure') : ctx.openSheet('quicklog')}>{metric === 'weight' || metric === 'height' ? '+ Thêm đo lường' : '+ Ghi nhanh'}</ButtonPrimary>
       </div>
     </div>
   );
@@ -94,7 +185,7 @@ function MeasureScreen({ ctx }) {
           ))}
         </div>
       )}
-      <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '0 24px 16px', display: 'flex', flexDirection: 'column' }}>
+      <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '0 24px 44px', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}><Bong emotion="happy" onesie="orange" size={100} float /></div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Input label="Ngày đo" value="Hôm nay · 05/06/2026" onChange={() => {}} rightSlot={<Ic name="cal" size={20} stroke="var(--text-muted)" />} />
@@ -121,15 +212,15 @@ function HistoryScreen({ ctx }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <AppBar title="Nhật ký của bé" onBack={ctx.back} />
-      <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 20px 14px' }}>
+      <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '6px 20px 14px', marginTop: -6 }}>
         {chips.map(([id, label]) => <Chip key={id} active={filter === id} onClick={() => setFilter(id)}>{label}</Chip>)}
       </div>
-      <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '0 20px 16px' }}>
+      <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '0 20px 40px' }}>
         {groups.length === 0 ? (
           <EmptyState emotion="snug" onesie="cream" heading="Chưa có ghi chép nào" helper="Cứ thong thả mama 💛 Mọi khoảnh khắc sẽ được lưu ở đây." />
         ) : groups.map((g, gi) => (
           <div key={gi} style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-muted)', margin: '4px 2px 8px', letterSpacing: 0.3 }}>{g.date}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-muted)', margin: '0 2px 12px', letterSpacing: 0.3 }}>{g.date}</div>
             <Card pad={6}>
               {g.items.map((it, i) => (
                 <div key={i} style={{ borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
@@ -150,7 +241,7 @@ function LibraryScreen({ ctx }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <AppBar title="Thư viện" onBack={ctx.back} />
-      <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '0 20px 16px' }}>
+      <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '0 20px 40px' }}>
         <div style={{ borderRadius: 'var(--r-xl)', overflow: 'hidden', background: 'var(--accent-primary)', padding: 20, color: 'var(--text-on-accent)', marginBottom: 24, position: 'relative' }}>
           <FlowerField items={[{ x: 250, y: -6, s: 60, c: 'rgba(255,255,255,0.18)', r: 10 }, { x: 300, y: 90, s: 40, c: 'rgba(255,255,255,0.14)' }]} />
           <div style={{ position: 'relative' }}>
@@ -159,7 +250,7 @@ function LibraryScreen({ ctx }) {
             <div style={{ fontSize: 13, opacity: 0.9, marginTop: 10 }}>4 phút đọc · dành cho mama</div>
           </div>
         </div>
-        <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 20 }}>
+        <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '-6px -20px 14px', padding: '6px 20px 10px' }}>
           {[['leap', 'Theo Leap'], ['age', 'Theo Tuổi'], ['saved', 'Đã lưu'], ['all', 'Tất cả']].map(([id, l]) => <Chip key={id} active={tab === id} onClick={() => setTab(id)}>{l}</Chip>)}
         </div>
         {tab === 'saved' ? (

@@ -1,6 +1,7 @@
 /* ============================================================
    SCREEN 9A Notifications · 9B Profile/Me · Premium Paywall
-   Ported from project/screens/me.jsx.
+   · Market tab (Coming Soon)
+   Ported from project/screens/me.jsx (Muby App Final).
    ============================================================ */
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
@@ -11,6 +12,8 @@ import {
   ButtonText,
   Card,
   Ic,
+  Input,
+  NAV_CLEARANCE,
   Sheet,
   Toggle,
 } from '../components';
@@ -68,7 +71,7 @@ export function NotificationsScreen() {
   return (
     <View style={{ flex: 1 }}>
       <AppBar title="Thông báo" onBack={ctx.back} />
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 16 }}>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}>
         <NotifGroup title="Hôm nay" items={NOTIFS.today} />
         <NotifGroup title="Trước đó" items={NOTIFS.earlier} />
         <Txt style={{ textAlign: 'center', paddingVertical: 16, color: colors.textMuted, fontSize: 13 }}>
@@ -100,34 +103,44 @@ function SettingRow({
   sub,
   right,
   first = false,
+  onPress,
 }: {
   icon: string;
   label: string;
   sub?: string;
   right?: React.ReactNode;
   first?: boolean;
+  onPress?: () => void;
 }) {
   const { colors } = useTheme();
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-        paddingVertical: 12,
-        paddingHorizontal: 8,
-        borderTopWidth: first ? 0 : 1,
-        borderTopColor: colors.borderSubtle,
-      }}
-    >
+  const rowStyle = {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    minHeight: 48,
+    borderTopWidth: first ? 0 : 1,
+    borderTopColor: colors.borderSubtle,
+  };
+  const content = (
+    <>
       <Txt style={{ fontSize: 18, width: 24, textAlign: 'center' }}>{icon}</Txt>
       <View style={{ flex: 1 }}>
         <Txt style={{ fontSize: 15, fontWeight: '500', color: colors.textPrimary }}>{label}</Txt>
         {sub ? <Txt style={{ fontSize: 12.5, color: colors.textMuted, marginTop: 1 }}>{sub}</Txt> : null}
       </View>
       {right}
-    </View>
+    </>
   );
+  if (onPress) {
+    return (
+      <Pressable onPress={onPress} style={({ pressed }) => [rowStyle, { opacity: pressed ? 0.7 : 1 }]}>
+        {content}
+      </Pressable>
+    );
+  }
+  return <View style={rowStyle}>{content}</View>;
 }
 
 /* ============================================================
@@ -137,10 +150,16 @@ export function MeScreen() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
   const [reminders, setReminders] = useState(true);
+  const [sheet, setSheet] = useState<null | 'baby' | 'invite' | 'units' | 'terms'>(null);
+  const [units, setUnits] = useState('kg · cm');
+  const [inviteMail, setInviteMail] = useState('');
+  const [babyName, setBabyName] = useState(D.BABY.name);
+  const [babyDob, setBabyDob] = useState('23/03/2026');
   const dark = ctx.theme === 'dark';
 
   return (
-    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 6, paddingHorizontal: 20, paddingBottom: 16 }}>
+    <View style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 6, paddingHorizontal: 20, paddingBottom: 44 }}>
       <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, marginBottom: 16 }}>Mama & Bống</Txt>
 
       {/* Premium / trial state */}
@@ -174,9 +193,9 @@ export function MeScreen() {
           </View>
           <Txt serif style={{ fontSize: 22, fontWeight: '600', color: colors.bgCanvas }}>Wonder Premium</Txt>
           <Txt style={{ fontSize: 13.5, color: colors.bgCanvas, opacity: 0.7, marginTop: 4, fontWeight: '600' }}>199.000đ · Một lần · Trọn đời</Txt>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginTop: 14 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
             {['10 leaps đầy đủ', 'Sunny Play', '3 tiếng ồn trắng', 'Đồng bộ gia đình'].map((p) => (
-              <View key={p} style={{ backgroundColor: 'rgba(255,255,255,0.14)', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 999 }}>
+              <View key={p} style={{ backgroundColor: colors.bgCanvas + '33', borderWidth: 1, borderColor: colors.bgCanvas + '4D', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 999 }}>
                 <Txt style={{ fontSize: 11.5, fontWeight: '600', color: colors.bgCanvas }}>{p}</Txt>
               </View>
             ))}
@@ -187,7 +206,7 @@ export function MeScreen() {
           >
             <Txt style={{ fontWeight: '700', fontSize: 15, color: '#fff' }}>Dùng thử miễn phí 1 tháng</Txt>
           </Pressable>
-          <Txt style={{ fontSize: 11.5, color: colors.bgCanvas, opacity: 0.55, marginTop: 10 }}>
+          <Txt style={{ fontSize: 11.5, color: colors.bgCanvas, opacity: 0.55, marginTop: 12 }}>
             Không cần thẻ. Không tự gia hạn. Sau 1 tháng: 199.000đ trọn đời hoặc dùng bản Free.
           </Txt>
         </View>
@@ -195,20 +214,20 @@ export function MeScreen() {
 
       {/* Baby card */}
       <Card pad={16} style={{ marginBottom: 24 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <Pressable onPress={() => setSheet('baby')} style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', gap: 14, opacity: pressed ? 0.7 : 1 }]}>
           <BongFace emotion="happy" size={54} ring />
           <View style={{ flex: 1 }}>
             <Txt style={{ fontSize: 17, fontWeight: '700', color: colors.textPrimary }}>{D.BABY.name}</Txt>
             <Txt style={{ fontSize: 13, color: colors.textMuted, marginTop: 2 }}>{D.BABY.gender} · {D.BABY.ageLabel}</Txt>
           </View>
           <Ic name="chevron" size={18} color={colors.textMuted} />
-        </View>
+        </Pressable>
       </Card>
 
       {/* Caregivers */}
       <SettingsGroup title="Người chăm bé">
         <SettingRow first icon="👩" label="Mama (bạn)" sub="Chủ tài khoản" />
-        <SettingRow icon="➕" label="Mời bố vào cùng" sub="Đồng bộ mọi ghi chép" right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
+        <SettingRow icon="➕" label="Mời bố vào cùng" sub="Đồng bộ mọi ghi chép" onPress={() => setSheet('invite')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
       </SettingsGroup>
 
       {/* Display */}
@@ -219,13 +238,13 @@ export function MeScreen() {
       {/* Info & reminders */}
       <SettingsGroup title="Thông tin & Nhắc">
         <SettingRow first icon="🔔" label="Nhắc nhẹ nhàng" sub="Cữ ăn, giấc ngủ" right={<Toggle on={reminders} onPress={() => setReminders((r) => !r)} />} />
-        <SettingRow icon="📏" label="Đơn vị đo" sub="kg · cm" right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
+        <SettingRow icon="📏" label="Đơn vị đo" sub={units} onPress={() => setSheet('units')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
       </SettingsGroup>
 
       {/* About */}
       <SettingsGroup title="Về Baby Wonder Weeks">
-        <SettingRow first icon="💛" label="Đánh giá ứng dụng" right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
-        <SettingRow icon="📄" label="Điều khoản & Quyền riêng tư" right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
+        <SettingRow first icon="💛" label="Đánh giá ứng dụng" onPress={() => ctx.toast('Cảm ơn mama! Chờ chút để mở App Store nhé 💛')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
+        <SettingRow icon="📄" label="Điều khoản & Quyền riêng tư" onPress={() => setSheet('terms')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
       </SettingsGroup>
 
       <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
@@ -237,6 +256,80 @@ export function MeScreen() {
         <Txt style={{ textAlign: 'center', color: colors.textMuted, fontSize: 12 }}>Baby Wonder Weeks v3 · 1.0.0</Txt>
       </Pressable>
     </ScrollView>
+
+    {/* --- Sheets --- */}
+    <Sheet open={sheet === 'baby'} onClose={() => setSheet(null)} height="52%" title={D.BABY.name} sub="Thông tin bé">
+      <View style={{ gap: 14, paddingTop: 6 }}>
+        <View style={{ alignItems: 'center' }}>
+          <BongFace emotion="happy" size={72} ring />
+        </View>
+        <Input label="Tên bé" value={babyName} onChange={setBabyName} />
+        <Input label="Ngày sinh" value={babyDob} onChange={setBabyDob} />
+        <ButtonPrimary onPress={() => { setSheet(null); ctx.toast('Đã lưu thông tin bé 💚'); }}>Lưu thay đổi</ButtonPrimary>
+      </View>
+    </Sheet>
+
+    <Sheet open={sheet === 'invite'} onClose={() => setSheet(null)} height="46%" title="Mời bố vào cùng" sub="Bố cũng thấy mọi ghi chép, dự báo của bé">
+      <View style={{ gap: 14, paddingTop: 6 }}>
+        <Input label="Email của bố" type="email" placeholder="bo@email.com" value={inviteMail} onChange={setInviteMail} />
+        <ButtonPrimary
+          disabled={!inviteMail.includes('@')}
+          onPress={() => { setSheet(null); setInviteMail(''); ctx.toast('Đã gửi lời mời tới bố 💛'); }}
+        >
+          Gửi lời mời
+        </ButtonPrimary>
+        <ButtonText onPress={() => setSheet(null)} style={{ alignSelf: 'center' }} textStyle={{ textAlign: 'center' }}>
+          Để sau cũng được
+        </ButtonText>
+      </View>
+    </Sheet>
+
+    <Sheet open={sheet === 'units'} onClose={() => setSheet(null)} height="38%" title="Đơn vị đo">
+      <View style={{ gap: 10, paddingTop: 6 }}>
+        {['kg · cm', 'lb · in'].map((u) => (
+          <Pressable
+            key={u}
+            onPress={() => { setUnits(u); setSheet(null); ctx.toast('Đã đổi đơn vị đo'); }}
+            style={({ pressed }) => [
+              {
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 15,
+                paddingHorizontal: 16,
+                minHeight: 52,
+                borderRadius: radii.md,
+                backgroundColor: units === u ? colors.bgAccentSoft : colors.bgSunken,
+                borderWidth: 1.5,
+                borderColor: units === u ? colors.accentPrimary : 'transparent',
+                opacity: pressed ? 0.8 : 1,
+              },
+            ]}
+          >
+            <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.textPrimary }}>{u}</Txt>
+            {units === u ? <Ic name="check" size={19} sw={2.4} color={colors.accentPrimary} /> : null}
+          </Pressable>
+        ))}
+      </View>
+    </Sheet>
+
+    <Sheet open={sheet === 'terms'} onClose={() => setSheet(null)} height="62%" title="Điều khoản & Quyền riêng tư">
+      <View style={{ gap: 12, paddingTop: 4 }}>
+        <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+          <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Dữ liệu của bé là của bạn.</Txt> Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, ảnh) thuộc về bạn mãi mãi — kể cả khi không dùng Premium.
+        </Txt>
+        <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+          <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Không bán dữ liệu.</Txt> Chúng mình không chia sẻ thông tin của bạn và bé cho bên thứ ba.
+        </Txt>
+        <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+          <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Nội dung tham khảo.</Txt> Dự báo leap và gợi ý EASY mang tính tham khảo, không thay thế tư vấn y khoa. Khi lo lắng về sức khoẻ của bé, hãy hỏi bác sĩ nhi.
+        </Txt>
+        <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+          <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Premium một lần.</Txt> 199.000đ trọn đời. Không tự gia hạn, không phí ẩn.
+        </Txt>
+      </View>
+    </Sheet>
+    </View>
   );
 }
 
@@ -305,5 +398,31 @@ export function Paywall() {
         Không cần thẻ. Không tự gia hạn. Dữ liệu bé đã ghi luôn thuộc về bạn — mãi mãi.
       </Txt>
     </Sheet>
+  );
+}
+
+/* ============================================================
+   MARKET TAB — Coming Soon (sau MVP)
+   ============================================================ */
+export function MarketScreen() {
+  const { colors } = useTheme();
+  const ctx = useApp();
+  return (
+    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 6, paddingHorizontal: 20, paddingBottom: NAV_CLEARANCE }}>
+      <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, marginBottom: 24 }}>Market</Txt>
+      <View style={{ alignItems: 'center', paddingVertical: 32, paddingHorizontal: 24, gap: 6 }}>
+        <Bong emotion="curious" onesie="sage" size={160} float />
+        <View style={{ marginTop: 16, paddingVertical: 8, paddingHorizontal: 16, borderRadius: 999, backgroundColor: colors.bgAccentSoft }}>
+          <Txt style={{ fontSize: 12.5, fontWeight: '700', letterSpacing: 0.5, color: colors.accentPrimary }}>SẮP RA MẮT</Txt>
+        </View>
+        <Txt serif style={{ fontSize: 22, fontWeight: '600', color: colors.textPrimary, marginTop: 10 }}>Đồ tốt cho mẹ & bé</Txt>
+        <Txt style={{ fontSize: 14.5, color: colors.textSecondary, maxWidth: 260, textAlign: 'center', lineHeight: 22 }}>
+          Mình đang chuẩn bị góc mua sắm nhỏ — chỉ những món thật sự hữu ích theo từng leap của bé.
+        </Txt>
+        <ButtonSecondary style={{ marginTop: 20 }} onPress={() => ctx.toast('Đã ghi nhớ. Mình sẽ báo bạn ngay khi mở nhé 💛')}>
+          Báo mình khi mở nhé
+        </ButtonSecondary>
+      </View>
+    </ScrollView>
   );
 }

@@ -9,10 +9,12 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import Svg, { Circle, G } from 'react-native-svg';
 import { useTheme } from '../theme/ThemeContext';
 import { fontFamily } from '../theme/tokens';
 import { Txt } from '../theme/Txt';
 import { Ic } from './Icon';
+import { hasIcon3D, Icon3D } from './Icon3D';
 
 /* ---------- Buttons ---------- */
 export function ButtonPrimary({
@@ -45,7 +47,13 @@ export function ButtonPrimary({
           opacity: pressed ? 0.92 : 1,
           transform: [{ scale: pressed && !disabled ? 0.98 : 1 }],
         },
-        !disabled && shadows[2],
+        !disabled && {
+          shadowColor: '#F96B26',
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.32,
+          shadowRadius: 22,
+          elevation: 5,
+        },
         style,
       ]}
     >
@@ -140,31 +148,55 @@ export function Card({
   return <View style={base}>{children}</View>;
 }
 
-/** Muby gradient hero — gradient bg, white text, intensity band on top. */
+/** Decorative tone-on-tone pattern: soft concentric arcs + scattered dots. */
+function HeroPattern() {
+  return (
+    <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+      <Svg width="100%" height="100%" viewBox="0 0 353 200" preserveAspectRatio="xMaxYMin slice">
+        <G fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth={1.5}>
+          <Circle cx={335} cy={-10} r={52} />
+          <Circle cx={335} cy={-10} r={86} />
+          <Circle cx={335} cy={-10} r={122} />
+          <Circle cx={-14} cy={205} r={46} />
+          <Circle cx={-14} cy={205} r={78} />
+        </G>
+        <G fill="rgba(255,255,255,0.14)">
+          <Circle cx={52} cy={34} r={2.4} />
+          <Circle cx={120} cy={16} r={1.7} />
+          <Circle cx={205} cy={42} r={2} />
+          <Circle cx={86} cy={88} r={1.6} />
+          <Circle cx={290} cy={132} r={2.2} />
+          <Circle cx={180} cy={150} r={1.6} />
+        </G>
+      </Svg>
+    </View>
+  );
+}
+
+/** Muby gradient hero — vivid orange gradient + arc/dot pattern (Muby App Final). */
 export function HeroCard({
   children,
-  intensity,
   style,
   pad = 20,
 }: {
   children: React.ReactNode;
+  /** kept for call-site compatibility; the final design drops the intensity band */
   intensity?: number;
   style?: StyleProp<ViewStyle>;
   pad?: number;
 }) {
   const { colors, radii, shadows } = useTheme();
-  const lv = intensity ? (Math.min(5, Math.max(1, intensity)) as 1 | 2 | 3 | 4 | 5) : undefined;
   return (
     <View style={[{ borderRadius: radii.xl, overflow: 'hidden' }, shadows[3], style]}>
       <LinearGradient colors={colors.gradientHero} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ flex: 0 }}>
-        {lv && <View style={{ height: 5, backgroundColor: colors.intensity[lv] }} />}
+        <HeroPattern />
         <View style={{ padding: pad }}>{children}</View>
       </LinearGradient>
     </View>
   );
 }
 
-/* ---------- Chip ---------- */
+/* ---------- Chip — active is solid orange (Muby App Final) ---------- */
 export function Chip({
   children,
   active,
@@ -182,19 +214,26 @@ export function Chip({
       onPress={onPress}
       style={[
         {
-          paddingHorizontal: 16,
+          paddingHorizontal: 18,
           minHeight: 44,
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: 999,
-          backgroundColor: active ? colors.bgAccentSoft : colors.bgElevated,
+          backgroundColor: active ? colors.accentPrimary : colors.bgElevated,
           borderWidth: 1.5,
           borderColor: active ? colors.accentPrimary : colors.borderSubtle,
+        },
+        active && {
+          shadowColor: '#F96B26',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 12,
+          elevation: 4,
         },
         style,
       ]}
     >
-      <Txt style={{ fontSize: 14, fontWeight: '600', color: active ? colors.accentPrimary : colors.textSecondary }}>
+      <Txt style={{ fontSize: 14, fontWeight: '600', color: active ? '#fff' : colors.textSecondary }}>
         {children as any}
       </Txt>
     </Pressable>
@@ -336,7 +375,7 @@ export function Banner({
   const bg = tone === 'soft' ? colors.bgAccentSoft : colors.bgSunken;
   return (
     <View style={[{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: bg, borderRadius: radii.md }, style]}>
-      {icon ? <Txt style={{ fontSize: 16 }}>{icon}</Txt> : null}
+      {icon ? (hasIcon3D(icon) ? <Icon3D emo={icon} size={30} /> : <Txt style={{ fontSize: 16 }}>{icon}</Txt>) : null}
       <View style={{ flex: 1 }}>
         {typeof children === 'string' ? (
           <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20 }}>{children}</Txt>

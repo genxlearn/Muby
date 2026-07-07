@@ -110,7 +110,7 @@ function A1({ go }: StepProps) {
           Người chị thân thiết đồng hành cùng mama qua từng tuần của bé 💛
         </Txt>
       </View>
-      <View style={{ paddingHorizontal: 24, paddingBottom: 30, gap: 12 }}>
+      <View style={{ paddingHorizontal: 24, paddingBottom: 48, gap: 12 }}>
         <ButtonPrimary onPress={() => go('A2')}>Đăng ký</ButtonPrimary>
         <ButtonSecondary onPress={() => go('A3')}>Đã có tài khoản? Đăng nhập</ButtonSecondary>
       </View>
@@ -133,7 +133,7 @@ function A2({ go }: StepProps) {
     <AuthScaffold flowers={false}>
       <AppBar title="Tạo tài khoản" onBack={() => go('A1')} />
       <View style={{ paddingHorizontal: 24, flex: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <Bong emotion="happy" onesie="sage" size={78} />
           <Txt serif style={{ flex: 1, fontSize: 20, fontWeight: '600', color: colors.textPrimary }}>Chỉ mất 1 phút thôi.</Txt>
         </View>
@@ -161,7 +161,7 @@ function A2({ go }: StepProps) {
           />
         </View>
         <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 20, paddingBottom: 16 }}>
+        <View style={{ paddingTop: 20, paddingBottom: 44 }}>
           <ButtonPrimary disabled={!valid} onPress={() => go('A4')}>Tạo tài khoản</ButtonPrimary>
           <Txt style={{ fontSize: 12, color: colors.textMuted, textAlign: 'center', marginTop: 14, lineHeight: 18 }}>
             Khi tiếp tục, bạn đồng ý với <Txt style={{ color: colors.accentPrimary, fontWeight: '600' }}>Điều khoản</Txt> &{' '}
@@ -201,7 +201,7 @@ function A3({ go, ctx }: StepProps) {
           <ButtonText onPress={() => go('A5')} style={{ padding: 0 }}>Khôi phục mật khẩu?</ButtonText>
         </View>
         <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 16 }}>
+        <View style={{ paddingTop: 12, paddingBottom: 44 }}>
           <ButtonPrimary onPress={submit}>Đăng nhập</ButtonPrimary>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 20 }}>
             <View style={{ flex: 1, height: 1, backgroundColor: colors.borderSubtle }} />
@@ -341,7 +341,7 @@ function A5({ go }: StepProps) {
     <AuthScaffold flowers={false}>
       <AppBar title="Khôi phục mật khẩu" onBack={() => go('A3')} />
       <View style={{ paddingHorizontal: 24, flex: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <Bong emotion="snug" onesie="lavender" size={76} />
           <Txt style={{ flex: 1, fontSize: 14.5, color: colors.textSecondary, lineHeight: 22 }}>
             Nhập số điện thoại, mình gửi mã để bạn đặt lại nhé.
@@ -357,7 +357,7 @@ function A5({ go }: StepProps) {
           </Banner>
         ) : null}
         <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 16 }}>
+        <View style={{ paddingTop: 12, paddingBottom: 44 }}>
           <ButtonPrimary disabled={!ok} onPress={() => (phone.includes('000') ? setErr(true) : go('A6'))}>Gửi mã xác nhận</ButtonPrimary>
         </View>
       </View>
@@ -416,7 +416,7 @@ function A6({ go }: StepProps) {
           </View>
         ) : null}
         <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 16 }}>
+        <View style={{ paddingTop: 12, paddingBottom: 44 }}>
           <ButtonPrimary disabled={!valid} onPress={() => setDone(true)}>Lưu mật khẩu mới</ButtonPrimary>
         </View>
       </View>
@@ -452,7 +452,7 @@ function OB1({ go }: StepProps) {
           Cùng nhau, mình sẽ hiểu bé hơn mỗi ngày — nhẹ nhàng và không vội vã.
         </Txt>
       </View>
-      <View style={{ paddingHorizontal: 24, paddingBottom: 30 }}>
+      <View style={{ paddingHorizontal: 24, paddingBottom: 48 }}>
         <ButtonPrimary onPress={() => go('ob2')}>Bắt đầu</ButtonPrimary>
       </View>
     </AuthScaffold>
@@ -492,7 +492,7 @@ function OB2({ go }: StepProps) {
         </View>
         <Banner icon="💛" tone="soft" style={{ marginTop: 18 }}>Chỉ ngày sinh là cần thiết — còn lại để sau cũng được.</Banner>
         <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 16 }}>
+        <View style={{ paddingTop: 12, paddingBottom: 44 }}>
           <ButtonPrimary disabled={!dob} onPress={() => go('ob3')}>Tiếp tục</ButtonPrimary>
         </View>
       </View>
@@ -523,7 +523,7 @@ function OB3({ go, ctx }: StepProps) {
         </Txt>
         <Input label="Email của bố" type="email" value={email} onChange={setEmail} placeholder="bo@email.com" />
         <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 16, gap: 10 }}>
+        <View style={{ paddingTop: 12, paddingBottom: 44, gap: 10 }}>
           <ButtonPrimary onPress={finish}>Gửi lời mời</ButtonPrimary>
           <ButtonText onPress={finish} style={{ alignSelf: 'center' }}>Để sau cũng được</ButtonText>
         </View>

@@ -79,33 +79,33 @@ export const LEAPS: Leap[] = [
     ],
   },
   {
-    n: 4, world: 'Sự kiện', fullName: 'Thế giới sự kiện phức tạp', wk: 19, range: [14.5, 19.5],
-    skill: 'hiểu nguyên nhân → kết quả',
-    desc: 'Con bắt đầu hiểu rằng hành động tạo ra kết quả.\nRơi đồ chơi → tiếng động. Đẩy ti → sữa hết. Khóc → mẹ đến.\nNão bộ đang nâng cấp lớn — thật kỳ diệu!',
-    symptoms: ['Cho tay vào miệng', 'Ngủ ngày ngắn', 'Bám mẹ, nhát lạ'],
+    n: 4, world: 'Sự kiện', fullName: 'Bé bắt đầu hiểu "chuyện gì xảy ra tiếp theo"', wk: 19, range: [14.5, 19.5],
+    skill: 'hiểu một chuỗi hành động là một "câu chuyện" trọn vẹn',
+    desc: 'Trước đây với bé, mọi thứ là từng mảnh rời rạc. Giờ con bắt đầu hiểu chúng nối liền nhau:\nThả đồ chơi → nghe "cạch" → nhìn nó lăn đi. Với con đó là cả một khám phá!\nVì thế giới bỗng "nhiều chuyện" hơn hẳn, bé dễ mệt và cần mẹ hơn bình thường.',
+    symptoms: ['Khóc nhiều hơn bình thường', 'Bám mẹ không rời', 'Ngủ ngắn, hay tỉnh giấc', 'Bú thất thường'],
     actions: [
-      { emoji: '🍼', title: 'Bé ọc sữa / từ chối bú', why: 'Bé đang "nghiên cứu" nên dễ phân tâm lúc ăn. Không phải chán sữa!', what: 'Bú ít + thường xuyên hơn. Vỗ ợ 5-10 phút sau mỗi cữ bú. Bế thẳng 20 phút sau ăn.', hasSound: false },
-      { emoji: '🌙', title: 'Giấc ngủ ngày ngắn', why: 'Não bộ hoạt động mạnh → giấc bị chia nhỏ. Bé cần nhiều giấc ngắn hơn.', what: 'Phòng tối + ồn trắng + 24-26°C. Đặt bé xuống khi mắt lim dim, chưa ngủ hẳn.', hasSound: true },
-      { emoji: '🤱', title: 'Bé bám mẹ, nhát lạ', why: 'Bé MỚI hiểu "mẹ đi = mẹ mất." Đây là bước phát triển nhận thức quan trọng.', what: 'Bế địu da kề da. Chơi peek-a-boo để bé học "mẹ đi rồi mẹ quay lại."', hasSound: false },
+      { emoji: '🍼', title: 'Bé bú ít, hay nhả ti', why: 'Không phải bé chán sữa đâu. Thế giới đang quá thú vị — con mải "hóng chuyện" nên xao nhãng cả ăn.', what: 'Cho bú ở phòng yên tĩnh, ánh sáng dịu. Bú ít một nhưng nhiều lần trong ngày là được.', hasSound: false },
+      { emoji: '🌙', title: 'Bé ngủ ngắn, hay tỉnh dậy khóc', why: 'Não con đang "học bài mới" cả trong lúc ngủ — nhiều mẹ thấy đây là đoạn ngủ vất vả nhất năm đầu. Rồi sẽ qua!', what: 'Phòng tối, tiếng ồn trắng, đặt bé xuống khi mắt lim dim. Đừng ngại dỗ thêm — bé đang cần thật.', hasSound: true },
+      { emoji: '🤱', title: 'Bé khóc ngay khi mẹ đi khỏi', why: 'Bé vừa hiểu "mẹ mặc áo = mẹ sắp đi" — nhưng chưa hiểu mẹ sẽ quay lại. Con không nhõng nhẽo đâu.', what: 'Chơi ú òa mỗi ngày để con học "mất rồi lại có". Luôn chào bé khi đi, đừng lẻn — dù rất muốn!', hasSound: false },
     ],
     sunnyPlay: [
-      { title: 'Trốn tìm với khăn', desc: 'Che mặt rồi ló ra — bé học nguyên nhân → kết quả (che = mất, mở = có!).' },
-      { title: 'Rơi và nhặt', desc: 'Thả đồ vật từ bàn xuống. Bé sẽ mê nhìn — đang học lực hấp dẫn đấy!' },
-      { title: 'Nút bấm phát nhạc', desc: 'Đồ chơi bấm → phát nhạc. Bé hiểu "hành động mình tạo ra kết quả."' },
+      { title: 'Ú òa với khăn', desc: 'Che mặt rồi ló ra — con học được điều kỳ diệu: mất rồi sẽ lại có.' },
+      { title: 'Thả đồ — nhặt đồ', desc: 'Bé thả, mẹ nhặt, lặp đi lặp lại. Nhàm với mẹ — nhưng là bài học vật lý đầu đời của con!' },
+      { title: 'Hát bài có động tác', desc: 'Vừa hát vừa làm động tác quen thuộc — bé sẽ dần đoán được đoạn tiếp theo và cười khúc khích.' },
     ],
   },
   {
     n: 5, world: 'Quan hệ', fullName: 'Thế giới của khoảng cách & quan hệ', wk: 26, range: [22.5, 26.5],
     skill: 'nhận biết khoảng cách có ý nghĩa',
-    desc: 'Bé hiểu rằng mẹ có thể ĐI XA. Khoảng cách giờ đáng sợ. Separation anxiety bắt đầu — và hoàn toàn bình thường.',
+    desc: 'Bé chợt nhận ra: mẹ có thể đi xa khỏi con. Vì thế bé lo lắng khi xa mẹ — đây là dấu hiệu bé gắn bó với mẹ rất tốt, không phải hư.',
     symptoms: ['Khóc khi mẹ rời phòng', 'Giơ tay đòi bế', 'Không chịu người lạ'],
     actions: [
-      { emoji: '🚪', title: 'Bé khóc khi mẹ rời phòng', why: 'Con ĐÃ HIỂU mẹ có thể biến mất — nhưng CHƯA HIỂU mẹ sẽ quay lại.', what: 'Nói "Mẹ ra ngoài rồi quay lại nhé." Peek-a-boo ở cửa phòng. ĐỪNG lẻn đi.' },
+      { emoji: '🚪', title: 'Bé khóc khi mẹ rời phòng', why: 'Con ĐÃ HIỂU mẹ có thể biến mất — nhưng CHƯA HIỂU mẹ sẽ quay lại.', what: 'Nói "Mẹ ra ngoài rồi quay lại nhé" bằng giọng vui vẻ. Chơi ú òa ở cửa phòng. Đừng lẻn đi nhé.' },
       { emoji: '😰', title: 'Nhát lạ đột ngột', why: 'Bé phân biệt rõ "quen" và "lạ." Người lạ = nguy hiểm tiềm tàng trong logic của bé.', what: 'Cho người mới đến gần TỪ TỪ. Bé ngồi trong lòng mẹ khi gặp người lạ.' },
       { emoji: '🛏️', title: 'Thức đêm, đòi mẹ', why: 'Nửa đêm tỉnh dậy + không thấy mẹ = hoảng. Bé cần xác nhận mẹ vẫn ở đây.', what: 'Vỗ nhẹ, không bật đèn sáng. Giọng mẹ trầm, đều. Đặt áo mẹ cạnh bé.' },
     ],
     sunnyPlay: [
-      { title: 'Peek-a-boo nâng cao', desc: 'Trốn sau cửa, gọi tên bé, ló ra — bé học mẹ luôn quay lại!' },
+      { title: 'Ú òa sau cánh cửa', desc: 'Trốn sau cửa, gọi tên bé rồi ló ra — con học được rằng mẹ luôn quay lại!' },
       { title: 'Đặt tên mọi thứ', desc: 'Chỉ vào đồ vật và nói tên. Bé đang gắn "từ" vào "vật" rất nhanh.' },
       { title: 'Bò tìm kho báu', desc: 'Giấu đồ chơi dưới chăn. Bé tập bò tới và lật tìm — phần thưởng!' },
     ],
@@ -253,14 +253,35 @@ export const NOTIFS: { today: Notif[]; earlier: Notif[] } = {
   ],
 };
 
+/* intensity copy — v5: probabilistic forecast framing (không khẳng định chắc chắn) */
 export interface IntensityCopy { label: string; emoji: string; copy: string }
 export const INTENSITY_COPY: Record<number, IntensityCopy> = {
-  1: { label: 'Tuần nắng đẹp', emoji: '🌼', copy: 'Bé sẵn sàng học kỹ năng mới!' },
-  2: { label: 'Bé thoải mái', emoji: '💛', copy: 'Bé đang thoải mái — thời điểm tuyệt vời để chơi cùng con.' },
-  3: { label: 'Bé cần thêm hơi ấm', emoji: '🤍', copy: 'Bé cần thêm hơi ấm. Ôm nhiều hơn chút nhé.' },
-  4: { label: 'Hôm nay khá khó', emoji: '☁️', copy: 'Hôm nay khá khó — bạn không một mình ❤️' },
-  5: { label: 'Bé cần mama nhất', emoji: '🌧️', copy: 'Bé cần mama nhất hôm nay. Cứ ôm con thật chặt.' },
+  1: { label: 'Tuần nắng đẹp', emoji: '🌼', copy: 'Bé có thể sẵn sàng học kỹ năng mới — quan sát tín hiệu của con nhé.' },
+  2: { label: 'Thường dễ chịu', emoji: '💛', copy: 'Nhiều bé thoải mái ở giai đoạn này — nhưng mỗi bé một nhịp riêng.' },
+  3: { label: 'Có thể cần thêm hơi ấm', emoji: '🤍', copy: 'Bé có thể cần được ôm nhiều hơn chút hôm nay.' },
+  4: { label: 'Có thể khá khó', emoji: '☁️', copy: 'Hôm nay có thể không dễ dàng — bạn không một mình ❤️' },
+  5: { label: 'Bé có thể cần mama nhất', emoji: '🌧️', copy: 'Nếu bé khóc nhiều hơn — đó là leap, không phải do bạn. Cứ ôm con thật chặt.' },
 };
+
+/* leap phase — computed from day/total (đầu / đỉnh / cuối) */
+export interface LeapPhase { key: 'start' | 'peak' | 'end'; name: string; desc: string }
+export function leapPhase(day: number, total: number): LeapPhase {
+  const r = day / total;
+  if (r < 0.3) return { key: 'start', name: 'những ngày đầu', desc: 'Bé có thể khóc nhiều hơn, bám mẹ hơn, cáu kỉnh hơn — 3 dấu hiệu quen thuộc báo leap bắt đầu. Không phải do bạn làm gì cả.' };
+  if (r < 0.65) return { key: 'peak', name: 'đoạn giữa', desc: 'Đoạn "lên dốc" nhất — bé thường cần mẹ nhiều nhất lúc này. Ôm con nhiều không bao giờ là hư đâu.' };
+  return { key: 'end', name: 'đoạn cuối', desc: 'Sắp đến phần vui nhất: bé bắt đầu khoe kỹ năng mới. Để ý nhé — con sắp làm bạn bất ngờ đấy!' };
+}
+
+/* Chỉ số hôm nay — đối chiếu khoảng thường gặp ở bé 3–4 tháng */
+export interface DailyStat {
+  id: string; icon: string; label: string; value: string;
+  num: number; lo: number; hi: number; unit: string; range: string; note: string;
+}
+export const DAILY_STATS: DailyStat[] = [
+  { id: 'feed', icon: '🍼', label: 'Cữ ăn hôm nay', value: '5 cữ · 460ml', num: 5, lo: 5, hi: 8, unit: 'cữ', range: 'Bé 3–4 tháng thường bú 5–8 cữ mỗi ngày', note: 'Trong leap, bé có thể bú ít mỗi cữ nhưng đòi ăn nhiều lần — bình thường nhé mama.' },
+  { id: 'sleep', icon: '🌙', label: 'Giấc ngủ hôm nay', value: '3 giấc ngày · 14g tổng', num: 14, lo: 12, hi: 17, unit: 'giờ', range: 'Bé 3–4 tháng thường ngủ 12–17 giờ mỗi ngày', note: 'Ngủ ngắn hơn trong leap là chuyện rất thường gặp.' },
+  { id: 'diaper', icon: '💧', label: 'Tã hôm nay', value: '6 lần · 5 ướt, 1 bẩn', num: 6, lo: 5, hi: 8, unit: 'tã ướt', range: 'Bé bú đủ thường có 5–8 tã ướt mỗi ngày', note: 'Tã ướt đều đặn = bé đang bú đủ — dấu hiệu yên tâm nhất.' },
+];
 
 export const FORECAST_EMO: Record<number, Emotion> = {
   1: 'blissful', 2: 'happy', 3: 'uncertain', 4: 'crying', 5: 'crying',

@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -6,79 +7,82 @@ import { Txt } from '../theme/Txt';
 import { Ic, IconName } from './Icon';
 import type { Tab } from '../navigation/AppContext';
 
-/* ---------- Bottom Nav + raised FAB ---------- */
-const NAV_ITEMS: { id: Tab | 'fab'; icon?: IconName; label?: string }[] = [
+/* ---------- Bottom Nav — modern floating pill (Muby App Final) ---------- */
+const NAV_ITEMS: { id: Tab; icon: IconName; label: string }[] = [
   { id: 'today', icon: 'home', label: 'Hôm nay' },
   { id: 'leap', icon: 'leap', label: 'Leap' },
-  { id: 'fab' },
   { id: 'growth', icon: 'growth', label: 'Phát triển' },
-  { id: 'me', icon: 'me', label: 'Mama' },
+  { id: 'market', icon: 'market', label: 'Market' },
 ];
 
-export function BottomNav({ active, onNav, onFab }: { active: Tab; onNav: (t: Tab) => void; onFab: () => void }) {
+/** Height the floating nav needs at the bottom of scrollable tab content. */
+export const NAV_CLEARANCE = 118;
+
+export function BottomNav({ active, onNav }: { active: Tab; onNav: (t: Tab) => void }) {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
+  // hex canvas + alpha — approximates the CSS color-mix fade above the pill
+  const fadeTop = colors.bgCanvas + '00';
+  const fadeBottom = colors.bgCanvas + 'E0';
   return (
-    <View
-      style={[
-        {
-          flexDirection: 'row',
-          alignItems: 'flex-end',
-          justifyContent: 'space-around',
-          paddingTop: 8,
-          paddingHorizontal: 8,
-          paddingBottom: Math.max(insets.bottom, 12),
-          backgroundColor: colors.bgElevated,
-          borderTopWidth: 1,
-          borderTopColor: colors.borderSubtle,
-        },
-        shadows[2],
-      ]}
-    >
-      {NAV_ITEMS.map((it) =>
-        it.id === 'fab' ? (
-          <Pressable
-            key="fab"
-            onPress={onFab}
-            accessibilityLabel="Ghi nhanh"
-            style={{
-              width: 64,
-              height: 64,
-              borderRadius: 32,
-              backgroundColor: colors.accentPrimary,
+    <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+      <LinearGradient
+        pointerEvents="none"
+        colors={[fadeTop, fadeBottom]}
+        style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+      />
+      <View style={{ paddingTop: 28, paddingHorizontal: 18, paddingBottom: Math.max(insets.bottom, 14) + 8 }}>
+        <View
+          style={[
+            {
+              flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'center',
-              transform: [{ translateY: -18 }],
-              borderWidth: 4,
-              borderColor: colors.bgElevated,
-              shadowColor: '#D87242',
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.42,
-              shadowRadius: 20,
-              elevation: 8,
-            }}
-          >
-            <Ic name="plus" size={30} sw={2.4} color={colors.textOnAccent} />
-          </Pressable>
-        ) : (
-          <Pressable
-            key={it.id}
-            onPress={() => onNav(it.id as Tab)}
-            accessibilityLabel={it.label}
-            style={{ flex: 1, alignItems: 'center', gap: 3, paddingVertical: 6, minHeight: 48 }}
-          >
-            <Ic
-              name={it.icon as IconName}
-              size={25}
-              sw={active === it.id ? 2.2 : 1.8}
-              color={active === it.id ? colors.accentPrimary : colors.textMuted}
-            />
-            <Txt style={{ fontSize: 10.5, fontWeight: active === it.id ? '700' : '500', color: active === it.id ? colors.accentPrimary : colors.textMuted }}>
-              {it.label}
-            </Txt>
-          </Pressable>
-        )
-      )}
+              gap: 4,
+              backgroundColor: colors.bgElevated + 'F0',
+              borderWidth: 1,
+              borderColor: colors.borderSubtle,
+              borderRadius: 999,
+              padding: 6,
+            },
+            shadows[3],
+          ]}
+        >
+          {NAV_ITEMS.map((it) => {
+            const on = active === it.id;
+            return (
+              <Pressable
+                key={it.id}
+                onPress={() => onNav(it.id)}
+                accessibilityLabel={it.label}
+                style={[
+                  {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 7,
+                    minHeight: 48,
+                    borderRadius: 999,
+                    paddingHorizontal: on ? 18 : 6,
+                    backgroundColor: on ? colors.accentPrimary : 'transparent',
+                  },
+                  on
+                    ? {
+                        shadowColor: '#F96B26',
+                        shadowOffset: { width: 0, height: 6 },
+                        shadowOpacity: 0.35,
+                        shadowRadius: 16,
+                        elevation: 5,
+                      }
+                    : { flex: 1 },
+                ]}
+              >
+                <Ic name={it.icon} size={23} sw={on ? 2.4 : 1.8} color={on ? '#fff' : colors.textMuted} />
+                {on ? <Txt style={{ fontSize: 13, fontWeight: '700', color: '#fff' }}>{it.label}</Txt> : null}
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
     </View>
   );
 }

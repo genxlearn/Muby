@@ -22,7 +22,7 @@ function AppFlow({ ctx }) {
     today: () => <TodayScreen ctx={ctx} />,
     leap: () => (window.LeapScreen ? <LeapScreen ctx={ctx} /> : <Placeholder name="Leap" />),
     growth: () => (window.GrowthScreen ? <GrowthScreen ctx={ctx} /> : <Placeholder name="Tăng trưởng" />),
-    me: () => (window.MeScreen ? <MeScreen ctx={ctx} /> : <Placeholder name="Tôi" />),
+    market: () => (window.MarketScreen ? <MarketScreen ctx={ctx} /> : <Placeholder name="Market" />),
   };
   const STACKS = {
     leapdetail: () => (window.LeapDetailScreen ? <LeapDetailScreen ctx={ctx} /> : <Placeholder name="Leap chi tiết" />),
@@ -30,6 +30,8 @@ function AppFlow({ ctx }) {
     history: () => (window.HistoryScreen ? <HistoryScreen ctx={ctx} /> : <Placeholder name="Lịch sử ghi" />),
     library: () => (window.LibraryScreen ? <LibraryScreen ctx={ctx} /> : <Placeholder name="Thư viện" />),
     notifications: () => (window.NotificationsScreen ? <NotificationsScreen ctx={ctx} /> : <Placeholder name="Thông báo" />),
+    easy: () => (window.EasyScreen ? <EasyScreen ctx={ctx} /> : <Placeholder name="EASY" />),
+    me: () => (window.MeScreen ? <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}><AppBar title="" onBack={ctx.back} /><MeScreen ctx={ctx} /></div> : <Placeholder name="Mama" />),
   };
 
   if (route.flow === 'auth') return window.AuthFlow ? <AuthFlow ctx={ctx} /> : <Placeholder name="Auth" />;
@@ -39,7 +41,7 @@ function AppFlow({ ctx }) {
     return <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>{(STACKS[route.stack] || (() => <Placeholder name={route.stack} />))()}</div>;
   }
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative' }}>
       {(TABS[route.tab] || TABS.today)()}
       <BottomNav active={route.tab} onNav={(t) => ctx.setTab(t)} onFab={() => ctx.openSheet('quicklog')} />
     </div>

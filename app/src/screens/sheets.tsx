@@ -3,7 +3,7 @@
    ============================================================ */
 import React, { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
-import { Chip, Ic, Sheet } from '../components';
+import { Chip, Ic, Icon3D, Sheet } from '../components';
 import * as D from '../data/sampleData';
 import { BongFace, Emotion, Onesie } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
@@ -89,7 +89,7 @@ export function SoothingSheet({ open }: { open: boolean }) {
           return (
             <View key={s.id} style={{ width: 150, borderRadius: radii.lg, overflow: 'hidden', backgroundColor: colors.bgSunken, borderWidth: 1, borderColor: colors.borderSubtle }}>
               <View style={{ height: 86, backgroundColor: tintColor(s.tintKey), alignItems: 'center', justifyContent: 'center' }}>
-                <Txt style={{ fontSize: 38 }}>{s.emoji}</Txt>
+                <Icon3D emo={s.emoji} size={50} />
                 {locked ? (
                   <View style={{ position: 'absolute', top: 8, right: 8, flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: 'rgba(42,26,20,0.55)', borderRadius: 999, paddingVertical: 3, paddingHorizontal: 9 }}>
                     <Ic name="lock" size={11} sw={2.4} color="#fff" />

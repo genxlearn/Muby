@@ -1,10 +1,19 @@
 # Baby Wonder Weeks — React Native (Expo) implementation
 
-An iOS-first mobile app for Vietnamese new parents, implementing the **Baby
-Wonder Weeks v3** design (Muby design system, v4 leap-specific content, semi-3D
-Bống mascot, 1-month Premium trial). This is a faithful React Native port of the
-HTML/React prototype in `../project/` — recreated with native primitives,
-`react-native-svg`, a themed token system, and a light/dark theme toggle.
+An iOS-first mobile app for Vietnamese new parents, implementing the **Muby App
+Final** design (vivid-orange Muby theme, floating pill navigation, Icon3D
+gradient badges, phase-based leap forecast, semi-3D Bống mascot, 1-month
+Premium trial). This is a faithful React Native port of the HTML/React
+prototype in `../project/Muby App Final.html` — recreated with native
+primitives, `react-native-svg`, a themed token system, and a light/dark theme
+toggle.
+
+Highlights of the final revision: 4-tab floating nav (Hôm nay · Leap · Phát
+triển · Market), Mama profile via the Today avatar, compact phase-based Today
+hero with embedded 7-day forecast, symptoms grid + action-card carousel, a
+dedicated EASY explainer screen, Growth with 5 metrics + typical-range
+comparison, in-app sheets for baby info / invite / units / terms, and a Market
+"coming soon" tab.
 
 ## Stack
 

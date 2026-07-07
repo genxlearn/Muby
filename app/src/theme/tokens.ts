@@ -64,19 +64,21 @@ export interface ThemeColors {
 }
 
 const lightColors: ThemeColors = {
-  bgCanvas: '#FAF6EE',
+  /* Surfaces — bright, airy (Muby App Final) */
+  bgCanvas: '#FFF9F4',
   bgElevated: '#FFFFFF',
-  bgSunken: '#F2EBDD',
-  bgAccentSoft: '#FBE7D5',
+  bgSunken: '#F5F3F0',
+  bgAccentSoft: '#FFEDE0',
 
-  textPrimary: '#2A1A14',
-  textSecondary: '#6B5B52',
-  textMuted: '#A39989',
+  textPrimary: '#201A15',
+  textSecondary: '#6E655C',
+  textMuted: '#A89F96',
   textOnAccent: '#FFFFFF',
 
-  accentPrimary: '#D87242',
-  accentHover: '#C25E2F',
-  accentSoftBg: '#F4D5BD',
+  /* Brand — vivid orange */
+  accentPrimary: '#F96B26',
+  accentHover: '#E4570F',
+  accentSoftBg: '#FFD9C2',
 
   success: '#7A9A65',
   warning: '#D4A540',
@@ -85,11 +87,12 @@ const lightColors: ThemeColors = {
   warningSoft: '#FFF8E8',
   dangerSoft: '#FCEEEC',
 
-  gradientHero: ['#3D2A1F', '#5C3D2A'],
-  textOnHero: '#FAF6EE',
+  /* Gradient hero — vivid orange */
+  gradientHero: ['#FF9051', '#F96B26'],
+  textOnHero: '#FFFFFF',
 
-  borderSubtle: '#E8DECF',
-  borderDefault: '#D4C7B5',
+  borderSubtle: '#F0EBE5',
+  borderDefault: '#DED6CD',
 
   intensity: { 1: '#C8DFBC', 2: '#F0E6C8', 3: '#F5C842', 4: '#E07C3A', 5: '#C24A2A' },
   intensityInk: { 1: '#3E5530', 2: '#6B5A2E', 3: '#6B5410', 4: '#FAF6EE', 5: '#FAF6EE' },
@@ -110,18 +113,18 @@ const lightColors: ThemeColors = {
 };
 
 const darkColors: ThemeColors = {
-  bgCanvas: '#1A1410',
-  bgElevated: '#241D17',
-  bgSunken: '#15100C',
-  bgAccentSoft: '#4A2414',
+  bgCanvas: '#17120E',
+  bgElevated: '#221C16',
+  bgSunken: '#120E0A',
+  bgAccentSoft: '#47250F',
 
-  textPrimary: '#F5EFE2',
-  textSecondary: '#B8AC9B',
-  textMuted: '#7A6F62',
-  textOnAccent: '#1A1410',
+  textPrimary: '#F7F1EA',
+  textSecondary: '#B5ABA0',
+  textMuted: '#786E64',
+  textOnAccent: '#FFFFFF',
 
-  accentPrimary: '#E8895E',
-  accentHover: '#F0A07D',
+  accentPrimary: '#FF8A50',
+  accentHover: '#FFA070',
   accentSoftBg: '#3D2E22',
 
   success: '#8FB07A',
@@ -131,8 +134,8 @@ const darkColors: ThemeColors = {
   warningSoft: '#4E370F',
   dangerSoft: '#481A19',
 
-  gradientHero: ['#0F0C09', '#2A1D14'],
-  textOnHero: '#F5EFE2',
+  gradientHero: ['#C24E12', '#8C3407'],
+  textOnHero: '#FFF3EA',
 
   borderSubtle: '#2E251E',
   borderDefault: '#3A2F26',
@@ -155,8 +158,8 @@ const darkColors: ThemeColors = {
   onesieLavender: '#9C8FB0',
 };
 
-/* Radii */
-export const radii = { sm: 8, md: 12, lg: 20, xl: 28, full: 999 } as const;
+/* Radii — extra rounded (Muby App Final) */
+export const radii = { sm: 10, md: 16, lg: 24, xl: 32, full: 999 } as const;
 
 /* Spacing scale (8pt base) */
 export const spacing = {
@@ -168,13 +171,13 @@ export const spacing = {
 export type ShadowLevels = { 1: ViewStyle; 2: ViewStyle; 3: ViewStyle; 4: ViewStyle };
 
 function shadowsFor(mode: ThemeMode): ShadowLevels {
-  const color = mode === 'dark' ? '#000000' : '#2A1A14';
+  const color = mode === 'dark' ? '#000000' : '#201A15';
   const o = (light: number, dark: number) => (mode === 'dark' ? dark : light);
   return {
-    1: { shadowColor: color, shadowOffset: { width: 0, height: 1 }, shadowOpacity: o(0.04, 0.4), shadowRadius: 2, elevation: 1 },
-    2: { shadowColor: color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: o(0.06, 0.4), shadowRadius: 12, elevation: 3 },
-    3: { shadowColor: color, shadowOffset: { width: 0, height: 12 }, shadowOpacity: o(0.08, 0.45), shadowRadius: 24, elevation: 8 },
-    4: { shadowColor: color, shadowOffset: { width: 0, height: 20 }, shadowOpacity: o(0.12, 0.5), shadowRadius: 40, elevation: 16 },
+    1: { shadowColor: color, shadowOffset: { width: 0, height: 1 }, shadowOpacity: o(0.05, 0.4), shadowRadius: 3, elevation: 1 },
+    2: { shadowColor: color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: o(0.06, 0.4), shadowRadius: 14, elevation: 3 },
+    3: { shadowColor: color, shadowOffset: { width: 0, height: 14 }, shadowOpacity: o(0.08, 0.45), shadowRadius: 26, elevation: 8 },
+    4: { shadowColor: color, shadowOffset: { width: 0, height: 24 }, shadowOpacity: o(0.13, 0.5), shadowRadius: 44, elevation: 16 },
   };
 }
 

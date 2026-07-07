@@ -6,9 +6,10 @@ import React, { createContext, useContext, useRef, useState } from 'react';
 import { ThemeMode } from '../theme/tokens';
 
 export type Flow = 'auth' | 'onboard' | 'app';
-export type Tab = 'today' | 'leap' | 'growth' | 'me';
+export type Tab = 'today' | 'leap' | 'growth' | 'market';
 export type Stack =
-  | 'leapdetail' | 'measure' | 'history' | 'library' | 'notifications' | 'designsystem' | null;
+  | 'leapdetail' | 'measure' | 'history' | 'library' | 'notifications'
+  | 'easy' | 'me' | 'designsystem' | null;
 export type Sheet = 'quicklog' | 'soothing' | null;
 
 export interface Route {

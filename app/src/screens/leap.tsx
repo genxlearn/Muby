@@ -16,6 +16,7 @@ import {
   IntensityBadge,
   ListRow,
   MiniIntensityCurve,
+  NAV_CLEARANCE,
   Sheet,
   SubTabs,
 } from '../components';
@@ -25,7 +26,7 @@ import { BongFace, BongIntensity } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
-import { ActionCard, SunnyPlaySection, SymptomPills } from './shared';
+import { ActionCard, ForecastStrip, SunnyPlaySection, SymptomPills } from './shared';
 
 const clampLv = (n: number) => (Math.min(5, Math.max(1, n)) as 1 | 2 | 3 | 4 | 5);
 
@@ -44,58 +45,39 @@ function LeapToday() {
   const ctx = useApp();
   const { intensity } = ctx;
   const { CURRENT_LEAP, LEAP_DAY, LEAP_TOTAL } = D;
+  const PHASE = D.leapPhase(LEAP_DAY, LEAP_TOTAL);
   const sunny = intensity <= 2;
   const actions = CURRENT_LEAP.actions;
 
   return (
-    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 16 }}>
-      <View style={{ paddingTop: 14, paddingHorizontal: 20, gap: 24 }}>
-        {/* HERO — plain Card with intensity top band */}
+    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
+      <View style={{ paddingTop: 4, paddingHorizontal: 20, gap: 24 }}>
+        {/* HERO — phase-based framing (Muby App Final) */}
         <Card pad={0} style={{ overflow: 'hidden' }}>
           <View style={{ height: 5, backgroundColor: colors.intensity[clampLv(intensity)] }} />
           <View style={{ flexDirection: 'row', gap: 6, paddingVertical: 18, paddingHorizontal: 16 }}>
             <View style={{ flex: 1, minWidth: 0 }}>
-              <IntensityBadge level={intensity} size="lg" />
-              <Txt serif style={{ fontSize: 21, fontWeight: '600', lineHeight: 25, marginTop: 12, color: colors.textPrimary }}>
-                Leap {CURRENT_LEAP.n} · {CURRENT_LEAP.world}
+              <IntensityBadge level={intensity} size="md" />
+              <Txt serif style={{ fontSize: 21, fontWeight: '600', lineHeight: 26, marginTop: 12, color: colors.textPrimary }}>
+                Bé đang ở {PHASE.name} của Leap {CURRENT_LEAP.n}
               </Txt>
               <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20, marginTop: 6 }}>
-                Bé đang học: <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>{CURRENT_LEAP.skill}</Txt>
+                {PHASE.desc}
               </Txt>
               <Txt style={{ fontSize: 12, color: colors.textMuted, fontWeight: '600', marginTop: 8 }}>
-                Ngày {LEAP_DAY}/{LEAP_TOTAL}
+                Ngày {LEAP_DAY}/{LEAP_TOTAL} · còn ~{LEAP_TOTAL - LEAP_DAY} ngày
               </Txt>
             </View>
             <View style={{ alignSelf: 'flex-end' }}>
-              <BongIntensity level={intensity} size={140} float />
+              <BongIntensity level={intensity} size={128} float />
             </View>
           </View>
         </Card>
 
-        {/* FORECAST — inline, non-tappable */}
+        {/* FORECAST — swipeable strip */}
         <Card pad={14}>
-          <Txt style={{ fontSize: 13.5, fontWeight: '700', color: colors.textSecondary, marginBottom: 10 }}>7 ngày tới</Txt>
-          <View style={{ flexDirection: 'row', gap: 7, justifyContent: 'space-between' }}>
-            {D.FORECAST.map((d, i) => (
-              <View key={i} style={{ flex: 1, alignItems: 'center', gap: 6 }}>
-                <Txt style={{ fontSize: 11, fontWeight: '700', color: d.today ? colors.accentPrimary : colors.textMuted }}>{d.day}</Txt>
-                <View
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: colors.intensity[clampLv(d.n)],
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: d.today ? 2 : 0,
-                    borderColor: d.today ? colors.accentPrimary : 'transparent',
-                  }}
-                >
-                  <BongFace emotion={D.FORECAST_EMO[d.n]} size={27} />
-                </View>
-              </View>
-            ))}
-          </View>
+          <Txt style={{ fontSize: 13.5, fontWeight: '700', color: colors.textSecondary, marginBottom: 12 }}>7 ngày tới</Txt>
+          <ForecastStrip data={D.FORECAST} />
         </Card>
 
         {/* "ĐANG XẢY RA GÌ?" — tap to open detail */}
@@ -158,7 +140,7 @@ function LeapJourney() {
   const ctx = useApp();
   const { LEAPS, CURRENT_LEAP, BABY } = D;
   return (
-    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 16 }}>
+    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
       <View style={{ paddingTop: 16, paddingHorizontal: 20, position: 'relative' }}>
         {/* vertical line behind nodes */}
         <View style={{ position: 'absolute', left: 43, top: 24, bottom: 24, width: 2.5, backgroundColor: colors.borderSubtle }} />
@@ -224,7 +206,8 @@ function LeapCalendar() {
   const [pick, setPick] = useState<D.CalendarWeek | null>(null);
   const [legend, setLegend] = useState(true);
   return (
-    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 16 }}>
+    <View style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
       <View style={{ paddingTop: 16, paddingHorizontal: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
           <Txt style={{ fontSize: 14.5, fontWeight: '700', color: colors.textPrimary }}>77 tuần kỳ diệu</Txt>
@@ -266,6 +249,7 @@ function LeapCalendar() {
           ))}
         </View>
       </View>
+    </ScrollView>
 
       <Sheet
         open={!!pick}
@@ -284,7 +268,7 @@ function LeapCalendar() {
           </View>
         ) : null}
       </Sheet>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -333,7 +317,7 @@ export function LeapDetailScreen() {
           </Pressable>
         }
       />
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={{ paddingHorizontal: 20 }}>
           {/* HERO */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 12 }}>

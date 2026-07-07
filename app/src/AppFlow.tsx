@@ -1,16 +1,17 @@
 /* ============================================================
-   APP FLOW — router ported from app-clean.jsx AppFlow.
-   Immersive: Auth → Onboarding → App (tabs + stacks + sheets).
+   APP FLOW — router (Muby App Final).
+   Tabs: today · leap · growth · market (floating pill nav overlays content).
+   Me is a stack screen reached from the Today avatar.
    ============================================================ */
 import React from 'react';
 import { View } from 'react-native';
-import { BottomNav } from './components';
+import { AppBar, BottomNav } from './components';
 import { useApp } from './navigation/AppContext';
 import { AuthFlow, OnboardFlow } from './screens/auth';
 import { GrowthScreen, HistoryScreen, LibraryScreen, MeasureScreen } from './screens/growth';
 import { LeapDetailScreen, LeapScreen } from './screens/leap';
-import { MeScreen, NotificationsScreen } from './screens/me';
-import { TodayScreen } from './screens/Today';
+import { MarketScreen, MeScreen, NotificationsScreen } from './screens/me';
+import { EasyScreen, TodayScreen } from './screens/Today';
 import { DesignSystemScreen } from './screens/DesignSystem';
 
 export function AppFlow() {
@@ -27,6 +28,13 @@ export function AppFlow() {
       history: <HistoryScreen />,
       library: <LibraryScreen />,
       notifications: <NotificationsScreen />,
+      easy: <EasyScreen />,
+      me: (
+        <View style={{ flex: 1 }}>
+          <AppBar title="" onBack={ctx.back} />
+          <MeScreen />
+        </View>
+      ),
       designsystem: <DesignSystemScreen />,
     };
     return <View style={{ flex: 1 }}>{stacks[route.stack] ?? <TodayScreen />}</View>;
@@ -36,12 +44,12 @@ export function AppFlow() {
     today: <TodayScreen />,
     leap: <LeapScreen />,
     growth: <GrowthScreen />,
-    me: <MeScreen />,
+    market: <MarketScreen />,
   };
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>{tabs[route.tab] ?? <TodayScreen />}</View>
-      <BottomNav active={route.tab} onNav={(t) => ctx.setTab(t)} onFab={() => ctx.openSheet('quicklog')} />
+      {tabs[route.tab] ?? <TodayScreen />}
+      <BottomNav active={route.tab} onNav={(t) => ctx.setTab(t)} />
     </View>
   );
 }
