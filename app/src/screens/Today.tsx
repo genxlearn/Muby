@@ -15,6 +15,7 @@ import {
   AppBar,
   Banner,
   ButtonPrimary,
+  ButtonSecondary,
   ButtonText,
   Card,
   EmptyState,
@@ -182,11 +183,27 @@ export function TodayScreen() {
           </View>
         </HeroCard>
 
+        {/* ===== ALL-LEAPS-DONE celebration (empty state) ===== */}
+        {st.status === 'after-all' ? (
+          <Card pad={10}>
+            <EmptyState
+              size="sm"
+              emotion="blissful"
+              onesie="sage"
+              heading="10 leaps đã trọn vẹn 🎉"
+              helper="Bé đã đi qua mọi tuần kỳ diệu. Giờ mình cùng dõi theo bé lớn lên mỗi ngày nhé."
+              action={<ButtonSecondary onPress={() => ctx.setTab('growth')}>Xem bé lớn lên</ButtonSecondary>}
+            />
+          </Card>
+        ) : null}
+
         {/* ===== SYMPTOMS — 2-col grid with Bống faces ===== */}
-        {CURRENT_LEAP.symptoms.length > 0 ? (
+        {st.status !== 'after-all' && CURRENT_LEAP.symptoms.length > 0 ? (
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingHorizontal: 2 }}>
-              <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary }}>Biểu hiện thường thấy</Txt>
+              <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary }}>
+                {inLeap ? 'Biểu hiện thường thấy' : `Biểu hiện có thể gặp ở Leap ${CURRENT_LEAP.n}`}
+              </Txt>
               <ButtonText onPress={() => ctx.go('leapdetail')} style={{ padding: 0 }}>Cách giúp bé →</ButtonText>
             </View>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
@@ -222,10 +239,12 @@ export function TodayScreen() {
         ) : null}
 
         {/* ===== ACTION CARDS — horizontal carousel with full content ===== */}
-        {CURRENT_LEAP.actions.length > 0 ? (
+        {st.status !== 'after-all' && CURRENT_LEAP.actions.length > 0 ? (
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingHorizontal: 2 }}>
-              <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary }}>Giúp bé hợp tác ở Leap {CURRENT_LEAP.n}</Txt>
+              <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary }}>
+                {inLeap ? `Giúp bé hợp tác ở Leap ${CURRENT_LEAP.n}` : `Chuẩn bị cho Leap ${CURRENT_LEAP.n}`}
+              </Txt>
               <ButtonText onPress={() => ctx.go('leapdetail')} style={{ padding: 0 }}>Tất cả →</ButtonText>
             </View>
             <ScrollView

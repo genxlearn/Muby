@@ -11,6 +11,7 @@ import {
   ButtonSecondary,
   ButtonText,
   Card,
+  EmptyState,
   Ic,
   Input,
   NAV_CLEARANCE,
@@ -71,15 +72,24 @@ export function NotificationsScreen() {
   const { colors } = useTheme();
   const ctx = useApp();
   const { NOTIFS } = D;
+  const empty = NOTIFS.today.length === 0 && NOTIFS.earlier.length === 0;
   return (
     <View style={{ flex: 1 }}>
       <AppBar title="Thông báo" onBack={ctx.back} />
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}>
-        <NotifGroup title="Hôm nay" items={NOTIFS.today} />
-        <NotifGroup title="Trước đó" items={NOTIFS.earlier} />
-        <Txt style={{ textAlign: 'center', paddingVertical: 16, color: colors.textMuted, fontSize: 13 }}>
-          Hết rồi. Dành chút thời gian cho mama nhé ☕
-        </Txt>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, flexGrow: 1 }}>
+        {empty ? (
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            <EmptyState emotion="happy" onesie="orange" heading="Hết rồi" helper="Dành chút thời gian cho mama nhé ☕" />
+          </View>
+        ) : (
+          <>
+            {NOTIFS.today.length > 0 ? <NotifGroup title="Hôm nay" items={NOTIFS.today} /> : null}
+            {NOTIFS.earlier.length > 0 ? <NotifGroup title="Trước đó" items={NOTIFS.earlier} /> : null}
+            <Txt style={{ textAlign: 'center', paddingVertical: 16, color: colors.textMuted, fontSize: 13 }}>
+              Hết rồi. Dành chút thời gian cho mama nhé ☕
+            </Txt>
+          </>
+        )}
       </ScrollView>
     </View>
   );

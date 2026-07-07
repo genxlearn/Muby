@@ -9,6 +9,7 @@ import {
   AppBar,
   Banner,
   ButtonPrimary,
+  ButtonSecondary,
   ButtonText,
   Card,
   Chip,
@@ -245,8 +246,15 @@ export function GrowthScreen() {
                 </View>
               ))
             ) : (
-              <Card pad={16}>
-                <Txt style={{ fontSize: 13.5, color: colors.textMuted, textAlign: 'center' }}>Chưa có ghi chép hôm nay. Cứ thong thả mama 💛</Txt>
+              <Card pad={10}>
+                <EmptyState
+                  size="sm"
+                  emotion="snug"
+                  onesie="cream"
+                  heading="Chưa có ghi chép hôm nay"
+                  helper="Cứ thong thả mama 💛 Một chạm là ghi xong."
+                  action={<ButtonSecondary onPress={() => ctx.openSheet('quicklog')}>＋ Ghi nhanh</ButtonSecondary>}
+                />
               </Card>
             )
           ) : (

@@ -108,11 +108,23 @@ function LeapToday() {
         </Card>
 
         {/* CONTEXT-AWARE SECTION */}
-        {sunny ? (
+        {st.status === 'after-all' ? (
+          <Card pad={10}>
+            <EmptyState
+              size="sm"
+              emotion="blissful"
+              onesie="sage"
+              heading="10 leaps đã trọn vẹn 🎉"
+              helper="Bé đã đi qua mọi tuần kỳ diệu. Xem lại hành trình ở tab Hành trình nhé."
+            />
+          </Card>
+        ) : sunny ? (
           <SunnyPlaySection leap={CURRENT_LEAP} />
         ) : actions.length > 0 ? (
           <View>
-            <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary, marginBottom: 12, paddingHorizontal: 2 }}>Giúp bé hợp tác ở Leap {CURRENT_LEAP.n}</Txt>
+            <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary, marginBottom: 12, paddingHorizontal: 2 }}>
+              {inLeap ? `Giúp bé hợp tác ở Leap ${CURRENT_LEAP.n}` : `Chuẩn bị cho Leap ${CURRENT_LEAP.n}`}
+            </Txt>
             <View style={{ gap: 10 }}>
               {actions.map((a, i) => (
                 <ActionCard key={i} action={a} intensity={intensity} onSound={a.hasSound ? () => ctx.openSheet('soothing') : null} />
@@ -131,9 +143,11 @@ function LeapToday() {
         )}
 
         {/* Symptoms pills — non-tappable */}
-        {CURRENT_LEAP.symptoms.length > 0 ? (
+        {st.status !== 'after-all' && CURRENT_LEAP.symptoms.length > 0 ? (
           <View>
-            <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 8, paddingHorizontal: 2 }}>📌 Biểu hiện thường thấy:</Txt>
+            <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 8, paddingHorizontal: 2 }}>
+              {inLeap ? '📌 Biểu hiện thường thấy:' : `📌 Biểu hiện có thể gặp ở Leap ${CURRENT_LEAP.n}:`}
+            </Txt>
             <SymptomPills symptoms={CURRENT_LEAP.symptoms} />
           </View>
         ) : null}
