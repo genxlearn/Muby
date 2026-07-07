@@ -18,6 +18,7 @@ import {
   Sheet,
   Toggle,
 } from '../components';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../auth/AuthContext';
 import * as D from '../data/sampleData';
 import { formatDobDisplay, parseDobInput } from '../data/leapEngine';
@@ -211,13 +212,13 @@ export function MeScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Txt style={{ fontSize: 15, fontWeight: '700', color: colors.textPrimary }}>Đang dùng thử Premium</Txt>
-              <Txt style={{ fontSize: 12.5, color: colors.textMuted, marginTop: 2 }}>Còn {ctx.trial.daysLeft} ngày · không tự gia hạn</Txt>
+              <Txt style={{ fontSize: 12.5, color: colors.textMuted, marginTop: 2 }}>Còn {ctx.trial.daysLeft} ngày · sau đó trừ 199.000đ nếu không hủy</Txt>
             </View>
             <Pressable
-              onPress={() => ctx.openPaywall('Giữ Premium mãi mãi')}
-              style={{ paddingVertical: 11, paddingHorizontal: 15, minHeight: 44, justifyContent: 'center', borderRadius: 999, backgroundColor: colors.accentPrimary }}
+              onPress={() => { ctx.cancelTrial(); ctx.toast('Đã hủy dùng thử. Bạn vẫn dùng bản Free thoải mái 💛'); }}
+              style={{ paddingVertical: 11, paddingHorizontal: 15, minHeight: 44, justifyContent: 'center', borderRadius: 999, backgroundColor: colors.bgSunken, borderWidth: 1, borderColor: colors.borderDefault }}
             >
-              <Txt style={{ fontWeight: '700', fontSize: 13, color: '#fff' }}>Giữ mãi mãi</Txt>
+              <Txt style={{ fontWeight: '700', fontSize: 13, color: colors.textSecondary }}>Hủy dùng thử</Txt>
             </Pressable>
           </View>
         </Card>
@@ -242,7 +243,7 @@ export function MeScreen() {
             <Txt style={{ fontWeight: '700', fontSize: 15, color: '#fff' }}>Dùng thử miễn phí 1 tháng</Txt>
           </Pressable>
           <Txt style={{ fontSize: 11.5, color: colors.bgCanvas, opacity: 0.55, marginTop: 12 }}>
-            Không cần thẻ. Không tự gia hạn. Sau 1 tháng: 199.000đ trọn đời hoặc dùng bản Free.
+            Miễn phí 1 tháng đầu — hủy lúc nào cũng được. Không hủy: 199.000đ một lần, trọn đời.
           </Txt>
         </View>
       )}
@@ -385,60 +386,156 @@ const PAYWALL_BENEFITS: [string, string, string][] = [
   ['👨‍👩‍👧', 'Đồng bộ gia đình', 'Cả nhà cùng chăm bé trên một tài khoản'],
 ];
 
+/** One "Continue with …" button for the store-account linking step. */
+function LinkButton({
+  label,
+  icon,
+  dark,
+  onPress,
+  busy,
+}: {
+  label: string;
+  icon: 'apple' | 'google';
+  dark?: boolean;
+  onPress: () => void;
+  busy?: boolean;
+}) {
+  const { colors } = useTheme();
+  return (
+    <Pressable
+      onPress={busy ? undefined : onPress}
+      style={({ pressed }) => [
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 10,
+          minHeight: 56,
+          borderRadius: 999,
+          backgroundColor: dark ? '#000000' : colors.bgElevated,
+          borderWidth: dark ? 0 : 1.5,
+          borderColor: colors.borderDefault,
+          opacity: pressed || busy ? 0.7 : 1,
+        },
+      ]}
+    >
+      <MaterialCommunityIcons name={icon} size={22} color={dark ? '#fff' : colors.textPrimary} />
+      <Txt style={{ fontSize: 16, fontWeight: '700', color: dark ? '#fff' : colors.textPrimary }}>{label}</Txt>
+    </Pressable>
+  );
+}
+
 export function Paywall() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
+  // 'intro' → benefits + trial CTA · 'link' → connect Apple/Google before the trial starts
+  const [step, setStep] = useState<'intro' | 'link'>('intro');
+  const [linking, setLinking] = useState<null | 'apple' | 'google'>(null);
+
   // audit #16: never gate comfort when baby is crying (intensity >= 4).
   // Close in an effect (not during render) to avoid a setState-in-render warning.
   useEffect(() => {
     if (ctx.paywall && ctx.intensity >= 4) ctx.closePaywall();
   }, [ctx.paywall, ctx.intensity]);
   const open = !!ctx.paywall && ctx.intensity < 4;
+
+  // reset to the first step whenever the sheet reopens
+  useEffect(() => {
+    if (open) {
+      setStep('intro');
+      setLinking(null);
+    }
+  }, [open]);
+
+  const link = (provider: 'apple' | 'google') => {
+    setLinking(provider);
+    // Prototype: simulates the App Store / Play Store linking handshake.
+    // Real IAP (StoreKit / Play Billing) needs a dev build — not Expo Go.
+    setTimeout(() => {
+      setLinking(null);
+      ctx.startTrial();
+      ctx.closePaywall();
+      ctx.toast(`Đã liên kết ${provider === 'apple' ? 'Apple' : 'Google'} — dùng thử 1 tháng bắt đầu 💛`);
+    }, 900);
+  };
+
   return (
-    <Sheet open={open} onClose={ctx.closePaywall} height="72%" title="Wonder Premium" sub="Một lần · Trọn đời · Không tự gia hạn">
-      <View style={{ alignItems: 'center', paddingTop: 4 }}>
-        <Bong emotion="excited" onesie="orange" size={130} float />
-        <Txt serif style={{ fontSize: 30, fontWeight: '600', color: colors.textPrimary, marginTop: 8 }}>199.000đ</Txt>
-        <Txt style={{ fontSize: 13.5, color: colors.textMuted, marginTop: 2 }}>{ctx.paywall?.title || ''}</Txt>
-      </View>
-
-      <View style={{ gap: 10, marginTop: 20 }}>
-        {PAYWALL_BENEFITS.map(([e, t, d], i) => (
-          <View key={i} style={{ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 4, paddingHorizontal: 2 }}>
-            <View style={{ width: 42, height: 42, borderRadius: radii.md, backgroundColor: colors.bgSunken, alignItems: 'center', justifyContent: 'center' }}>
-              <Txt style={{ fontSize: 19 }}>{e}</Txt>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Txt style={{ fontSize: 14.5, fontWeight: '700', color: colors.textPrimary }}>{t}</Txt>
-              <Txt style={{ fontSize: 12.5, color: colors.textSecondary }}>{d}</Txt>
-            </View>
+    <Sheet
+      open={open}
+      onClose={ctx.closePaywall}
+      height="72%"
+      title="Wonder Premium"
+      sub={step === 'intro' ? 'Miễn phí 1 tháng đầu · 199.000đ trọn đời' : 'Liên kết để bắt đầu dùng thử'}
+    >
+      {step === 'intro' ? (
+        <>
+          <View style={{ alignItems: 'center', paddingTop: 4 }}>
+            <Bong emotion="excited" onesie="orange" size={130} float />
+            <Txt serif style={{ fontSize: 30, fontWeight: '600', color: colors.textPrimary, marginTop: 8 }}>199.000đ</Txt>
+            <Txt style={{ fontSize: 13.5, color: colors.textMuted, marginTop: 2 }}>{ctx.paywall?.title || ''}</Txt>
           </View>
-        ))}
-      </View>
 
-      <View style={{ gap: 10, marginTop: 22 }}>
-        {!ctx.trial ? (
-          <>
-            <ButtonPrimary onPress={() => { ctx.startTrial(); ctx.closePaywall(); ctx.toast('Đã mở khóa 1 tháng dùng thử 💛'); }}>
-              Dùng thử miễn phí 1 tháng
-            </ButtonPrimary>
-            <ButtonSecondary onPress={() => { ctx.setPremium(true); ctx.closePaywall(); ctx.toast('Đã mở khóa Wonder Premium 💛'); }}>
-              Mua trọn đời · 199.000đ
-            </ButtonSecondary>
-          </>
-        ) : (
-          <ButtonPrimary onPress={() => { ctx.setPremium(true); ctx.closePaywall(); ctx.toast('Wonder Premium là của bạn mãi mãi 💛'); }}>
-            Giữ mãi mãi · 199.000đ
-          </ButtonPrimary>
-        )}
-        <ButtonText onPress={ctx.closePaywall} style={{ alignSelf: 'center' }} textStyle={{ textAlign: 'center' }}>
-          Để sau
-        </ButtonText>
-      </View>
+          <View style={{ gap: 10, marginTop: 20 }}>
+            {PAYWALL_BENEFITS.map(([e, t, d], i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 4, paddingHorizontal: 2 }}>
+                <View style={{ width: 42, height: 42, borderRadius: radii.md, backgroundColor: colors.bgSunken, alignItems: 'center', justifyContent: 'center' }}>
+                  <Txt style={{ fontSize: 19 }}>{e}</Txt>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Txt style={{ fontSize: 14.5, fontWeight: '700', color: colors.textPrimary }}>{t}</Txt>
+                  <Txt style={{ fontSize: 12.5, color: colors.textSecondary }}>{d}</Txt>
+                </View>
+              </View>
+            ))}
+          </View>
 
-      <Txt style={{ textAlign: 'center', fontSize: 11.5, color: colors.textMuted, marginTop: 6, paddingBottom: 8 }}>
-        Không cần thẻ. Không tự gia hạn. Dữ liệu bé đã ghi luôn thuộc về bạn — mãi mãi.
-      </Txt>
+          <View style={{ gap: 10, marginTop: 22 }}>
+            <ButtonPrimary onPress={() => setStep('link')}>Dùng thử miễn phí 1 tháng</ButtonPrimary>
+            <ButtonText onPress={ctx.closePaywall} style={{ alignSelf: 'center' }} textStyle={{ textAlign: 'center' }}>
+              Để sau
+            </ButtonText>
+          </View>
+
+          <Txt style={{ textAlign: 'center', fontSize: 11.5, color: colors.textMuted, marginTop: 6, paddingBottom: 8, lineHeight: 17 }}>
+            Không trừ tiền trong 1 tháng đầu. Nếu không hủy, sau 1 tháng sẽ trừ 199.000đ — một lần, trọn đời.
+            Dữ liệu bé đã ghi luôn thuộc về bạn — mãi mãi.
+          </Txt>
+        </>
+      ) : (
+        <>
+          <View style={{ alignItems: 'center', paddingTop: 4 }}>
+            <Bong emotion="curious" onesie="cream" size={120} float />
+            <Txt serif style={{ fontSize: 21, fontWeight: '600', color: colors.textPrimary, marginTop: 10, textAlign: 'center' }}>
+              Liên kết tài khoản để bắt đầu
+            </Txt>
+            <Txt style={{ fontSize: 13.5, color: colors.textSecondary, marginTop: 6, textAlign: 'center', lineHeight: 20, maxWidth: 300 }}>
+              Chọn tài khoản thanh toán của bạn. <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Không trừ tiền trong 1 tháng đầu</Txt> — hủy lúc nào cũng được trong màn Mama.
+            </Txt>
+          </View>
+
+          <View style={{ gap: 12, marginTop: 24 }}>
+            <LinkButton icon="apple" dark label={linking === 'apple' ? 'Đang liên kết…' : 'Tiếp tục với Apple'} busy={!!linking} onPress={() => link('apple')} />
+            <LinkButton icon="google" label={linking === 'google' ? 'Đang liên kết…' : 'Tiếp tục với Google'} busy={!!linking} onPress={() => link('google')} />
+          </View>
+
+          <View style={{ marginTop: 18, padding: 14, borderRadius: radii.md, backgroundColor: colors.bgSunken, gap: 6 }}>
+            {[
+              ['🗓️', 'Hôm nay: bắt đầu 1 tháng miễn phí'],
+              ['🔔', 'Trước khi hết hạn: mình sẽ nhắc bạn'],
+              ['💛', 'Sau 1 tháng: trừ 199.000đ nếu bạn không hủy — trọn đời, không phí nào khác'],
+            ].map(([e, t], i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 9, alignItems: 'flex-start' }}>
+                <Txt style={{ fontSize: 13 }}>{e}</Txt>
+                <Txt style={{ flex: 1, fontSize: 12.5, color: colors.textSecondary, lineHeight: 18 }}>{t}</Txt>
+              </View>
+            ))}
+          </View>
+
+          <ButtonText onPress={() => setStep('intro')} style={{ alignSelf: 'center', marginTop: 10 }} textStyle={{ textAlign: 'center' }}>
+            ← Quay lại
+          </ButtonText>
+        </>
+      )}
     </Sheet>
   );
 }

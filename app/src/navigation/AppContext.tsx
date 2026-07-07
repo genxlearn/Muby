@@ -37,6 +37,7 @@ export interface AppCtx {
   trial: Trial | null;
 
   startTrial: () => void;
+  cancelTrial: () => void;
   setTheme: (m: ThemeMode) => void;
   setTab: (t: Tab) => void;
   go: (stack: Exclude<Stack, null>) => void;
@@ -97,6 +98,7 @@ export function AppProvider({
     purchased,
     trial,
     startTrial: () => setTrial({ daysLeft: 30 }),
+    cancelTrial: () => setTrial(null),
     setTheme: setThemeMode,
     setTab: (t) => { setRoute({ flow: 'app', tab: t, stack: null }); setSheet(null); },
     go: (stack) => { setRoute((r) => ({ ...r, flow: 'app', stack })); setSheet(null); },
