@@ -1,13 +1,16 @@
 {
   "expo": {
-    "name": "Baby Wonder Weeks",
-    "slug": "baby-wonder-weeks",
+    "name": "Muby",
+    "slug": "muby",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Cho phép Muby dùng Face ID để mở khóa ứng dụng."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,6 +23,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Cho phép Muby dùng Face ID để mở khóa ứng dụng."
+        }
+      ]
+    ]
   }
 }

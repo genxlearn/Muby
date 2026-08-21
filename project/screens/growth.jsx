@@ -5,44 +5,44 @@
 /* ---- WHO-style growth chart ---- */
 function GrowthChart({ metric }) {
   // weeks 0..16, user points
-  const W = 300, H = 180, padL = 8, padR = 8, padT = 12, padB = 18;
+  const W = 300,H = 180,padL = 8,padR = 8,padT = 12,padB = 18;
   const sets = {
     weight: { lo: [3.0, 4.0, 4.8, 5.4, 5.9, 6.3, 6.6], hi: [4.2, 5.4, 6.4, 7.1, 7.7, 8.2, 8.6], user: [3.3, 4.3, 5.2, 5.8, 6.1, 6.4], unit: 'kg', max: 9, min: 2.5 },
     height: { lo: [49, 53, 56, 58, 60, 61.5, 63], hi: [53, 57, 60, 62.5, 64.5, 66, 67.5], user: [50, 54, 57, 59, 60.5, 61], unit: 'cm', max: 70, min: 47 },
-    feed:   { lo: [560, 600, 640, 680, 700, 720, 720], hi: [900, 950, 1000, 1000, 1000, 1000, 1000], user: [580, 650, 720, 780, 700, 640], unit: 'ml/ngày', max: 1100, min: 450 },
-    sleep:  { lo: [14, 13.5, 13, 12.5, 12, 12, 12], hi: [17, 17, 16.5, 16.5, 16, 16, 16], user: [16, 15.5, 15, 14.5, 13.5, 14], unit: 'giờ/ngày', max: 18.5, min: 10.5 },
-    diaper: { lo: [6, 6, 5.5, 5, 5, 5, 5], hi: [10, 9.5, 9, 8.5, 8, 8, 8], user: [8, 7.5, 7, 6.5, 6, 6], unit: 'tã/ngày', max: 11, min: 3.5 },
+    feed: { lo: [560, 600, 640, 680, 700, 720, 720], hi: [900, 950, 1000, 1000, 1000, 1000, 1000], user: [580, 650, 720, 780, 700, 640], unit: 'ml/ngày', max: 1100, min: 450 },
+    sleep: { lo: [14, 13.5, 13, 12.5, 12, 12, 12], hi: [17, 17, 16.5, 16.5, 16, 16, 16], user: [16, 15.5, 15, 14.5, 13.5, 14], unit: 'giờ/ngày', max: 18.5, min: 10.5 },
+    diaper: { lo: [6, 6, 5.5, 5, 5, 5, 5], hi: [10, 9.5, 9, 8.5, 8, 8, 8], user: [8, 7.5, 7, 6.5, 6, 6], unit: 'tã/ngày', max: 11, min: 3.5 }
   };
   const d = sets[metric];
   const n = d.hi.length;
-  const xs = (i, len) => padL + (i / (len - 1)) * (W - padL - padR);
-  const ys = (v) => H - padB - ((v - d.min) / (d.max - d.min)) * (H - padT - padB);
+  const xs = (i, len) => padL + i / (len - 1) * (W - padL - padR);
+  const ys = (v) => H - padB - (v - d.min) / (d.max - d.min) * (H - padT - padB);
   const bandTop = d.hi.map((v, i) => `${xs(i, n).toFixed(1)},${ys(v).toFixed(1)}`).join(' ');
   const bandBot = d.lo.map((v, i) => `${xs(i, n).toFixed(1)},${ys(v).toFixed(1)}`).reverse().join(' ');
   const userPath = d.user.map((v, i) => `${i ? 'L' : 'M'}${xs(i, d.user.length).toFixed(1)} ${ys(v).toFixed(1)}`).join(' ');
-  const lastX = xs(d.user.length - 1, d.user.length), lastY = ys(d.user[d.user.length - 1]);
+  const lastX = xs(d.user.length - 1, d.user.length),lastY = ys(d.user[d.user.length - 1]);
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
-      {[0.25, 0.5, 0.75].map(f => <line key={f} x1={padL} x2={W - padR} y1={padT + f * (H - padT - padB)} y2={padT + f * (H - padT - padB)} stroke="var(--border-subtle)" strokeWidth="1" strokeDasharray="3 4" />)}
+      {[0.25, 0.5, 0.75].map((f) => <line key={f} x1={padL} x2={W - padR} y1={padT + f * (H - padT - padB)} y2={padT + f * (H - padT - padB)} stroke="var(--border-subtle)" strokeWidth="1" strokeDasharray="3 4" />)}
       <polygon points={`${bandTop} ${bandBot}`} fill="var(--intensity-1)" opacity="0.5" />
       <polyline points={d.hi.map((v, i) => `${xs(i, n)},${ys(v)}`).join(' ')} fill="none" stroke="var(--success)" strokeWidth="1.5" opacity="0.5" />
       <polyline points={d.lo.map((v, i) => `${xs(i, n)},${ys(v)}`).join(' ')} fill="none" stroke="var(--success)" strokeWidth="1.5" opacity="0.5" />
       <path d={userPath} fill="none" stroke="var(--accent-primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       {d.user.map((v, i) => <circle key={i} cx={xs(i, d.user.length)} cy={ys(v)} r="3.5" fill="var(--accent-primary)" stroke="var(--bg-elevated)" strokeWidth="2" />)}
       <circle cx={lastX} cy={lastY} r="6" fill="var(--accent-primary)" stroke="var(--bg-elevated)" strokeWidth="3" />
-    </svg>
-  );
+    </svg>);
+
 }
 
-function GrowthScreen({ ctx }) {
-  const [metric, setMetric] = useState('weight');
+function GrowthScreen({ ctx, initialMetric }) {
+  const [metric, setMetric] = useState(initialMetric || 'weight');
   const { BABY } = BWW_DATA;
   const META = {
     weight: { latest: `${BABY.weight} kg`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
     height: { latest: `${BABY.height} cm`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
     feed: { latest: '640 ml/ngày', sub: 'Bé đang bú đủ — yên tâm nhé mama 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
     sleep: { latest: '14 giờ/ngày', sub: 'Ngủ ít hơn chút trong leap là bình thường 💛', band: 'Khoảng thường gặp ở bé cùng tuổi' },
-    diaper: { latest: '6 tã/ngày', sub: 'Tã ướt đều đặn = bé bú đủ 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
+    diaper: { latest: '6 tã/ngày', sub: 'Tã ướt đều đặn = bé bú đủ 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' }
   };
   const m = META[metric];
   const stat = BWW_DATA.DAILY_STATS.find((s) => s.id === metric);
@@ -50,30 +50,56 @@ function GrowthScreen({ ctx }) {
   // nhật ký theo từng tab
   const TYPE_MAP = { feed: 'feed', sleep: 'sleep', diaper: 'diaper' };
   const MEASURE_LOG = [
-    { date: 'Hôm nay · 04/07', label: '6.4 kg · 61 cm' },
-    { date: '20/06', label: '6.1 kg · 60.5 cm' },
-    { date: '05/06', label: '5.8 kg · 59 cm' },
-  ];
-  const dailyLog = TYPE_MAP[metric]
-    ? BWW_DATA.LOG_HISTORY.map((g) => ({ date: g.date, items: g.items.filter((it) => it.type === TYPE_MAP[metric]) })).filter((g) => g.items.length)
-    : null;
+  { date: 'Hôm nay', label: `${BWW_DATA.BABY.weight} kg · ${BWW_DATA.BABY.height} cm` },
+  { date: '20/06', label: '6.1 kg · 60.5 cm' },
+  { date: '05/06', label: '5.8 kg · 59 cm' }];
+
+  const dailyLog = TYPE_MAP[metric] ?
+  BWW_DATA.LOG_HISTORY.map((g) => ({ date: g.date, items: g.items.filter((it) => it.type === TYPE_MAP[metric]) })).filter((g) => g.items.length) :
+  null;
+
+  if (ctx.empty) {
+    const EMPTY_META = {
+      weight: { heading: 'Chưa có số đo nào', helper: 'Thêm số đo đầu tiên để bắt đầu vẽ đường lớn của bé nhé mama 💛', cta: '+ Thêm số đo đầu tiên', measure: true },
+      height: { heading: 'Chưa có số đo nào', helper: 'Thêm số đo đầu tiên để bắt đầu vẽ đường lớn của bé nhé mama 💛', cta: '+ Thêm số đo đầu tiên', measure: true },
+      feed: { heading: 'Chưa có cữ ăn nào', helper: 'Ghi cữ ăn đầu tiên để thấy nhịp bú của bé nhé mama 💛', cta: '+ Ghi cữ ăn' },
+      sleep: { heading: 'Chưa có giấc ngủ nào', helper: 'Ghi giấc ngủ đầu tiên để thấy nhịp ngủ của bé 🌙', cta: '+ Ghi giấc ngủ' },
+      diaper: { heading: 'Chưa có lần thay tã nào', helper: 'Tã ướt đều đặn là dấu hiệu bé bú đủ — ghi lại để cùng theo dõi nhé 💛', cta: '+ Ghi tã' }
+    };
+    const em = EMPTY_META[metric];
+    return (
+      <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto' }}>
+        <div style={{ padding: '6px 20px 16px' }}>
+          <div className="serif" style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>Bé lớn lên</div>
+          <div style={{ fontSize: 15.5, fontWeight: 700, marginBottom: 12, padding: '0 2px' }}>Đường lớn của bé</div>
+          <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '-8px -20px 14px', padding: '8px 20px 14px' }}>
+            {[{ id: 'weight', label: 'Cân nặng' }, { id: 'height', label: 'Chiều cao' }, { id: 'feed', label: 'Cữ ăn' }, { id: 'sleep', label: 'Giấc ngủ' }].map((t) =>
+            <Chip key={t.id} active={metric === t.id} onClick={() => setMetric(t.id)}>{t.label}</Chip>
+            )}
+          </div>
+          <EmptyState emotion="curious" onesie="sage" heading={em.heading} helper={em.helper} />
+          <ButtonPrimary onClick={() => em.measure ? ctx.go('measure') : ctx.openSheet('quicklog')}>{em.cta}</ButtonPrimary>
+        </div>
+      </div>);
+
+  }
 
   return (
     <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto' }}>
-      <div style={{ padding: '6px 20px 0' }}>
+      <div style={{ padding: '6px 20px 0' }} data-comment-anchor="f5142ed9b0-div-75-7">
         <div className="serif" style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>Bé lớn lên</div>
 
         <div style={{ fontSize: 15.5, fontWeight: 700, marginBottom: 12, padding: '0 2px' }}>Đường lớn của bé</div>
-        <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '-6px -20px 18px', padding: '6px 20px 10px' }}>
-          {[{ id: 'weight', label: 'Cân nặng' }, { id: 'height', label: 'Chiều cao' }, { id: 'feed', label: 'Cữ ăn' }, { id: 'sleep', label: 'Giấc ngủ' }, { id: 'diaper', label: 'Tã' }].map(t => (
-            <Chip key={t.id} active={metric === t.id} onClick={() => setMetric(t.id)}>{t.label}</Chip>
-          ))}
+        <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '-8px -20px 14px', padding: '8px 20px 14px' }} data-comment-anchor="6c40757d70-div-79-9">
+          {[{ id: 'weight', label: 'Cân nặng' }, { id: 'height', label: 'Chiều cao' }, { id: 'feed', label: 'Cữ ăn' }, { id: 'sleep', label: 'Giấc ngủ' }].map((t) =>
+          <Chip key={t.id} active={metric === t.id} onClick={() => setMetric(t.id)}>{t.label}</Chip>
+          )}
         </div>
 
         {/* HÔM NAY — chỉ số đối chiếu của tab đang chọn (cữ ăn / ngủ / tã) */}
         {stat && (() => {
           const inRange = stat.num >= stat.lo && stat.num <= stat.hi;
-          const pos = Math.min(100, Math.max(0, ((stat.num - stat.lo) / (stat.hi - stat.lo)) * 60 + 20));
+          const pos = Math.min(100, Math.max(0, (stat.num - stat.lo) / (stat.hi - stat.lo) * 60 + 20));
           return (
             <Card pad={16} style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -96,8 +122,8 @@ function GrowthScreen({ ctx }) {
                 <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.45 }}>{stat.range}</div>
               </div>
               <Banner icon="💛" tone="soft" style={{ marginTop: 12, fontSize: 12.5 }}>{stat.note}</Banner>
-            </Card>
-          );
+            </Card>);
+
         })()}
 
         {/* Số mới nhất — cho cân nặng / chiều cao */}
@@ -129,66 +155,66 @@ function GrowthScreen({ ctx }) {
         {/* NHẬT KÝ theo tab */}
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, padding: '0 2px' }}>
-            <div style={{ fontSize: 15.5, fontWeight: 700 }}>Nhật ký {({ weight: 'đo lường', height: 'đo lường', feed: 'cữ ăn', sleep: 'giấc ngủ', diaper: 'tã' })[metric]}</div>
+            <div style={{ fontSize: 15.5, fontWeight: 700 }}>Nhật ký {{ weight: 'đo lường', height: 'đo lường', feed: 'cữ ăn', sleep: 'giấc ngủ', diaper: 'tã' }[metric]}</div>
             <ButtonText onClick={() => ctx.go('history')} style={{ padding: 0 }}>Xem tất cả →</ButtonText>
           </div>
-          {dailyLog ? (
-            dailyLog.length ? dailyLog.map((g, gi) => (
-              <div key={gi} style={{ marginBottom: 12 }}>
+          {dailyLog ?
+          dailyLog.length ? dailyLog.map((g, gi) =>
+          <div key={gi} style={{ marginBottom: 12 }}>
                 <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-muted)', margin: '0 2px 8px' }}>{g.date}</div>
                 <Card pad={6}>
-                  {g.items.map((it, i) => (
-                    <div key={i} style={{ borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
+                  {g.items.map((it, i) =>
+              <div key={i} style={{ borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
                       <ListRow icon={it.icon} title={it.label} right={<span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{it.time}</span>} />
                     </div>
-                  ))}
+              )}
                 </Card>
               </div>
-            )) : (
-              <Card pad={16}><div style={{ fontSize: 13.5, color: 'var(--text-muted)', textAlign: 'center' }}>Chưa có ghi chép hôm nay. Cứ thong thả mama 💛</div></Card>
-            )
-          ) : (
-            <Card pad={6}>
-              {MEASURE_LOG.map((r, i) => (
-                <div key={i} style={{ borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
+          ) :
+          <Card pad={16}><div style={{ fontSize: 13.5, color: 'var(--text-muted)', textAlign: 'center' }}>Chưa có ghi chép hôm nay. Cứ thong thả mama 💛</div></Card> :
+
+
+          <Card pad={6}>
+              {MEASURE_LOG.map((r, i) =>
+            <div key={i} style={{ borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
                   <ListRow icon="📏" title={r.label} sub={r.date} right={<Ic name="chevron" size={16} stroke="var(--text-muted)" />} />
                 </div>
-              ))}
+            )}
             </Card>
-          )}
+          }
         </div>
       </div>
       <div style={{ padding: '0 20px 16px' }}>
         <ButtonPrimary onClick={() => metric === 'weight' || metric === 'height' ? ctx.go('measure') : ctx.openSheet('quicklog')}>{metric === 'weight' || metric === 'height' ? '+ Thêm đo lường' : '+ Ghi nhanh'}</ButtonPrimary>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 /* ---- SCREEN 6 Add Measurement ---- */
 function MeasureScreen({ ctx }) {
-  const [w, setW] = useState(''); const [h, setH] = useState(''); const [hd, setHd] = useState('');
+  const [w, setW] = useState('');const [h, setH] = useState('');const [hd, setHd] = useState('');
   const [petals, setPetals] = useState(false);
   const save = () => {
     setPetals(true);
-    setTimeout(() => { ctx.back(); ctx.toast('Đã lưu. Bé đang phát triển khoẻ mạnh 💚'); }, 900);
+    setTimeout(() => {ctx.back();ctx.toast('Đã lưu. Bé đang phát triển khoẻ mạnh 💚');}, 900);
   };
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative', overflow: 'hidden' }}>
       <AppBar title="Thêm đo lường" onBack={ctx.back} />
-      {petals && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'none' }}>
-          {Array.from({ length: 14 }).map((_, i) => (
-            <div key={i} style={{ position: 'absolute', left: `${(i * 7 + 5) % 95}%`, top: -10, animation: `petalFall ${1 + (i % 5) * 0.2}s ${i * 0.05}s ease-in forwards` }}>
-              <Flower size={14 + (i % 3) * 6} color={['var(--warning)', 'var(--accent-primary)', 'var(--success)'][i % 3]} />
+      {petals &&
+      <div style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'none' }}>
+          {Array.from({ length: 14 }).map((_, i) =>
+        <div key={i} style={{ position: 'absolute', left: `${(i * 7 + 5) % 95}%`, top: -10, animation: `petalFall ${1 + i % 5 * 0.2}s ${i * 0.05}s ease-in forwards` }}>
+              <Flower size={14 + i % 3 * 6} color={['var(--warning)', 'var(--accent-primary)', 'var(--success)'][i % 3]} />
             </div>
-          ))}
+        )}
         </div>
-      )}
+      }
       <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '0 24px 44px', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}><Bong emotion="happy" onesie="orange" size={100} float /></div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <Input label="Ngày đo" value="Hôm nay · 05/06/2026" onChange={() => {}} rightSlot={<Ic name="cal" size={20} stroke="var(--text-muted)" />} />
+          <Input label="Ngày đo" value={'Hôm nay · ' + new Date().toLocaleDateString('vi-VN')} onChange={() => {}} rightSlot={<Ic name="cal" size={20} stroke="var(--text-muted)" />} />
           <Input label="Cân nặng (kg)" type="tel" value={w} onChange={setW} placeholder="6.4" />
           <Input label="Chiều cao (cm)" type="tel" value={h} onChange={setH} placeholder="61" />
           <Input label="Vòng đầu (cm) · không bắt buộc" type="tel" value={hd} onChange={setHd} placeholder="40.2" />
@@ -200,15 +226,15 @@ function MeasureScreen({ ctx }) {
         <div style={{ flex: 1, minHeight: 16 }} />
         <ButtonPrimary disabled={!w || !h} onClick={save}>Lưu số đo</ButtonPrimary>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 /* ---- SCREEN 7 Log History ---- */
 function HistoryScreen({ ctx }) {
   const [filter, setFilter] = useState('all');
   const chips = [['all', 'Tất cả'], ['feed', 'Cữ ăn'], ['sleep', 'Giấc ngủ'], ['diaper', 'Tã'], ['mood', 'Cảm xúc']];
-  const groups = BWW_DATA.LOG_HISTORY.map(g => ({ ...g, items: g.items.filter(it => filter === 'all' || it.type === filter) })).filter(g => g.items.length);
+  const groups = (ctx.empty ? [] : BWW_DATA.LOG_HISTORY).map((g) => ({ ...g, items: g.items.filter((it) => filter === 'all' || it.type === filter) })).filter((g) => g.items.length);
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <AppBar title="Nhật ký của bé" onBack={ctx.back} />
@@ -216,33 +242,36 @@ function HistoryScreen({ ctx }) {
         {chips.map(([id, label]) => <Chip key={id} active={filter === id} onClick={() => setFilter(id)}>{label}</Chip>)}
       </div>
       <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '0 20px 40px' }}>
-        {groups.length === 0 ? (
-          <EmptyState emotion="snug" onesie="cream" heading="Chưa có ghi chép nào" helper="Cứ thong thả mama 💛 Mọi khoảnh khắc sẽ được lưu ở đây." />
-        ) : groups.map((g, gi) => (
-          <div key={gi} style={{ marginBottom: 24 }}>
+        {groups.length === 0 ?
+        <EmptyState emotion="snug" onesie="cream" heading="Chưa có ghi chép nào" helper="Cứ thong thả mama 💛 Mọi khoảnh khắc sẽ được lưu ở đây." /> :
+        groups.map((g, gi) =>
+        <div key={gi} style={{ marginBottom: 24 }}>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-muted)', margin: '0 2px 12px', letterSpacing: 0.3 }}>{g.date}</div>
             <Card pad={6}>
-              {g.items.map((it, i) => (
-                <div key={i} style={{ borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
+              {g.items.map((it, i) =>
+            <div key={i} style={{ borderTop: i ? '1px solid var(--border-subtle)' : 'none' }}>
                   <ListRow icon={it.icon} title={it.label} right={<span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{it.time}</span>} />
                 </div>
-              ))}
+            )}
             </Card>
           </div>
-        ))}
+        )}
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 /* ---- SCREEN 8 Library ---- */
 function LibraryScreen({ ctx }) {
   const [tab, setTab] = useState('leap');
+  const [art, setArt] = useState(null);
+  const FEATURED = { tag: 'LEAP 4', title: 'Vì sao bé bám mẹ hơn trong Leap 4', mins: 4, locked: false };
+  const openArt = (a, locked) => setArt({ ...a, locked });
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <AppBar title="Thư viện" onBack={ctx.back} />
       <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '0 20px 40px' }}>
-        <div style={{ borderRadius: 'var(--r-xl)', overflow: 'hidden', background: 'var(--accent-primary)', padding: 20, color: 'var(--text-on-accent)', marginBottom: 24, position: 'relative' }}>
+        <div style={{ borderRadius: 'var(--r-xl)', overflow: 'hidden', background: 'var(--accent-primary)', padding: 20, color: 'var(--text-on-accent)', marginBottom: 24, position: 'relative' }} onClick={() => openArt(FEATURED, false)}>
           <FlowerField items={[{ x: 250, y: -6, s: 60, c: 'rgba(255,255,255,0.18)', r: 10 }, { x: 300, y: 90, s: 40, c: 'rgba(255,255,255,0.14)' }]} />
           <div style={{ position: 'relative' }}>
             <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: 1.2, opacity: 0.85 }}>CHO TUẦN NÀY CỦA BẠN</div>
@@ -253,12 +282,12 @@ function LibraryScreen({ ctx }) {
         <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '-6px -20px 14px', padding: '6px 20px 10px' }}>
           {[['leap', 'Theo Leap'], ['age', 'Theo Tuổi'], ['saved', 'Đã lưu'], ['all', 'Tất cả']].map(([id, l]) => <Chip key={id} active={tab === id} onClick={() => setTab(id)}>{l}</Chip>)}
         </div>
-        {tab === 'saved' ? (
-          <EmptyState emotion="happy" onesie="sage" heading="Chưa lưu bài nào" helper="Chạm ♥ ở bài viết để đọc lại sau nhé mama." />
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {BWW_DATA.LIBRARY.map((a, i) => (
-              <Card key={i} pad={0} style={{ overflow: 'hidden' }} onClick={() => i >= 3 && !ctx.premium ? ctx.openPaywall('Mở khóa toàn bộ thư viện') : null}>
+        {tab === 'saved' ?
+        <EmptyState emotion="happy" onesie="sage" heading="Chưa lưu bài nào" helper="Chạm ♥ ở bài viết để đọc lại sau nhé mama." /> :
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }} data-comment-anchor="36b077b423-div-285-9">
+            {BWW_DATA.LIBRARY.map((a, i) =>
+          <Card key={i} pad={0} style={{ overflow: 'hidden' }} onClick={() => openArt(a, i >= 3 && !ctx.premium)}>
                 <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
                   <div style={{ width: 84, flexShrink: 0, background: a.color, position: 'relative', display: 'grid', placeItems: 'center' }}>
                     <Flower size={34} color="rgba(255,255,255,0.5)" />
@@ -271,12 +300,35 @@ function LibraryScreen({ ctx }) {
                   </div>
                 </div>
               </Card>
-            ))}
+          )}
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+
+      {/* ---- Article reader sheet ---- */}
+      <Sheet open={!!art} onClose={() => setArt(null)} height="82%" title={art ? art.title : ''} sub={art ? `${art.tag} · ${art.mins} phút đọc` : ''}>
+        {art &&
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 4, fontSize: 14.5, lineHeight: 1.7, color: 'var(--text-primary)' }}>
+          <div>Tuần này, não bé đang mở ra một cách nhìn thế giới hoàn toàn mới. Những điều quen thuộc bỗng trở nên lạ lẫm — và người duy nhất con thấy an toàn lúc này chính là mẹ.</div>
+          <div>Đó là lý do bé bám mẹ hơn, khóc khi mẹ rời phòng, và đòi bế nhiều hơn hẳn. Đây không phải thói quen xấu — đây là nhu cầu thật của một bộ não đang lớn rất nhanh.</div>
+          {art.locked ?
+          <Card pad={16} style={{ background: 'var(--bg-accent-soft)', border: '1px dashed var(--accent-primary)' }}>
+            <div style={{ fontSize: 14, lineHeight: 1.55, marginBottom: 12 }}>Đọc đầy đủ bài này và toàn bộ thư viện — Muby Premium 199.000đ trọn đời 💛</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <ButtonPrimary onClick={() => {setArt(null);ctx.openPaywall('Mở khóa toàn bộ thư viện');}} style={{ minHeight: 48 }}>Mở khóa</ButtonPrimary>
+              <ButtonSecondary onClick={() => setArt(null)} style={{ minHeight: 48 }}>Để sau</ButtonSecondary>
+            </div>
+          </Card> :
+          <>
+            <div>Điều mẹ có thể làm: giữ nhịp sinh hoạt quen thuộc, ôm con nhiều hơn, và nhớ rằng giai đoạn này sẽ qua. Sau mỗi leap, bé lại biết thêm một kỹ năng mới — và nụ cười của con sẽ cho mẹ biết ngay.</div>
+            <Banner icon="💛" tone="soft">Mẹo nhỏ: đọc xong bài này, thử ôm con thêm 5 phút trước giờ ngủ — cả hai mẹ con đều sẽ dễ chịu hơn.</Banner>
+          </>
+          }
+        </div>
+        }
+      </Sheet>
+    </div>);
+
 }
 
 Object.assign(window, { GrowthScreen, MeasureScreen, HistoryScreen, LibraryScreen });

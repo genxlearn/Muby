@@ -7,23 +7,58 @@ import { Txt } from '../theme/Txt';
 import { Ic, IconName } from './Icon';
 import type { Tab } from '../navigation/AppContext';
 
-/* ---------- Bottom Nav — modern floating pill (Muby App Final) ---------- */
-const NAV_ITEMS: { id: Tab; icon: IconName; label: string }[] = [
+/* ---------- Bottom Nav — 2 tabs + Ghi nhanh FAB + 2 tabs (Muby v3) ---------- */
+const NAV_LEFT: { id: Tab; icon: IconName; label: string }[] = [
   { id: 'today', icon: 'home', label: 'Hôm nay' },
   { id: 'leap', icon: 'leap', label: 'Leap' },
-  { id: 'growth', icon: 'growth', label: 'Phát triển' },
-  { id: 'market', icon: 'market', label: 'Market' },
+];
+const NAV_RIGHT: { id: Tab; icon: IconName; label: string }[] = [
+  { id: 'growth', icon: 'growth', label: 'Lớn khôn' },
+  { id: 'me', icon: 'me', label: 'Mama' },
 ];
 
 /** Height the floating nav needs at the bottom of scrollable tab content. */
 export const NAV_CLEARANCE = 118;
 
-export function BottomNav({ active, onNav }: { active: Tab; onNav: (t: Tab) => void }) {
+export function BottomNav({
+  active,
+  onNav,
+  onFab,
+}: {
+  active: Tab;
+  onNav: (t: Tab) => void;
+  onFab: () => void;
+}) {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
   // hex canvas + alpha — approximates the CSS color-mix fade above the pill
   const fadeTop = colors.bgCanvas + '00';
   const fadeBottom = colors.bgCanvas + 'E0';
+
+  const Item = ({ it }: { it: { id: Tab; icon: IconName; label: string } }) => {
+    const on = active === it.id;
+    return (
+      <Pressable
+        onPress={() => onNav(it.id)}
+        accessibilityLabel={it.label}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 3,
+          minHeight: 52,
+          borderRadius: 999,
+        }}
+      >
+        <Ic name={it.icon} size={23} sw={on ? 2.4 : 1.8} color={on ? colors.accentPrimary : colors.textMuted} />
+        <Txt numberOfLines={1} style={{ fontSize: 10.5, fontWeight: on ? '700' : '500', color: on ? colors.accentPrimary : colors.textMuted }}>
+          {it.label}
+        </Txt>
+      </Pressable>
+    );
+  };
+
   return (
     <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
       <LinearGradient
@@ -31,62 +66,54 @@ export function BottomNav({ active, onNav }: { active: Tab; onNav: (t: Tab) => v
         colors={[fadeTop, fadeBottom]}
         style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
       />
-      <View style={{ paddingTop: 28, paddingHorizontal: 18, paddingBottom: Math.max(insets.bottom, 14) + 8 }}>
+      <View pointerEvents="box-none" style={{ paddingTop: 28, paddingHorizontal: 16, paddingBottom: Math.max(insets.bottom, 14) + 8 }}>
         <View
           style={[
             {
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 4,
+              gap: 2,
               backgroundColor: colors.bgElevated + 'F0',
               borderWidth: 1,
               borderColor: colors.borderSubtle,
               borderRadius: 999,
-              padding: 6,
+              paddingVertical: 6,
+              paddingHorizontal: 8,
             },
             shadows[3],
           ]}
         >
-          {NAV_ITEMS.map((it) => {
-            const on = active === it.id;
-            return (
-              <Pressable
-                key={it.id}
-                onPress={() => onNav(it.id)}
-                accessibilityLabel={it.label}
-                style={[
-                  {
-                    // flex ratios (not content width) so the 4 items always sum
-                    // exactly to the pill's width — nothing can overflow it
-                    flex: on ? 2 : 1,
-                    minWidth: 0,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 6,
-                    minHeight: 48,
-                    borderRadius: 999,
-                    paddingHorizontal: on ? 10 : 4,
-                    backgroundColor: on ? colors.accentPrimary : 'transparent',
-                  },
-                  on && {
-                    shadowColor: '#F96B26',
-                    shadowOffset: { width: 0, height: 6 },
-                    shadowOpacity: 0.35,
-                    shadowRadius: 16,
-                    elevation: 5,
-                  },
-                ]}
-              >
-                <Ic name={it.icon} size={23} sw={on ? 2.4 : 1.8} color={on ? '#fff' : colors.textMuted} />
-                {on ? (
-                  <Txt numberOfLines={1} style={{ fontSize: 13, fontWeight: '700', color: '#fff', flexShrink: 1 }}>
-                    {it.label}
-                  </Txt>
-                ) : null}
-              </Pressable>
-            );
-          })}
+          {NAV_LEFT.map((it) => (
+            <Item key={it.id} it={it} />
+          ))}
+          {/* FAB — Ghi nhanh */}
+          <Pressable
+            onPress={onFab}
+            accessibilityLabel="Ghi nhanh"
+            style={{
+              width: 58,
+              height: 58,
+              borderRadius: 29,
+              flexShrink: 0,
+              marginTop: -14,
+              marginHorizontal: 6,
+              backgroundColor: colors.accentPrimary,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderWidth: 5,
+              borderColor: colors.bgCanvas + 'CC',
+              shadowColor: '#D87242',
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.4,
+              shadowRadius: 20,
+              elevation: 8,
+            }}
+          >
+            <Ic name="plus" size={26} sw={2.6} color="#fff" />
+          </Pressable>
+          {NAV_RIGHT.map((it) => (
+            <Item key={it.id} it={it} />
+          ))}
         </View>
       </View>
     </View>

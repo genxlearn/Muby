@@ -6,7 +6,7 @@
 
 function SubTabs({ tabs, value, onChange }) {
   return (
-    <div style={{ display: 'flex', gap: 4, background: 'var(--bg-sunken)', borderRadius: 'var(--r-full)', padding: 4, margin: '0 20px' }}>
+    <div style={{ display: 'flex', gap: 4, background: 'var(--bg-sunken)', borderRadius: 'var(--r-full)', padding: 4, margin: '0 20px' }} data-comment-anchor="7befceb31a-div-9-5">
       {tabs.map((t) =>
       <button key={t.id} onClick={() => onChange(t.id)} style={{
         flex: 1, padding: '9px 4px', borderRadius: 'var(--r-full)', fontSize: 13.5, fontWeight: 600,
@@ -30,7 +30,7 @@ function LeapToday({ ctx }) {
   const sunny = intensity <= 2;
 
   return (
-    <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '4px 20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '4px 20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }} data-comment-anchor="e6ced5d135-div-32-5">
       {/* HERO — phase-based framing */}
       <Card pad={0} style={{ overflow: 'hidden', flexShrink: 0 }}>
         <div style={{ height: 5, background: `var(--intensity-${intensity})` }} />
@@ -44,7 +44,7 @@ function LeapToday({ ctx }) {
               {PHASE.desc}
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginTop: 8 }}>
-              Ngày {LEAP_DAY}/{LEAP_TOTAL} · còn ~{LEAP_TOTAL - LEAP_DAY} ngày
+              Ngày {LEAP_DAY}/{LEAP_TOTAL} · còn khoảng {LEAP_TOTAL - LEAP_DAY} ngày
             </div>
           </div>
           <div style={{ alignSelf: 'flex-end', flexShrink: 0 }}>
@@ -56,7 +56,7 @@ function LeapToday({ ctx }) {
       {/* FORECAST */}
       <Card pad={14}>
         <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12 }}>7 ngày tới</div>
-        <div className="no-sb" style={{ display: 'flex', gap: 10, overflowX: 'auto', margin: '-6px -6px -6px', padding: '6px 6px 12px' }}>
+        <div className="no-sb" style={{ display: 'flex', gap: 10, overflowX: 'auto', margin: '-6px -6px -6px', padding: '6px 6px 12px' }} data-comment-anchor="e9ba184d9e-div-58-9">
           {BWW_DATA.FORECAST.map((d, i) =>
           <div key={i} style={{
             flexShrink: 0, width: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '10px 4px',
@@ -73,16 +73,29 @@ function LeapToday({ ctx }) {
         </div>
       </Card>
 
+      {/* Symptoms — quan trọng, ngay sau dự báo; badge xuống dòng */}
+      {CURRENT_LEAP.symptoms && CURRENT_LEAP.symptoms.length > 0 &&
+      <div data-comment-anchor="274fa89efd-div-120-7">
+          <div style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 12, padding: '0 2px' }}>📌 Biểu hiện thường thấy:</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {CURRENT_LEAP.symptoms.map((s, i) =>
+          <span key={i} style={{
+            padding: '8px 14px', borderRadius: 'var(--r-full)', fontSize: 13, fontWeight: 600,
+            background: 'var(--bg-accent-soft)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)'
+          }}>{s}</span>
+          )}
+          </div>
+        </div>
+      }
+
       {/* "ĐANG XẢY RA GÌ?" — SPECIFIC description from leap data */}
       <Card onClick={() => ctx.go('leapdetail')}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: 1, color: 'var(--accent-primary)' }}>ĐANG XẢY RA GÌ?</div>
-          <Ic name="chevron" size={18} stroke="var(--text-muted)" />
-        </div>
+        <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: 1, color: 'var(--accent-primary)' }}>ĐANG XẢY RA GÌ?</div>
         <div className="serif" style={{ fontSize: 19, fontWeight: 600, marginTop: 8, lineHeight: 1.3 }}>{CURRENT_LEAP.fullName}</div>
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 6, lineHeight: 1.55, whiteSpace: 'pre-line' }}>
           {CURRENT_LEAP.desc.split('\n')[0]}
         </div>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 12, minHeight: 44, padding: '10px 16px', borderRadius: 'var(--r-full)', background: 'var(--bg-accent-soft)', color: 'var(--accent-primary)', fontSize: 13, fontWeight: 700 }}>Xem chi tiết <Ic name="chevron" size={14} sw={2.4} /></span>
       </Card>
 
       {/* CONTEXT-AWARE SECTION */}
@@ -113,21 +126,6 @@ function LeapToday({ ctx }) {
             </div>
           </div>)
 
-      }
-
-      {/* Symptoms pills */}
-      {CURRENT_LEAP.symptoms && CURRENT_LEAP.symptoms.length > 0 &&
-      <div>
-          <div style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 12, padding: '0 2px' }}>📌 Biểu hiện thường thấy:</div>
-          <div className="no-sb" style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '-6px -20px -8px', padding: '6px 20px 14px' }}>
-            {CURRENT_LEAP.symptoms.map((s, i) =>
-          <span key={i} style={{
-            flexShrink: 0, padding: '8px 14px', borderRadius: 'var(--r-full)', fontSize: 13, fontWeight: 600,
-            background: 'var(--bg-accent-soft)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)'
-          }}>{s}</span>
-          )}
-          </div>
-        </div>
       }
 
       <Banner icon="💛" tone="soft">Bé hôm nay thế nào rồi mama? <span style={{ color: 'var(--accent-primary)', fontWeight: 700 }} onClick={() => ctx.openSheet('quicklog')}>Ghi lại cảm xúc</span></Banner>
@@ -185,43 +183,96 @@ function LeapJourney({ ctx }) {
 
 }
 
-/* ---- 3C Lịch (calendar — unchanged) ---- */
+/* ---- 3C Lịch (calendar — tuần/ngày + chi tiết 7 ngày trong tuần) ---- */
 function LeapCalendar({ ctx }) {
   const weeks = BWW_DATA.buildCalendar();
   const [pick, setPick] = useState(null);
   const [legend, setLegend] = useState(true);
+  const [mode, setMode] = useState('week'); // 'week' | 'day'
+  const DOW = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  const curIdx = weeks.findIndex((w) => w.current);
+  const todayDow = (new Date().getDay() + 6) % 7; // 0=T2
+  const dayN = (weekN, di) => Math.max(1, Math.min(5, weekN + [-1, 0, 0, 1, 0, 0, -1][di]));
+  // day mode: 14 ngày tới
+  const days = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date();d.setDate(d.getDate() + i);
+    const wi = Math.min(weeks.length - 1, curIdx + Math.floor((todayDow + i) / 7));
+    return { d, n: dayN(weeks[wi].n, (todayDow + i) % 7), today: i === 0, w: weeks[wi].w };
+  });
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative' }}>
-    <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '16px 20px 16px' }}>
+    <div className="screen-scroll" style={{ flex: 1, overflowY: 'auto', padding: '16px 20px 16px' }} data-comment-anchor="e2757568b0-div-195-5">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <div style={{ fontSize: 14.5, fontWeight: 700 }}>77 tuần kỳ diệu</div>
         <button onClick={() => setLegend((l) => !l)} style={{ fontSize: 12.5, color: 'var(--accent-primary)', fontWeight: 600 }}>{legend ? 'Ẩn chú thích' : 'Chú thích'}</button>
       </div>
-      {legend &&
-      <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-          {[[1, 'Nắng'], [3, 'Hơi ấm'], [5, 'Cần mama']].map(([l, t]) =>
-        <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-secondary)' }}>
-              <span style={{ width: 14, height: 14, borderRadius: 4, background: `var(--intensity-${l})` }} />{t}
-            </div>
-        )}
-        </div>
-      }
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 7 }}>
-        {weeks.map((w) =>
-        <button key={w.w} onClick={() => setPick(w)} style={{
-          aspectRatio: '0.9', borderRadius: 9, background: `var(--intensity-${w.n})`, color: `var(--intensity-${w.n}-ink)`,
-          fontSize: 12, fontWeight: 700, border: w.current ? '2.5px solid var(--accent-primary)' : '2.5px solid transparent',
-          display: 'grid', placeItems: 'center'
-        }}>{w.w}</button>
+      <div style={{ display: 'flex', gap: 4, background: 'var(--bg-sunken)', borderRadius: 'var(--r-full)', padding: 4, marginBottom: 16 }}>
+        {[['week', 'Theo tuần'], ['day', 'Theo ngày']].map(([id, l]) =>
+        <button key={id} onClick={() => setMode(id)} style={{ flex: 1, padding: '9px 4px', borderRadius: 'var(--r-full)', fontSize: 13, fontWeight: 600, background: mode === id ? 'var(--bg-elevated)' : 'transparent', color: mode === id ? 'var(--text-primary)' : 'var(--text-muted)', boxShadow: mode === id ? 'var(--shadow-1)' : 'none' }}>{l}</button>
         )}
       </div>
+      {legend &&
+        <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+          {[[1, 'Nắng'], [3, 'Hơi ấm'], [5, 'Cần mama']].map(([l, t]) =>
+          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-secondary)' }}>
+              <span style={{ width: 14, height: 14, borderRadius: 4, background: `var(--intensity-${l})` }} />{t}
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-secondary)' }}>
+            <span style={{ width: 14, height: 14, borderRadius: 4, background: 'var(--bg-elevated)', border: '2.5px solid var(--accent-primary)' }} />Hôm nay (bé đang ở đây)
+          </div>
+        </div>
+        }
+      {mode === 'week' ?
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 7 }}>
+        {weeks.map((w) =>
+          <button key={w.w} onClick={() => setPick(w)} style={{
+            aspectRatio: '0.9', borderRadius: 9, background: `var(--intensity-${w.n})`, color: `var(--intensity-${w.n}-ink)`,
+            fontSize: 12, fontWeight: 700, border: w.current ? '2.5px solid var(--accent-primary)' : '2.5px solid transparent',
+            display: 'grid', placeItems: 'center'
+          }}>{w.w}</button>
+          )}
+      </div> :
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {days.map((d, i) =>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', minHeight: 52, borderRadius: 'var(--r-md)', background: 'var(--bg-elevated)', border: d.today ? '2px solid var(--accent-primary)' : '1px solid var(--border-subtle)' }}>
+            <span style={{ width: 34, height: 34, borderRadius: '50%', background: `var(--intensity-${d.n})`, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+              <BongFace emotion={FORECAST_EMO[d.n]} size={28} />
+            </span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700 }}>{d.today ? 'Hôm nay' : `${DOW[(d.d.getDay() + 6) % 7]} · ${d.d.getDate()}/${d.d.getMonth() + 1}`}</div>
+              <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Tuần {d.w} · {BWW_DATA.INTENSITY_COPY[d.n].label}</div>
+            </div>
+            {d.today && <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)' }}>Bé đang ở đây</span>}
+          </div>
+        )}
+      </div>
+      }
     </div>
-      <Sheet open={!!pick} onClose={() => setPick(null)} height="46%" title={pick ? `Tuần ${pick.w}` : ''} sub={pick ? `Mức cảm xúc dự kiến` : ''}>
+      <Sheet open={!!pick} onClose={() => setPick(null)} height="58%" title={pick ? `Tuần ${pick.w}` : ''} sub={pick ? `7 ngày trong tuần này` : ''}>
         {pick &&
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, paddingTop: 8 }}>
-            <BongIntensity level={pick.n} size={120} />
-            <IntensityBadge level={pick.n} size="lg" />
-            <div style={{ fontSize: 14.5, color: 'var(--text-secondary)', textAlign: 'center', maxWidth: 260, lineHeight: 1.5 }}>{BWW_DATA.INTENSITY_COPY[pick.n].copy}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 8 }}>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {DOW.map((lbl, di) => {
+              const n = dayN(pick.n, di);
+              const isToday = pick.current && di === todayDow;
+              return (
+                <div key={di} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '8px 2px', borderRadius: 'var(--r-md)', background: isToday ? 'var(--bg-accent-soft)' : 'var(--bg-sunken)', border: isToday ? '2px solid var(--accent-primary)' : '2px solid transparent' }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: isToday ? 'var(--accent-primary)' : 'var(--text-muted)' }}>{lbl}</span>
+                    <span style={{ width: 26, height: 26, borderRadius: '50%', background: `var(--intensity-${n})`, display: 'grid', placeItems: 'center' }}>
+                      <BongFace emotion={FORECAST_EMO[n]} size={21} />
+                    </span>
+                  </div>);
+            })}
+            </div>
+            {pick.current && <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--accent-primary)', textAlign: 'center' }}>▼ Bé đang ở {DOW[todayDow]} tuần này</div>}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, justifyContent: 'center' }}>
+              <BongIntensity level={pick.n} size={84} />
+              <div>
+                <IntensityBadge level={pick.n} size="md" />
+                <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', maxWidth: 190, lineHeight: 1.5, marginTop: 8 }}>{BWW_DATA.INTENSITY_COPY[pick.n].copy}</div>
+              </div>
+            </div>
           </div>
         }
       </Sheet>
@@ -235,7 +286,7 @@ function LeapScreen({ ctx, initialSub }) {
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <div style={{ padding: '6px 0 12px' }}>
         <div className="serif" style={{ fontSize: 24, fontWeight: 600, padding: '0 20px 12px' }}>Hành trình của bé</div>
-        <SubTabs value={sub} onChange={setSub} tabs={[{ id: 'today', label: 'Hôm nay' }, { id: 'journey', label: 'Hành trình' }, { id: 'cal', label: 'Lịch' }]} />
+        <SubTabs value={sub} onChange={setSub} tabs={[{ id: 'today', label: 'Hôm nay' }, { id: 'cal', label: 'Lịch' }, { id: 'journey', label: 'Hành trình' }]} />
       </div>
       {sub === 'today' && <LeapToday ctx={ctx} />}
       {sub === 'journey' && <LeapJourney ctx={ctx} />}
@@ -310,7 +361,7 @@ function LeapDetailScreen({ ctx }) {
             {locked &&
           <Card pad={16} style={{ background: 'var(--bg-accent-soft)', border: '1px dashed var(--accent-primary)' }}>
                 <div style={{ fontSize: 14.5, color: 'var(--text-primary)', lineHeight: 1.5, marginBottom: 12 }}>Đọc đầy đủ dấu hiệu & cách đồng hành cùng bé qua Leap {CURRENT_LEAP.n}…</div>
-                <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 14 }}>Dùng thử miễn phí 1 tháng — sau đó 199.000đ trọn đời 💛</div>
+                <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 14 }}>Mở khóa trọn đời — 199.000đ — sau đó 199.000đ trọn đời 💛</div>
                 <div style={{ display: 'flex', gap: 10 }}>
                   <ButtonPrimary onClick={() => ctx.openPaywall('Mở khóa Leap đầy đủ')} style={{ minHeight: 48 }}>Dùng thử 1 tháng</ButtonPrimary>
                   <ButtonSecondary onClick={ctx.back} style={{ minHeight: 48 }}>Để sau</ButtonSecondary>

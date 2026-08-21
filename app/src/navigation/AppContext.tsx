@@ -1,12 +1,16 @@
 /* ============================================================
    APP CONTEXT — state machine ported from app-clean.jsx.
    Pure immersive flow (no external controls): Auth → Onboarding → App.
+   Premium is a reverse trial: 7 days start automatically at signup
+   (no card), then the app falls back to Free until the one-time
+   199k unlock. Both are persisted per account.
    ============================================================ */
-import React, { createContext, useContext, useRef, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { ThemeMode } from '../theme/tokens';
 
 export type Flow = 'auth' | 'onboard' | 'app';
-export type Tab = 'today' | 'leap' | 'growth' | 'market';
+export type Tab = 'today' | 'leap' | 'growth' | 'me';
 export type Stack =
   | 'leapdetail' | 'measure' | 'history' | 'library' | 'notifications'
   | 'easy' | 'me' | 'designsystem' | null;
@@ -32,10 +36,13 @@ export interface AppCtx {
   intensity: number;
   empty: boolean;
   paywall: Paywall | null;
-  premium: boolean;       // effective unlock (purchased OR trial)
+  premium: boolean;       // effective unlock (purchased OR reverse trial running)
   purchased: boolean;
   trial: Trial | null;
 
+  /** One-time 199k unlock — persists for this account. */
+  buyPremium: () => void;
+  /** (Re)start the 7-day reverse trial — normally only fired at signup. */
   startTrial: () => void;
   cancelTrial: () => void;
   setTheme: (m: ThemeMode) => void;
@@ -62,15 +69,29 @@ export function useApp(): AppCtx {
   return c;
 }
 
+/* ---- persisted premium record (per account) ---- */
+const TRIAL_DAYS = 7;
+const premiumKey = (account: string) => `bww.premium.v2.${account}`;
+interface PremiumRecord { purchased: boolean; trialStart: number | null }
+
+function daysLeftOf(rec: PremiumRecord): number {
+  if (rec.trialStart == null) return 0;
+  const elapsed = Math.floor((Date.now() - rec.trialStart) / 86400000);
+  return Math.max(0, TRIAL_DAYS - elapsed);
+}
+
 export function AppProvider({
   themeMode,
   setThemeMode,
   initialRoute,
+  accountKey = 'local',
   children,
 }: {
   themeMode: ThemeMode;
   setThemeMode: (m: ThemeMode) => void;
   initialRoute?: Route;
+  /** Normalized phone of the signed-in account — premium/trial persist per account. */
+  accountKey?: string;
   children: React.ReactNode;
 }) {
   const [route, setRoute] = useState<Route>(
@@ -80,11 +101,38 @@ export function AppProvider({
   const [toastVal, setToastVal] = useState<Toast | null>(null);
   const [intensity, setIntensity] = useState(2);
   const [empty, setEmpty] = useState(false);
-  const [purchased, setPurchased] = useState(false);
-  const [trial, setTrial] = useState<Trial | null>(null);
+  const [rec, setRec] = useState<PremiumRecord>({ purchased: false, trialStart: null });
   const [paywall, setPaywall] = useState<Paywall | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastSeq = useRef(0);
+
+  // Load the account's premium record; first entry starts the reverse trial.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(premiumKey(accountKey));
+        if (raw) {
+          if (alive) setRec(JSON.parse(raw) as PremiumRecord);
+        } else {
+          const fresh: PremiumRecord = { purchased: false, trialStart: Date.now() };
+          if (alive) setRec(fresh);
+          await AsyncStorage.setItem(premiumKey(accountKey), JSON.stringify(fresh));
+        }
+      } catch {}
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [accountKey]);
+
+  const saveRec = (next: PremiumRecord) => {
+    setRec(next);
+    AsyncStorage.setItem(premiumKey(accountKey), JSON.stringify(next)).catch(() => {});
+  };
+
+  const daysLeft = daysLeftOf(rec);
+  const trial: Trial | null = !rec.purchased && daysLeft > 0 ? { daysLeft } : null;
 
   const ctx: AppCtx = {
     theme: themeMode,
@@ -94,11 +142,12 @@ export function AppProvider({
     intensity,
     empty,
     paywall,
-    premium: purchased || !!trial, // trial unlocks everything
-    purchased,
+    premium: rec.purchased || !!trial, // trial unlocks everything
+    purchased: rec.purchased,
     trial,
-    startTrial: () => setTrial({ daysLeft: 30 }),
-    cancelTrial: () => setTrial(null),
+    buyPremium: () => saveRec({ ...rec, purchased: true }),
+    startTrial: () => saveRec({ ...rec, trialStart: Date.now() }),
+    cancelTrial: () => saveRec({ ...rec, trialStart: null }),
     setTheme: setThemeMode,
     setTab: (t) => { setRoute({ flow: 'app', tab: t, stack: null }); setSheet(null); },
     go: (stack) => { setRoute((r) => ({ ...r, flow: 'app', stack })); setSheet(null); },
@@ -109,7 +158,7 @@ export function AppProvider({
     closeSheet: () => setSheet(null),
     setIntensity,
     setEmpty,
-    setPremium: setPurchased,
+    setPremium: (b) => saveRec({ ...rec, purchased: b }),
     openPaywall: (title) => setPaywall({ title }),
     closePaywall: () => setPaywall(null),
     toast: (text) => {

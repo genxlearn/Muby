@@ -1,12 +1,12 @@
 /* ============================================================
-   AUTH FLOW (A1–A6) + ONBOARDING (OB1–OB3)
+   MUBY AUTH (A1 Welcome · A2 Phone · A3 OTP — passwordless)
+   + ONBOARDING (OB1 Mừng mama · OB2 Thêm bé + ngày dự sinh)
    Wired to the real auth service (src/auth) and baby profile store.
    In demo mode the OTP code is shown inside the app (no SMS is sent).
    ============================================================ */
 import React, { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
-  LayoutAnimation,
   NativeSyntheticEvent,
   Platform,
   ScrollView,
@@ -19,14 +19,13 @@ import {
   AppBar,
   Banner,
   ButtonPrimary,
-  ButtonSecondary,
   ButtonText,
   Chip,
   FlowerField,
   Ic,
   Input,
 } from '../components';
-import { parseDobInput } from '../data/leapEngine';
+import { parseDobInput, parseDueDateInput } from '../data/leapEngine';
 import { Bong } from '../mascot/Bong';
 import { AppCtx, useApp } from '../navigation/AppContext';
 import { hasBabyFor, useBaby } from '../state/BabyContext';
@@ -34,10 +33,9 @@ import { useTheme } from '../theme/ThemeContext';
 import { fontFamily } from '../theme/tokens';
 import { Txt } from '../theme/Txt';
 
-/* Shared state across auth steps (phone/password travel A2 → A4, A5 → A6). */
+/* Shared state across auth steps (phone travels A2 → A3). */
 interface AuthDraft {
   phone: string;
-  password: string;
   demoCode: string | null;
 }
 type StepProps = {
@@ -83,35 +81,6 @@ function AuthScaffold({
   );
 }
 
-/* password strength (0..4) */
-function pwStrength(p: string) {
-  let s = 0;
-  if (p.length >= 8) s++;
-  if (/[A-Z]/.test(p) || /[a-z]/.test(p)) s++;
-  if (/\d/.test(p)) s++;
-  if (/[^A-Za-z0-9]/.test(p)) s++;
-  return Math.min(s, 4);
-}
-
-function StrengthBars({ st }: { st: number }) {
-  const { colors } = useTheme();
-  return (
-    <View style={{ flexDirection: 'row', gap: 5, marginTop: 8 }}>
-      {[0, 1, 2, 3].map((i) => (
-        <View
-          key={i}
-          style={{
-            flex: 1,
-            height: 4,
-            borderRadius: 2,
-            backgroundColor: i < st ? (st <= 2 ? colors.warning : colors.success) : colors.borderDefault,
-          }}
-        />
-      ))}
-    </View>
-  );
-}
-
 const phoneOkRe = /^\d{9,10}$/;
 
 /* ---- A1 Welcome ---- */
@@ -121,40 +90,36 @@ function A1({ go }: StepProps) {
     <AuthScaffold>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, paddingVertical: 20 }}>
         <Bong emotion="happy" onesie="orange" size={184} float />
-        <Txt serif style={{ fontSize: 38, fontWeight: '600', lineHeight: 40, marginTop: 18, color: colors.textPrimary, textAlign: 'center' }}>
-          Baby{'\n'}Wonder Weeks
+        <Txt serif style={{ fontSize: 46, fontWeight: '600', lineHeight: 48, marginTop: 18, color: colors.textPrimary, textAlign: 'center' }}>
+          Muby
         </Txt>
-        <Txt style={{ fontSize: 15.5, color: colors.textSecondary, marginTop: 14, maxWidth: 280, lineHeight: 23, textAlign: 'center' }}>
+        <Txt style={{ fontSize: 14, fontWeight: '700', letterSpacing: 2.5, textTransform: 'uppercase', color: colors.accentPrimary, marginTop: 8 }}>
+          Mẹ hiểu Bé
+        </Txt>
+        <Txt style={{ fontSize: 15.5, color: colors.textSecondary, marginTop: 16, maxWidth: 280, lineHeight: 23, textAlign: 'center' }}>
           Người chị thân thiết đồng hành cùng mama qua từng tuần của bé 💛
         </Txt>
       </View>
-      <View style={{ paddingHorizontal: 24, paddingBottom: 48, gap: 12 }}>
-        <ButtonPrimary onPress={() => go('A2')}>Đăng ký</ButtonPrimary>
-        <ButtonSecondary onPress={() => go('A3')}>Đã có tài khoản? Đăng nhập</ButtonSecondary>
+      <View style={{ paddingHorizontal: 24, paddingBottom: 48 }}>
+        <ButtonPrimary onPress={() => go('A2')}>Bắt đầu với số điện thoại</ButtonPrimary>
       </View>
     </AuthScaffold>
   );
 }
 
-/* ---- A2 Register ---- */
+/* ---- A2 Phone entry (passwordless) ---- */
 function A2({ go, ctx, auth, setDraft }: StepProps) {
   const { colors } = useTheme();
   const [phone, setPhone] = useState('');
-  const [pw, setPw] = useState('');
-  const [pw2, setPw2] = useState('');
   const [busy, setBusy] = useState(false);
   const phoneOk = phoneOkRe.test(phone.replace(/\s/g, ''));
-  const pwOk = pw.length >= 8;
-  const matchOk = pw2.length > 0 && pw === pw2;
-  const valid = phoneOk && pwOk && matchOk && !busy;
-  const st = pwStrength(pw);
 
   const submit = async () => {
     setBusy(true);
     try {
-      const { demoCode } = await auth.sendOtp(phone, 'register');
-      setDraft({ phone, password: pw, demoCode: demoCode ?? null });
-      go('A4');
+      const { demoCode } = await auth.sendOtp(phone);
+      setDraft({ phone, demoCode: demoCode ?? null });
+      go('A3');
     } catch (e: any) {
       ctx.toast(e?.message || 'Mạng lag chút xíu. Mình thử lại nhé.');
     } finally {
@@ -164,103 +129,29 @@ function A2({ go, ctx, auth, setDraft }: StepProps) {
 
   return (
     <AuthScaffold flowers={false}>
-      <AppBar title="Tạo tài khoản" onBack={() => go('A1')} />
+      <AppBar title="Nhập số điện thoại" onBack={() => go('A1')} />
       <View style={{ paddingHorizontal: 24, flex: 1 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <Bong emotion="happy" onesie="sage" size={78} />
-          <Txt serif style={{ flex: 1, fontSize: 20, fontWeight: '600', color: colors.textPrimary }}>Chỉ mất 1 phút thôi.</Txt>
+          <Txt style={{ flex: 1, fontSize: 14.5, color: colors.textSecondary, lineHeight: 22 }}>
+            Mình gửi mã xác nhận qua SMS — không cần mật khẩu 💛
+          </Txt>
         </View>
-        <View style={{ gap: 16 }}>
-          <Input
-            label="Số điện thoại"
-            prefix="+84"
-            type="tel"
-            value={phone}
-            onChange={setPhone}
-            placeholder="912 345 678"
-            error={phone && !phoneOk ? 'Số điện thoại chưa đúng định dạng nhé' : ''}
-          />
-          <View>
-            <Input label="Mật khẩu" type="password" value={pw} onChange={setPw} placeholder="Ít nhất 8 ký tự" />
-            <StrengthBars st={st} />
-          </View>
-          <Input
-            label="Xác nhận mật khẩu"
-            type="password"
-            value={pw2}
-            onChange={setPw2}
-            placeholder="Nhập lại mật khẩu"
-            error={pw2 && !matchOk ? 'Mật khẩu chưa khớp 🤍' : ''}
-          />
-        </View>
+        <Input
+          label="Số điện thoại"
+          prefix="+84"
+          type="tel"
+          value={phone}
+          onChange={setPhone}
+          placeholder="912 345 678"
+          error={phone && !phoneOk ? 'Số điện thoại chưa đúng định dạng nhé' : ''}
+        />
         <View style={{ flex: 1 }} />
         <View style={{ paddingTop: 20, paddingBottom: 44 }}>
-          <ButtonPrimary disabled={!valid} onPress={submit}>{busy ? 'Đang gửi mã…' : 'Tạo tài khoản'}</ButtonPrimary>
+          <ButtonPrimary disabled={!phoneOk || busy} onPress={submit}>{busy ? 'Đang gửi mã…' : 'Gửi mã'}</ButtonPrimary>
           <Txt style={{ fontSize: 12, color: colors.textMuted, textAlign: 'center', marginTop: 14, lineHeight: 18 }}>
             Khi tiếp tục, bạn đồng ý với <Txt style={{ color: colors.accentPrimary, fontWeight: '600' }}>Điều khoản</Txt> &{' '}
             <Txt style={{ color: colors.accentPrimary, fontWeight: '600' }}>Quyền riêng tư</Txt>.
-          </Txt>
-        </View>
-      </View>
-    </AuthScaffold>
-  );
-}
-
-/* ---- A3 Login ---- */
-function A3({ go, ctx, auth }: StepProps) {
-  const { colors } = useTheme();
-  const [phone, setPhone] = useState('');
-  const [pw, setPw] = useState('');
-  const [err, setErr] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  const submit = async () => {
-    if (!phone || !pw) {
-      setErr('SĐT hoặc mật khẩu chưa đúng. Thử lại nhé?');
-      return;
-    }
-    setBusy(true);
-    try {
-      await auth.signIn(phone, pw);
-      const normalized = '+84' + phone.replace(/\D/g, '').replace(/^84/, '').replace(/^0/, '');
-      const onboarded = await hasBabyFor(normalized);
-      if (onboarded) {
-        ctx.goFlow('app');
-        ctx.setTab('today');
-      } else {
-        ctx.goFlow('onboard', { obStep: 'ob1' });
-      }
-    } catch (e: any) {
-      setErr(e?.message || 'SĐT hoặc mật khẩu chưa đúng. Thử lại nhé?');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <AuthScaffold flowers={false}>
-      <AppBar title="Đăng nhập" onBack={() => go('A1')} />
-      <View style={{ paddingHorizontal: 24, flex: 1 }}>
-        <Txt serif style={{ fontSize: 26, fontWeight: '600', marginBottom: 4, color: colors.textPrimary }}>Chào mừng trở lại 💛</Txt>
-        <Txt style={{ fontSize: 14.5, color: colors.textSecondary, marginBottom: 24 }}>Bé vẫn đang chờ mama đó.</Txt>
-        <View style={{ gap: 16 }}>
-          <Input label="Số điện thoại" prefix="+84" type="tel" value={phone} onChange={(v) => { setPhone(v); setErr(''); }} placeholder="912 345 678" />
-          <Input label="Mật khẩu" type="password" value={pw} onChange={(v) => { setPw(v); setErr(''); }} placeholder="Mật khẩu" error={err} />
-        </View>
-        <View style={{ alignItems: 'flex-end', marginTop: 10 }}>
-          <ButtonText onPress={() => go('A5')} style={{ padding: 0 }}>Khôi phục mật khẩu?</ButtonText>
-        </View>
-        <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 44 }}>
-          <ButtonPrimary disabled={busy} onPress={submit}>{busy ? 'Đang đăng nhập…' : 'Đăng nhập'}</ButtonPrimary>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 20 }}>
-            <View style={{ flex: 1, height: 1, backgroundColor: colors.borderSubtle }} />
-            <Txt style={{ fontSize: 13, color: colors.textMuted }}>hoặc</Txt>
-            <View style={{ flex: 1, height: 1, backgroundColor: colors.borderSubtle }} />
-          </View>
-          <Txt style={{ textAlign: 'center', fontSize: 14.5, color: colors.textSecondary }}>
-            Chưa có tài khoản?{' '}
-            <Txt onPress={() => go('A2')} style={{ color: colors.accentPrimary, fontWeight: '700' }}>Đăng ký ngay</Txt>
           </Txt>
         </View>
       </View>
@@ -344,12 +235,13 @@ function DemoCodeBanner({ code }: { code: string | null }) {
   );
 }
 
-/* ---- A4 OTP verify (register) ---- */
-function A4({ go, ctx, auth, draft, setDraft }: StepProps) {
+/* ---- A3 OTP verify (+ Face ID prompt after first verify) ---- */
+function A3({ go, ctx, auth, draft, setDraft }: StepProps) {
   const { colors } = useTheme();
   const [otp, setOtp] = useState('');
   const [secs, setSecs] = useState(299);
   const [success, setSuccess] = useState(false);
+  const [askFace, setAskFace] = useState(false);
   const [err, setErr] = useState('');
   const busyRef = useRef(false);
 
@@ -358,11 +250,29 @@ function A4({ go, ctx, auth, draft, setDraft }: StepProps) {
     return () => clearInterval(t);
   }, []);
 
+  /* After the OTP proves it's you: existing baby → app, else onboarding. */
+  const enterApp = async () => {
+    const onboarded = await hasBabyFor(normalized(draft.phone));
+    if (onboarded) {
+      ctx.goFlow('app');
+      ctx.setTab('today');
+    } else {
+      ctx.goFlow('onboard', { obStep: 'ob1' });
+    }
+  };
+
   useEffect(() => {
     if (otp.length !== 6 || busyRef.current) return;
     busyRef.current = true;
     (async () => {
-      const ok = await auth.verifyOtp(draft.phone, otp);
+      let ok = false;
+      try {
+        ok = await auth.verifyOtp(draft.phone, otp);
+      } catch (e: any) {
+        ctx.toast(e?.message || 'Mạng lag chút xíu. Mình thử lại nhé.');
+        busyRef.current = false;
+        return;
+      }
       if (!ok) {
         setErr('Mã chưa đúng. Thử lại nhé?');
         setOtp('');
@@ -371,21 +281,25 @@ function A4({ go, ctx, auth, draft, setDraft }: StepProps) {
       }
       setErr('');
       setSuccess(true);
-      try {
-        await auth.signUp(draft.phone, draft.password);
-        setTimeout(() => ctx.goFlow('onboard', { obStep: 'ob1' }), 1100);
-      } catch (e: any) {
-        ctx.toast(e?.message || 'Có lỗi xảy ra. Thử lại nhé.');
-        setSuccess(false);
-        busyRef.current = false;
-      }
+      setTimeout(() => {
+        if (auth.faceIdSupported && !auth.faceIdEnabled) setAskFace(true);
+        else enterApp();
+      }, 900);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [otp]);
 
+  const finish = async (useFace: boolean) => {
+    if (useFace) {
+      const on = await auth.setFaceIdEnabled(true);
+      if (!on) ctx.toast('Chưa bật được Face ID — thử lại trong Mama nhé.');
+    }
+    await enterApp();
+  };
+
   const resend = async () => {
     try {
-      const { demoCode } = await auth.sendOtp(draft.phone, 'register');
+      const { demoCode } = await auth.sendOtp(draft.phone);
       setDraft((d) => ({ ...d, demoCode: demoCode ?? null }));
       setSecs(299);
       ctx.toast('Đã gửi lại mã 💛');
@@ -393,6 +307,31 @@ function A4({ go, ctx, auth, draft, setDraft }: StepProps) {
       ctx.toast(e?.message || 'Mạng lag chút xíu. Mình thử lại nhé.');
     }
   };
+
+  if (askFace) {
+    return (
+      <AuthScaffold>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 }}>
+          <Bong emotion="excited" onesie="orange" size={160} hop />
+          <Txt serif style={{ fontSize: 25, fontWeight: '600', marginTop: 16, color: colors.textPrimary, textAlign: 'center' }}>
+            Dùng Face ID cho lần sau?
+          </Txt>
+          <Txt style={{ fontSize: 14.5, color: colors.textSecondary, marginTop: 8, maxWidth: 280, lineHeight: 22, textAlign: 'center' }}>
+            Lần sau chỉ cần nhìn máy là vào — không cần chờ SMS. Bật/tắt được trong Mama.
+          </Txt>
+        </View>
+        <View style={{ paddingHorizontal: 24, paddingBottom: 48, gap: 10 }}>
+          <ButtonPrimary onPress={() => finish(true)}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
+              <Ic name="faceid" size={22} color="#FFFFFF" sw={2.2} />
+              <Txt style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>Bật Face ID</Txt>
+            </View>
+          </ButtonPrimary>
+          <ButtonText onPress={() => finish(false)} style={{ alignSelf: 'center' }}>Để sau cũng được</ButtonText>
+        </View>
+      </AuthScaffold>
+    );
+  }
 
   const mm = String(Math.floor(secs / 60));
   const ss = String(secs % 60).padStart(2, '0');
@@ -429,164 +368,31 @@ function A4({ go, ctx, auth, draft, setDraft }: StepProps) {
   );
 }
 
-/* ---- A5 Forgot step 1 ---- */
-function A5({ go, ctx, auth, setDraft }: StepProps) {
-  const { colors } = useTheme();
-  const [phone, setPhone] = useState('');
-  const [busy, setBusy] = useState(false);
-  const ok = phoneOkRe.test(phone.replace(/\s/g, ''));
-
-  const submit = async () => {
-    setBusy(true);
-    try {
-      const { demoCode } = await auth.sendOtp(phone, 'reset');
-      setDraft({ phone, password: '', demoCode: demoCode ?? null });
-      go('A6');
-    } catch (e: any) {
-      ctx.toast(e?.message || 'Mạng lag chút xíu. Mình thử lại nhé.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <AuthScaffold flowers={false}>
-      <AppBar title="Khôi phục mật khẩu" onBack={() => go('A3')} />
-      <View style={{ paddingHorizontal: 24, flex: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-          <Bong emotion="snug" onesie="lavender" size={76} />
-          <Txt style={{ flex: 1, fontSize: 14.5, color: colors.textSecondary, lineHeight: 22 }}>
-            Nhập số điện thoại, mình gửi mã để bạn đặt lại nhé.
-          </Txt>
-        </View>
-        <Input label="Số điện thoại" prefix="+84" type="tel" value={phone} onChange={setPhone} placeholder="912 345 678" />
-        <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 44 }}>
-          <ButtonPrimary disabled={!ok || busy} onPress={submit}>{busy ? 'Đang gửi…' : 'Gửi mã xác nhận'}</ButtonPrimary>
-        </View>
-      </View>
-    </AuthScaffold>
-  );
-}
-
-/* ---- A6 Forgot step 2 (progressive disclosure) ---- */
-function A6({ go, ctx, auth, draft }: StepProps) {
-  const { colors } = useTheme();
-  const [otp, setOtp] = useState('');
-  const [otpOk, setOtpOk] = useState(false);
-  const [otpErr, setOtpErr] = useState('');
-  const [pw, setPw] = useState('');
-  const [pw2, setPw2] = useState('');
-  const [done, setDone] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const checking = useRef(false);
-  const valid = otpOk && pw.length >= 8 && pw === pw2 && !busy;
-
-  useEffect(() => {
-    if (otp.length !== 6 || otpOk || checking.current) return;
-    checking.current = true;
-    (async () => {
-      const ok = await auth.verifyOtp(draft.phone, otp);
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      if (ok) {
-        setOtpOk(true);
-        setOtpErr('');
-      } else {
-        setOtpErr('Mã chưa đúng. Thử lại nhé?');
-        setOtp('');
-      }
-      checking.current = false;
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [otp]);
-
-  const save = async () => {
-    setBusy(true);
-    try {
-      await auth.resetPassword(draft.phone, pw);
-      setDone(true);
-    } catch (e: any) {
-      if (e?.code === 'not-found') setNotFound(true);
-      else ctx.toast(e?.message || 'Có lỗi xảy ra. Thử lại nhé.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  if (done) {
-    return (
-      <AuthScaffold>
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 }}>
-          <Bong emotion="excited" onesie="orange" size={170} hop />
-          <Txt serif style={{ fontSize: 26, fontWeight: '600', marginTop: 16, color: colors.textPrimary, textAlign: 'center' }}>Mật khẩu đã cập nhật 💚</Txt>
-          <Txt style={{ fontSize: 14.5, color: colors.textSecondary, marginTop: 8, textAlign: 'center' }}>Giờ mình đăng nhập lại nhé mama.</Txt>
-          <View style={{ width: '100%', marginTop: 28 }}>
-            <ButtonPrimary onPress={() => go('A3')}>Về đăng nhập</ButtonPrimary>
-          </View>
-        </View>
-      </AuthScaffold>
-    );
-  }
-  return (
-    <AuthScaffold flowers={false}>
-      <AppBar title="Đặt lại mật khẩu" onBack={() => go('A5')} />
-      <View style={{ paddingHorizontal: 24, flex: 1 }}>
-        <Txt style={{ fontSize: 14.5, color: colors.textSecondary, marginBottom: 18 }}>Nhập mã xác nhận vừa gửi tới máy bạn.</Txt>
-        <OtpBoxes value={otp} onChange={setOtp} success={otpOk} />
-        {otpErr ? <Txt style={{ marginTop: 12, fontSize: 13, color: colors.danger, fontWeight: '600' }}>{otpErr}</Txt> : null}
-        {notFound ? (
-          <Banner icon="🤍" style={{ marginTop: 14 }}>
-            <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20 }}>
-              SĐT chưa đăng ký.{' '}
-              <Txt onPress={() => go('A2')} style={{ color: colors.accentPrimary, fontWeight: '700' }}>Bạn muốn tạo tài khoản mới?</Txt>
-            </Txt>
-          </Banner>
-        ) : null}
-        {otpOk ? (
-          <View style={{ gap: 16, marginTop: 22 }}>
-            <Input label="Mật khẩu mới" type="password" value={pw} onChange={setPw} placeholder="Ít nhất 8 ký tự" />
-            <Input
-              label="Xác nhận mật khẩu"
-              type="password"
-              value={pw2}
-              onChange={setPw2}
-              placeholder="Nhập lại"
-              error={pw2 && pw !== pw2 ? 'Mật khẩu chưa khớp 🤍' : ''}
-            />
-          </View>
-        ) : (
-          <DemoCodeBanner code={draft.demoCode} />
-        )}
-        <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 44 }}>
-          <ButtonPrimary disabled={!valid} onPress={save}>{busy ? 'Đang lưu…' : 'Lưu mật khẩu mới'}</ButtonPrimary>
-        </View>
-      </View>
-    </AuthScaffold>
-  );
+function normalized(phone: string): string {
+  return '+84' + phone.replace(/\D/g, '').replace(/^84/, '').replace(/^0/, '');
 }
 
 export function AuthFlow() {
   const ctx = useApp();
   const auth = useAuth();
   const [step, setStep] = useState(ctx.route.authStep || 'A1');
-  const [draft, setDraft] = useState<AuthDraft>({ phone: '', password: '', demoCode: null });
+  const [draft, setDraft] = useState<AuthDraft>({ phone: '', demoCode: null });
   useEffect(() => {
     if (ctx.route.authStep) setStep(ctx.route.authStep);
   }, [ctx.route.authStep]);
   const go = (s: string) => setStep(s);
-  const M: Record<string, React.ComponentType<StepProps>> = { A1, A2, A3, A4, A5, A6 };
+  const M: Record<string, React.ComponentType<StepProps>> = { A1, A2, A3 };
   const S = M[step] || A1;
   return <S go={go} ctx={ctx} auth={auth} draft={draft} setDraft={setDraft} />;
 }
 
 /* ============================================================
-   ONBOARDING OB1 / OB2 / OB3 — saves the real baby profile
+   ONBOARDING OB1 / OB2 — saves the real baby profile (+ due date)
    ============================================================ */
 interface ObDraft {
   name: string;
   dobInput: string;
+  dueInput: string;
   gender: string;
 }
 type ObProps = {
@@ -617,10 +423,51 @@ function OB1({ go }: ObProps) {
   );
 }
 
-function OB2({ go, draft, setDraft }: ObProps) {
+/** Ngày dự sinh — leaps count from the due date, so this matters for
+ *  bé sinh sớm/muộn. Optional, with a gentle explainer underneath. */
+export function DueDateField({
+  value,
+  onChange,
+  error,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+}) {
   const { colors } = useTheme();
+  return (
+    <View>
+      <Input
+        label="Ngày dự sinh (không bắt buộc)"
+        value={value}
+        onChange={onChange}
+        placeholder="DD/MM/YYYY"
+        type="tel"
+        error={error || ''}
+        rightSlot={<Ic name="cal" size={20} color={colors.textMuted} />}
+      />
+      <Txt style={{ fontSize: 12.5, color: colors.textSecondary, lineHeight: 19, marginTop: 8 }}>
+        Leap tính theo ngày dự sinh — vì não bé phát triển từ trong bụng mẹ. Với bé sinh sớm/muộn 2 tuần trở lên, điền ngày dự sinh giúp dự báo đúng hơn nhiều 💛
+      </Txt>
+    </View>
+  );
+}
+
+function OB2({ go, draft, setDraft, finish }: ObProps) {
+  const { colors } = useTheme();
+  const [busy, setBusy] = useState(false);
   const dobIso = parseDobInput(draft.dobInput);
   const dobErr = draft.dobInput.length >= 8 && !dobIso ? 'Ngày sinh chưa đúng — nhập dạng DD/MM/YYYY nhé' : '';
+  const dueIso = parseDueDateInput(draft.dueInput);
+  const dueErr = draft.dueInput.length >= 8 && !dueIso ? 'Ngày dự sinh chưa đúng — nhập dạng DD/MM/YYYY nhé' : '';
+  const submit = async () => {
+    setBusy(true);
+    try {
+      await finish();
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <AuthScaffold flowers={false}>
       <AppBar title="Chào bé yêu!" onBack={() => go('ob1')} />
@@ -639,6 +486,7 @@ function OB2({ go, draft, setDraft }: ObProps) {
             error={dobErr}
             rightSlot={<Ic name="cal" size={20} color={colors.textMuted} />}
           />
+          <DueDateField value={draft.dueInput} onChange={(v) => setDraft((d) => ({ ...d, dueInput: v }))} error={dueErr} />
           <View>
             <Txt style={{ fontSize: 13.5, fontWeight: '600', color: colors.textSecondary, marginBottom: 7 }}>Giới tính (không bắt buộc)</Txt>
             <View style={{ flexDirection: 'row', gap: 9 }}>
@@ -649,47 +497,8 @@ function OB2({ go, draft, setDraft }: ObProps) {
           </View>
         </View>
         <Banner icon="💛" tone="soft" style={{ marginTop: 18 }}>Chỉ ngày sinh là cần thiết — còn lại để sau cũng được.</Banner>
-        <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 44 }}>
-          <ButtonPrimary disabled={!dobIso} onPress={() => go('ob3')}>Tiếp tục</ButtonPrimary>
-        </View>
-      </View>
-    </AuthScaffold>
-  );
-}
-
-function OB3({ go, ctx, finish }: ObProps) {
-  const { colors } = useTheme();
-  const [email, setEmail] = useState('');
-  const [busy, setBusy] = useState(false);
-  const complete = async (invited: boolean) => {
-    setBusy(true);
-    try {
-      await finish();
-      if (invited) ctx.toast('Đã gửi lời mời tới bố 💛');
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <AuthScaffold flowers={false}>
-      <AppBar title="Mời bố vào cùng" onBack={() => go('ob2')} />
-      <View style={{ paddingHorizontal: 24, flex: 1 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 12 }}>
-          <Bong emotion="happy" onesie="orange" size={110} style={{ marginRight: -18 }} />
-          <Bong emotion="blissful" onesie="lavender" size={110} />
-        </View>
-        <Txt serif style={{ fontSize: 21, fontWeight: '600', textAlign: 'center', marginBottom: 6, color: colors.textPrimary }}>
-          Chăm bé nhẹ nhàng hơn khi có hai người
-        </Txt>
-        <Txt style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center', marginBottom: 22, lineHeight: 21 }}>
-          Mọi ghi chép sẽ được đồng bộ cho cả nhà.
-        </Txt>
-        <Input label="Email của bố" type="email" value={email} onChange={setEmail} placeholder="bo@email.com" />
-        <View style={{ flex: 1 }} />
-        <View style={{ paddingTop: 12, paddingBottom: 44, gap: 10 }}>
-          <ButtonPrimary disabled={busy} onPress={() => complete(email.includes('@'))}>Gửi lời mời</ButtonPrimary>
-          <ButtonText onPress={() => complete(false)} style={{ alignSelf: 'center' }}>Để sau cũng được</ButtonText>
+        <View style={{ paddingTop: 24, paddingBottom: 44 }}>
+          <ButtonPrimary disabled={!dobIso || (!!draft.dueInput && !dueIso) || busy} onPress={submit}>Tiếp tục</ButtonPrimary>
         </View>
       </View>
     </AuthScaffold>
@@ -700,7 +509,7 @@ export function OnboardFlow() {
   const ctx = useApp();
   const babyApi = useBaby();
   const [step, setStep] = useState(ctx.route.obStep || 'ob1');
-  const [draft, setDraft] = useState<ObDraft>({ name: '', dobInput: '', gender: '' });
+  const [draft, setDraft] = useState<ObDraft>({ name: '', dobInput: '', dueInput: '', gender: '' });
   useEffect(() => {
     if (ctx.route.obStep) setStep(ctx.route.obStep);
   }, [ctx.route.obStep]);
@@ -709,13 +518,20 @@ export function OnboardFlow() {
   const finish = async () => {
     const dobIso = parseDobInput(draft.dobInput);
     if (dobIso) {
-      await babyApi.saveBaby({ name: draft.name.trim(), dob: dobIso, gender: draft.gender });
+      const dueIso = parseDueDateInput(draft.dueInput);
+      await babyApi.saveBaby({
+        name: draft.name.trim(),
+        dob: dobIso,
+        gender: draft.gender,
+        ...(dueIso ? { dueDate: dueIso } : {}),
+      });
     }
     ctx.goFlow('app');
     ctx.setTab('today');
+    ctx.toast('Chào mừng hai mẹ con 💛');
   };
 
-  const M: Record<string, React.ComponentType<ObProps>> = { ob1: OB1, ob2: OB2, ob3: OB3 };
+  const M: Record<string, React.ComponentType<ObProps>> = { ob1: OB1, ob2: OB2, ob3: OB2 };
   const S = M[step] || OB1;
   return <S go={go} ctx={ctx} draft={draft} setDraft={setDraft} finish={finish} />;
 }

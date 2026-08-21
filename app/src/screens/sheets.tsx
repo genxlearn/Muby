@@ -1,9 +1,9 @@
 /* ============================================================
    SCREEN 2 — Quick Log Sheet · 2B — Soothing Sheet
    ============================================================ */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
-import { Chip, Ic, Icon3D, Sheet } from '../components';
+import { ButtonText, Chip, Ic, Icon3D, Sheet } from '../components';
 import * as D from '../data/sampleData';
 import { BongFace, Emotion, Onesie } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
@@ -11,50 +11,142 @@ import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
 
 const TILES: { id: string; emo: Emotion; onesie: Onesie; label: string; sub: string; icon: string }[] = [
-  { id: 'feed', emo: 'eating', onesie: 'orange', label: 'Cữ ăn', sub: '80ml', icon: '🍼' },
-  { id: 'sleep', emo: 'sleeping', onesie: 'lavender', label: 'Giấc ngủ', sub: 'bây giờ', icon: '🌙' },
-  { id: 'diaper', emo: 'happy', onesie: 'sage', label: 'Tã', sub: 'Ướt', icon: '💧' },
+  { id: 'feed', emo: 'eating', onesie: 'orange', label: 'Cữ ăn', sub: 'chọn lượng', icon: '🍼' },
+  { id: 'sleep', emo: 'sleeping', onesie: 'lavender', label: 'Giấc ngủ', sub: 'chọn giờ', icon: '🌙' },
+  { id: 'diaper', emo: 'happy', onesie: 'sage', label: 'Tã', sub: 'chọn loại', icon: '💧' },
   { id: 'mood', emo: 'blissful', onesie: 'cream', label: 'Cảm xúc', sub: '', icon: '💛' },
   { id: 'soothe', emo: 'snug', onesie: 'lavender', label: 'Dỗ bé', sub: '', icon: '🎵' },
   { id: 'play', emo: 'curious', onesie: 'orange', label: 'Sunny Play', sub: '', icon: '🌼' },
 ];
 
+/* second-tap detail options per category (v3 two-tap flow) */
+const LOG_OPTS: Record<string, { title: string; q: string; opts: string[] }> = {
+  feed: { title: 'Cữ ăn', q: 'Bé ăn bao nhiêu?', opts: ['60ml', '80ml', '100ml', '120ml', 'Bú mẹ'] },
+  sleep: { title: 'Giấc ngủ', q: 'Bé ngủ từ khi nào?', opts: ['Bắt đầu bây giờ', '15 phút trước', '30 phút trước', '1 giờ trước', 'Vừa thức dậy'] },
+  diaper: { title: 'Tã', q: 'Tã của bé thế nào?', opts: ['Ướt', 'Bẩn', 'Cả hai'] },
+};
+const MOODS: [Emotion, string][] = [
+  ['blissful', 'Vui lắm'],
+  ['happy', 'Thoải mái'],
+  ['uncertain', 'Hơi khó'],
+  ['fussy', 'Cáu kỉnh'],
+  ['crying', 'Khóc nhiều'],
+];
+
 export function QuickLogSheet({ open }: { open: boolean }) {
   const { colors, radii } = useTheme();
   const ctx = useApp();
+  const [detail, setDetail] = useState<string | null>(null);
+  useEffect(() => {
+    if (!open) setDetail(null);
+  }, [open]);
+
   const tap = (t: (typeof TILES)[number]) => {
     if (t.id === 'soothe') { ctx.openSheet('soothing'); return; }
     if (t.id === 'play') { ctx.closeSheet(); ctx.setTab('leap'); return; }
-    ctx.closeSheet();
-    ctx.toast(`Đã ghi ${t.label.toLowerCase()} rồi. Bạn đang làm rất tốt ❤️`);
+    setDetail(t.id);
   };
+  const save = (label: string, val: string) => {
+    ctx.closeSheet();
+    ctx.toast(`Đã ghi ${label} · ${val}. Bạn đang làm rất tốt ❤️`);
+  };
+  const OD = detail ? LOG_OPTS[detail] : undefined;
+
   return (
-    <Sheet open={open} onClose={ctx.closeSheet} height="66%" title="Ghi nhanh" sub="Một chạm là xong. Không cần điền gì thêm.">
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 11, marginTop: 8 }}>
-        {TILES.map((t) => (
-          <Pressable
-            key={t.id}
-            onPress={() => tap(t)}
-            style={({ pressed }) => ({
-              flexBasis: '31%',
-              flexGrow: 1,
-              aspectRatio: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 2,
-              backgroundColor: colors.bgSunken,
-              borderRadius: radii.lg,
-              borderWidth: 1.5,
-              borderColor: colors.borderSubtle,
-              transform: [{ scale: pressed ? 0.94 : 1 }],
-            })}
-          >
-            <BongFace emotion={t.emo} size={48} />
-            <Txt style={{ fontSize: 13.5, fontWeight: '700', color: colors.textPrimary, marginTop: 4 }}>{t.label}</Txt>
-            {t.sub ? <Txt style={{ fontSize: 11.5, color: colors.textMuted, fontWeight: '600' }}>{t.sub}</Txt> : null}
-          </Pressable>
-        ))}
-      </View>
+    <Sheet
+      open={open}
+      onClose={ctx.closeSheet}
+      height="66%"
+      title={detail ? (OD ? OD.title : 'Cảm xúc') : 'Ghi nhanh'}
+      sub={detail ? 'Chọn một ô là xong — không cần điền gì thêm.' : 'Chọn một mục, rồi chọn chi tiết. Hai chạm là xong.'}
+    >
+      {!detail ? (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 11, marginTop: 8 }}>
+          {TILES.map((t) => (
+            <Pressable
+              key={t.id}
+              onPress={() => tap(t)}
+              style={({ pressed }) => ({
+                flexBasis: '31%',
+                flexGrow: 1,
+                aspectRatio: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 2,
+                backgroundColor: colors.bgSunken,
+                borderRadius: radii.lg,
+                borderWidth: 1.5,
+                borderColor: colors.borderSubtle,
+                transform: [{ scale: pressed ? 0.94 : 1 }],
+              })}
+            >
+              <BongFace emotion={t.emo} size={48} />
+              <Txt style={{ fontSize: 13.5, fontWeight: '700', color: colors.textPrimary, marginTop: 4 }}>{t.label}</Txt>
+              {t.sub ? <Txt style={{ fontSize: 11.5, color: colors.textMuted, fontWeight: '600' }}>{t.sub}</Txt> : null}
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
+
+      {detail && OD ? (
+        <View style={{ marginTop: 8 }}>
+          <Txt style={{ fontSize: 14.5, fontWeight: '700', marginBottom: 12 }}>{OD.q}</Txt>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+            {OD.opts.map((o) => (
+              <Pressable
+                key={o}
+                onPress={() => save(OD.title.toLowerCase(), o)}
+                style={({ pressed }) => ({
+                  flexBasis: '47%',
+                  flexGrow: 1,
+                  minHeight: 56,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: radii.md,
+                  backgroundColor: colors.bgSunken,
+                  borderWidth: 1.5,
+                  borderColor: colors.borderSubtle,
+                  transform: [{ scale: pressed ? 0.96 : 1 }],
+                })}
+              >
+                <Txt style={{ fontSize: 15, fontWeight: '700', color: colors.textPrimary }}>{o}</Txt>
+              </Pressable>
+            ))}
+          </View>
+          <ButtonText onPress={() => setDetail(null)} style={{ alignSelf: 'center', marginTop: 16 }}>← Quay lại</ButtonText>
+        </View>
+      ) : null}
+
+      {detail === 'mood' ? (
+        <View style={{ marginTop: 8 }}>
+          <Txt style={{ fontSize: 14.5, fontWeight: '700', marginBottom: 12 }}>Hôm nay bé thế nào?</Txt>
+          <View style={{ flexDirection: 'row', gap: 8, justifyContent: 'space-between' }}>
+            {MOODS.map(([emo, label]) => (
+              <Pressable
+                key={emo}
+                onPress={() => save('cảm xúc', label.toLowerCase())}
+                style={({ pressed }) => ({
+                  flex: 1,
+                  alignItems: 'center',
+                  gap: 6,
+                  paddingVertical: 12,
+                  paddingHorizontal: 2,
+                  minHeight: 88,
+                  borderRadius: radii.md,
+                  backgroundColor: colors.bgSunken,
+                  borderWidth: 1.5,
+                  borderColor: colors.borderSubtle,
+                  transform: [{ scale: pressed ? 0.95 : 1 }],
+                })}
+              >
+                <BongFace emotion={emo} size={42} />
+                <Txt numberOfLines={1} style={{ fontSize: 10.5, fontWeight: '700', color: colors.textPrimary }}>{label}</Txt>
+              </Pressable>
+            ))}
+          </View>
+          <ButtonText onPress={() => setDetail(null)} style={{ alignSelf: 'center', marginTop: 16 }}>← Quay lại</ButtonText>
+        </View>
+      ) : null}
     </Sheet>
   );
 }

@@ -1,7 +1,7 @@
 /* ============================================================
-   APP FLOW — router (Muby App Final).
-   Tabs: today · leap · growth · market (floating pill nav overlays content).
-   Me is a stack screen reached from the Today avatar.
+   APP FLOW — router (Muby v3).
+   Tabs: today · leap · growth · me, with the Ghi nhanh FAB in the
+   middle of the floating nav (opens the quick-log sheet).
    ============================================================ */
 import React from 'react';
 import { View } from 'react-native';
@@ -10,7 +10,7 @@ import { useApp } from './navigation/AppContext';
 import { AuthFlow, OnboardFlow } from './screens/auth';
 import { GrowthScreen, HistoryScreen, LibraryScreen, MeasureScreen } from './screens/growth';
 import { LeapDetailScreen, LeapScreen } from './screens/leap';
-import { MarketScreen, MeScreen, NotificationsScreen } from './screens/me';
+import { MeScreen, NotificationsScreen } from './screens/me';
 import { EasyScreen, TodayScreen } from './screens/Today';
 import { DesignSystemScreen } from './screens/DesignSystem';
 
@@ -44,12 +44,12 @@ export function AppFlow() {
     today: <TodayScreen />,
     leap: <LeapScreen />,
     growth: <GrowthScreen />,
-    market: <MarketScreen />,
+    me: <MeScreen />,
   };
   return (
     <View style={{ flex: 1 }}>
       {tabs[route.tab] ?? <TodayScreen />}
-      <BottomNav active={route.tab} onNav={(t) => ctx.setTab(t)} />
+      <BottomNav active={route.tab} onNav={(t) => ctx.setTab(t)} onFab={() => ctx.openSheet('quicklog')} />
     </View>
   );
 }

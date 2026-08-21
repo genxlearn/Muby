@@ -45,8 +45,8 @@ function AppFlow({ ctx }) {
   const TABS = {
     today: () => <TodayScreen ctx={ctx} />,
     leap: () => (window.LeapScreen ? <LeapScreen ctx={ctx} /> : <Placeholder name="Leap" />),
-    growth: () => (window.GrowthScreen ? <GrowthScreen ctx={ctx} /> : <Placeholder name="Tăng trưởng" />),
-    market: () => (window.MarketScreen ? <MarketScreen ctx={ctx} /> : <Placeholder name="Market" />),
+    growth: () => (window.GrowthScreen ? <GrowthScreen ctx={ctx} /> : <Placeholder name="Lớn khôn" />),
+    me: () => (window.MeScreen ? <MeScreen ctx={ctx} /> : <Placeholder name="Mama" />),
   };
   const STACKS = {
     leapdetail: () => (window.LeapDetailScreen ? <LeapDetailScreen ctx={ctx} /> : <Placeholder name="Leap chi tiết" />),
@@ -117,20 +117,23 @@ function App() {
   const [route, setRoute] = useS({ flow: 'app', tab: 'today', stack: null });
   const [sheet, setSheet] = useS(null);
   const [toastVal, setToastVal] = useS(null);
-  const [intensity, setIntensity] = useS(2);
+  const [intensity, setIntensity] = useS(window.BWW_DATA ? BWW_DATA.FORECAST[0].n : 2);
   const [empty, setEmpty] = useS(false);
   const [premium, setPremium] = useS(false);
   const [trial, setTrial] = useS(null); // null | { daysLeft: number }
   const [paywall, setPaywall] = useS(null);
+  const [faceId, setFaceId] = useS(true);
   const toastTimer = useR(null);
 
   useE(() => { document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : ''; }, [theme]);
 
   const ctx = {
-    theme, route, sheet, toastVal, intensity, empty, paywall,
+    theme, route, sheet, toastVal, intensity, empty, paywall, faceId, setFaceId,
     premium: premium || !!trial,
     purchased: premium, trial,
-    startTrial: () => { setTrial({ daysLeft: 30 }); },
+    startTrial: () => setTrial({ daysLeft: 7 }),
+    cancelTrial: () => setTrial(null),
+    updateBaby: (name, dob) => { BWW_DATA.recompute(dob, name); setIntensity(BWW_DATA.FORECAST[0].n); },
     setTheme,
     setTab: (t) => { setRoute({ flow: 'app', tab: t, stack: null }); setSheet(null); },
     go: (stack) => { setRoute(r => ({ ...r, flow: 'app', stack })); setSheet(null); },
@@ -173,7 +176,7 @@ function App() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
           <Flower size={24} color="var(--accent-primary)" />
-          <div style={{ fontWeight: 700, fontSize: 15.5 }}>Baby Wonder Weeks <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>v3 · Prototype</span></div>
+          <div style={{ fontWeight: 700, fontSize: 15.5 }}>Muby <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>v3 · Prototype</span></div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           {onToday && (

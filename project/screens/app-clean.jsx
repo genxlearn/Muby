@@ -21,8 +21,8 @@ function AppFlow({ ctx }) {
   const TABS = {
     today: () => <TodayScreen ctx={ctx} />,
     leap: () => (window.LeapScreen ? <LeapScreen ctx={ctx} /> : <Placeholder name="Leap" />),
-    growth: () => (window.GrowthScreen ? <GrowthScreen ctx={ctx} /> : <Placeholder name="Tăng trưởng" />),
-    market: () => (window.MarketScreen ? <MarketScreen ctx={ctx} /> : <Placeholder name="Market" />),
+    growth: () => (window.GrowthScreen ? <GrowthScreen ctx={ctx} /> : <Placeholder name="Lớn khôn" />),
+    me: () => (window.MeScreen ? <MeScreen ctx={ctx} /> : <Placeholder name="Mama" />),
   };
   const STACKS = {
     leapdetail: () => (window.LeapDetailScreen ? <LeapDetailScreen ctx={ctx} /> : <Placeholder name="Leap chi tiết" />),
@@ -70,25 +70,31 @@ function App() {
   const [route, setRoute] = useS({ flow: 'auth', tab: 'today', stack: null, authStep: 'A1' });
   const [sheet, setSheet] = useS(null);
   const [toastVal, setToastVal] = useS(null);
-  const [intensity, setIntensity] = useS(2);
+  const [intensity, setIntensity] = useS(window.BWW_DATA ? BWW_DATA.FORECAST[0].n : 2);
   const [empty, setEmpty] = useS(false);
   const [premium, setPremium] = useS(false);
-  const [trial, setTrial] = useS(null); // null | { daysLeft: number }
+  const [trial, setTrial] = useS(null); // reverse trial: { daysLeft } — starts at signup, no card
   const [paywall, setPaywall] = useS(null);
+  const [faceId, setFaceId] = useS(true);
   const toastTimer = useR(null);
 
   useE(() => { document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : ''; }, [theme]);
 
   const ctx = {
-    theme, route, sheet, toastVal, intensity, empty, paywall,
+    theme, route, sheet, toastVal, intensity, empty, paywall, faceId, setFaceId,
     premium: premium || !!trial,           // trial unlocks everything
     purchased: premium, trial,
-    startTrial: () => { setTrial({ daysLeft: 30 }); },
+    startTrial: () => setTrial({ daysLeft: 7 }),
+    cancelTrial: () => setTrial(null),
+    updateBaby: (name, dob) => { BWW_DATA.recompute(dob, name); setIntensity(BWW_DATA.FORECAST[0].n); },
     setTheme,
     setTab: (t) => { setRoute({ flow: 'app', tab: t, stack: null }); setSheet(null); },
     go: (stack) => { setRoute(r => ({ ...r, flow: 'app', stack })); setSheet(null); },
     back: () => setRoute(r => ({ ...r, stack: null })),
-    goFlow: (flow, extra = {}) => { setRoute({ flow, tab: 'today', stack: null, ...extra }); setSheet(null); },
+    goFlow: (flow, extra = {}) => {
+      if (flow === 'app' && route.flow === 'onboard' && !trial && !premium) setTrial({ daysLeft: 7 }); // reverse trial starts at signup
+      setRoute({ flow, tab: 'today', stack: null, ...extra }); setSheet(null);
+    },
     setRoute,
     openSheet: (s) => setSheet(s),
     closeSheet: () => setSheet(null),

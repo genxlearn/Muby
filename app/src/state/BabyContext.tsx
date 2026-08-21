@@ -86,9 +86,9 @@ export function BabyProvider({ children }: { children: React.ReactNode }) {
   );
 
   const state = useMemo(
-    () => computeBabyState(baby?.dob ?? SAMPLE_DOB),
+    () => computeBabyState(baby?.dob ?? SAMPLE_DOB, baby?.dueDate),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [baby?.dob, dayStamp]
+    [baby?.dob, baby?.dueDate, dayStamp]
   );
 
   const api = useMemo<BabyApi>(

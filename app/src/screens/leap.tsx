@@ -9,7 +9,6 @@ import {
   AppBar,
   Banner,
   ButtonPrimary,
-  ButtonSecondary,
   Card,
   EmptyState,
   Ic,
@@ -20,6 +19,7 @@ import {
   Sheet,
   SubTabs,
 } from '../components';
+import { intensityAtWeek } from '../data/leapEngine';
 import * as D from '../data/sampleData';
 import { LeapAction } from '../data/sampleData';
 import { BongFace, BongIntensity } from '../mascot/Bong';
@@ -27,9 +27,33 @@ import { useApp } from '../navigation/AppContext';
 import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
-import { ActionCard, ForecastStrip, SunnyPlaySection, SymptomPills } from './shared';
+import { ActionCard, ForecastStrip, SunnyPlaySection } from './shared';
 
 const clampLv = (n: number) => (Math.min(5, Math.max(1, n)) as 1 | 2 | 3 | 4 | 5);
+
+/** Symptom pills that wrap onto multiple lines (v3 layout — no horizontal scroll). */
+function WrapPills({ symptoms }: { symptoms: string[] }) {
+  const { colors } = useTheme();
+  return (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+      {symptoms.map((s, i) => (
+        <View
+          key={i}
+          style={{
+            paddingVertical: 8,
+            paddingHorizontal: 14,
+            borderRadius: 999,
+            backgroundColor: colors.bgAccentSoft,
+            borderWidth: 1,
+            borderColor: colors.borderSubtle,
+          }}
+        >
+          <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textPrimary }}>{s}</Txt>
+        </View>
+      ))}
+    </View>
+  );
+}
 
 type Sub = 'today' | 'journey' | 'cal';
 type DetailTab = 'now' | 'actions' | 'hist';
@@ -77,7 +101,7 @@ function LeapToday() {
               </Txt>
               <Txt style={{ fontSize: 12, color: colors.textMuted, fontWeight: '600', marginTop: 8 }}>
                 {inLeap
-                  ? `Ngày ${st.leapDay}/${st.leapTotal} · còn ~${st.leapTotal - st.leapDay} ngày`
+                  ? `Ngày ${st.leapDay}/${st.leapTotal} · còn khoảng ${st.leapTotal - st.leapDay} ngày`
                   : st.status === 'after-all'
                     ? `Bé ${st.ageLabel}`
                     : `Dự kiến bắt đầu trong ~${st.daysUntilLeap} ngày`}
@@ -95,16 +119,41 @@ function LeapToday() {
           <ForecastStrip data={st.forecast} />
         </Card>
 
+        {/* Symptoms — quan trọng, ngay sau dự báo; badge xuống dòng */}
+        {st.status !== 'after-all' && CURRENT_LEAP.symptoms.length > 0 ? (
+          <View>
+            <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 12, paddingHorizontal: 2 }}>
+              {inLeap ? '📌 Biểu hiện thường thấy:' : `📌 Biểu hiện có thể gặp ở Leap ${CURRENT_LEAP.n}:`}
+            </Txt>
+            <WrapPills symptoms={CURRENT_LEAP.symptoms} />
+          </View>
+        ) : null}
+
         {/* "ĐANG XẢY RA GÌ?" — tap to open detail */}
         <Card onPress={() => ctx.go('leapdetail')}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Txt style={{ fontSize: 11.5, fontWeight: '700', letterSpacing: 1, color: colors.accentPrimary }}>ĐANG XẢY RA GÌ?</Txt>
-            <Ic name="chevron" size={18} color={colors.textMuted} />
-          </View>
+          <Txt style={{ fontSize: 11.5, fontWeight: '700', letterSpacing: 1, color: colors.accentPrimary }}>ĐANG XẢY RA GÌ?</Txt>
           <Txt serif style={{ fontSize: 19, fontWeight: '600', marginTop: 8, lineHeight: 25, color: colors.textPrimary }}>{CURRENT_LEAP.fullName}</Txt>
           <Txt style={{ fontSize: 14, color: colors.textSecondary, marginTop: 6, lineHeight: 22 }}>
             {CURRENT_LEAP.desc.split('\n')[0]}
           </Txt>
+          <Pressable
+            onPress={() => ctx.go('leapdetail')}
+            style={{
+              alignSelf: 'flex-start',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 4,
+              marginTop: 12,
+              minHeight: 44,
+              paddingVertical: 10,
+              paddingHorizontal: 16,
+              borderRadius: 999,
+              backgroundColor: colors.bgAccentSoft,
+            }}
+          >
+            <Txt style={{ fontSize: 13, fontWeight: '700', color: colors.accentPrimary }}>Xem chi tiết</Txt>
+            <Ic name="chevron" size={14} sw={2.4} color={colors.accentPrimary} />
+          </Pressable>
         </Card>
 
         {/* CONTEXT-AWARE SECTION */}
@@ -141,16 +190,6 @@ function LeapToday() {
             </View>
           </View>
         )}
-
-        {/* Symptoms pills — non-tappable */}
-        {st.status !== 'after-all' && CURRENT_LEAP.symptoms.length > 0 ? (
-          <View>
-            <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 8, paddingHorizontal: 2 }}>
-              {inLeap ? '📌 Biểu hiện thường thấy:' : `📌 Biểu hiện có thể gặp ở Leap ${CURRENT_LEAP.n}:`}
-            </Txt>
-            <SymptomPills symptoms={CURRENT_LEAP.symptoms} />
-          </View>
-        ) : null}
 
         <Banner icon="💛" tone="soft">
           <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20 }}>
@@ -229,13 +268,35 @@ function LeapJourney() {
   );
 }
 
-/* ---- 3C Lịch (calendar) ---- */
+/* ---- 3C Lịch (calendar — tuần/ngày + chi tiết 7 ngày trong tuần) ---- */
+const DOW = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+type CalMode = 'week' | 'day';
+
 function LeapCalendar() {
-  const { colors } = useTheme();
+  const { colors, radii } = useTheme();
   const { state: st } = useBaby();
-  const weeks = D.buildCalendar(Math.min(77, Math.max(1, st.ageWeeks)));
+  /* Leap math anchors to the due date when set — the calendar shows leap weeks. */
+  const curWeek = Math.min(77, Math.max(1, Math.floor(st.leapWeeksFrac)));
+  const weeks = D.buildCalendar(curWeek);
   const [pick, setPick] = useState<D.CalendarWeek | null>(null);
   const [legend, setLegend] = useState(true);
+  const [mode, setMode] = useState<CalMode>('week');
+  const todayDow = (new Date().getDay() + 6) % 7; // 0 = T2
+  /* Intensity for day `di` (0=T2) of calendar week `w` — real engine curve. */
+  const dayN = (w: number, di: number) =>
+    clampLv(intensityAtWeek(st.leapWeeksFrac + ((w - curWeek) * 7 + (di - todayDow)) / 7));
+  /* Day mode: 14 ngày tới — real dates from today, engine intensity. */
+  const days = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const wf = st.leapWeeksFrac + i / 7;
+    return {
+      d,
+      n: clampLv(intensityAtWeek(wf)),
+      today: i === 0,
+      w: Math.min(77, Math.max(1, Math.floor(wf))),
+    };
+  });
   return (
     <View style={{ flex: 1 }}>
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
@@ -247,55 +308,138 @@ function LeapCalendar() {
           </Pressable>
         </View>
 
+        <SubTabs<CalMode>
+          value={mode}
+          onChange={setMode}
+          style={{ marginBottom: 16 }}
+          tabs={[
+            { id: 'week', label: 'Theo tuần' },
+            { id: 'day', label: 'Theo ngày' },
+          ]}
+        />
+
         {legend ? (
-          <View style={{ flexDirection: 'row', gap: 14, marginBottom: 16, flexWrap: 'wrap' }}>
+          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
             {([[1, 'Nắng'], [3, 'Hơi ấm'], [5, 'Cần mama']] as [number, string][]).map(([l, t]) => (
               <View key={l} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: colors.intensity[clampLv(l)] }} />
                 <Txt style={{ fontSize: 12, color: colors.textSecondary }}>{t}</Txt>
               </View>
             ))}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: colors.bgElevated, borderWidth: 2.5, borderColor: colors.accentPrimary }} />
+              <Txt style={{ fontSize: 12, color: colors.textSecondary }}>Hôm nay (bé đang ở đây)</Txt>
+            </View>
           </View>
         ) : null}
 
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>
-          {weeks.map((w) => (
-            <Pressable
-              key={w.w}
-              onPress={() => setPick(w)}
-              style={{
-                flexBasis: '14%',
-                flexGrow: 1,
-                aspectRatio: 0.9,
-                borderRadius: 9,
-                backgroundColor: colors.intensity[clampLv(w.n)],
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderWidth: 2.5,
-                borderColor: w.current ? colors.accentPrimary : 'transparent',
-              }}
-            >
-              <Txt style={{ fontSize: 12, fontWeight: '700', color: colors.intensityInk[clampLv(w.n)] }}>{w.w}</Txt>
-            </Pressable>
-          ))}
-        </View>
+        {mode === 'week' ? (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>
+            {weeks.map((w) => (
+              <Pressable
+                key={w.w}
+                onPress={() => setPick(w)}
+                style={{
+                  flexBasis: '14%',
+                  flexGrow: 1,
+                  aspectRatio: 0.9,
+                  borderRadius: 9,
+                  backgroundColor: colors.intensity[clampLv(w.n)],
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 2.5,
+                  borderColor: w.current ? colors.accentPrimary : 'transparent',
+                }}
+              >
+                <Txt style={{ fontSize: 12, fontWeight: '700', color: colors.intensityInk[clampLv(w.n)] }}>{w.w}</Txt>
+              </Pressable>
+            ))}
+          </View>
+        ) : (
+          <View style={{ gap: 8 }}>
+            {days.map((d, i) => (
+              <View
+                key={i}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 12,
+                  paddingVertical: 10,
+                  paddingHorizontal: 12,
+                  minHeight: 52,
+                  borderRadius: radii.md,
+                  backgroundColor: colors.bgElevated,
+                  borderWidth: d.today ? 2 : 1,
+                  borderColor: d.today ? colors.accentPrimary : colors.borderSubtle,
+                }}
+              >
+                <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: colors.intensity[d.n], alignItems: 'center', justifyContent: 'center' }}>
+                  <BongFace emotion={D.FORECAST_EMO[d.n]} size={28} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Txt style={{ fontSize: 13.5, fontWeight: '700', color: colors.textPrimary }}>
+                    {d.today ? 'Hôm nay' : `${DOW[(d.d.getDay() + 6) % 7]} · ${d.d.getDate()}/${d.d.getMonth() + 1}`}
+                  </Txt>
+                  <Txt style={{ fontSize: 11.5, color: colors.textMuted }}>Tuần {d.w} · {D.INTENSITY_COPY[d.n].label}</Txt>
+                </View>
+                {d.today ? (
+                  <Txt style={{ fontSize: 11, fontWeight: '700', color: colors.accentPrimary }}>Bé đang ở đây</Txt>
+                ) : null}
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </ScrollView>
 
       <Sheet
         open={!!pick}
         onClose={() => setPick(null)}
-        height="46%"
+        height="58%"
         title={pick ? `Tuần ${pick.w}` : ''}
-        sub={pick ? 'Mức cảm xúc dự kiến' : ''}
+        sub={pick ? '7 ngày trong tuần này' : ''}
       >
         {pick ? (
-          <View style={{ alignItems: 'center', gap: 12, paddingTop: 8 }}>
-            <BongIntensity level={pick.n} size={120} />
-            <IntensityBadge level={pick.n} size="lg" />
-            <Txt style={{ fontSize: 14.5, color: colors.textSecondary, textAlign: 'center', maxWidth: 260, lineHeight: 22 }}>
-              {D.INTENSITY_COPY[pick.n].copy}
-            </Txt>
+          <View style={{ gap: 16, paddingTop: 8 }}>
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              {DOW.map((lbl, di) => {
+                const n = dayN(pick.w, di);
+                const isToday = pick.current && di === todayDow;
+                return (
+                  <View
+                    key={di}
+                    style={{
+                      flex: 1,
+                      alignItems: 'center',
+                      gap: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 2,
+                      borderRadius: radii.md,
+                      backgroundColor: isToday ? colors.bgAccentSoft : colors.bgSunken,
+                      borderWidth: 2,
+                      borderColor: isToday ? colors.accentPrimary : 'transparent',
+                    }}
+                  >
+                    <Txt style={{ fontSize: 10.5, fontWeight: '700', color: isToday ? colors.accentPrimary : colors.textMuted }}>{lbl}</Txt>
+                    <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.intensity[n], alignItems: 'center', justifyContent: 'center' }}>
+                      <BongFace emotion={D.FORECAST_EMO[n]} size={21} />
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+            {pick.current ? (
+              <Txt style={{ fontSize: 12.5, fontWeight: '700', color: colors.accentPrimary, textAlign: 'center' }}>▼ Bé đang ở {DOW[todayDow]} tuần này</Txt>
+            ) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, justifyContent: 'center' }}>
+              <BongIntensity level={pick.n} size={84} />
+              <View>
+                <IntensityBadge level={pick.n} size="md" />
+                <Txt style={{ fontSize: 13.5, color: colors.textSecondary, maxWidth: 190, lineHeight: 20, marginTop: 8 }}>
+                  {D.INTENSITY_COPY[pick.n].copy}
+                </Txt>
+              </View>
+            </View>
           </View>
         ) : null}
       </Sheet>
@@ -316,8 +460,8 @@ export function LeapScreen({ initialSub }: { initialSub?: Sub }) {
           style={{ marginHorizontal: 20 }}
           tabs={[
             { id: 'today', label: 'Hôm nay' },
-            { id: 'journey', label: 'Hành trình' },
             { id: 'cal', label: 'Lịch' },
+            { id: 'journey', label: 'Hành trình' },
           ]}
         />
       </View>
@@ -392,23 +536,20 @@ export function LeapDetailScreen() {
 
               {CURRENT_LEAP.symptoms.length > 0 ? (
                 <View>
-                  <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 8 }}>📌 Biểu hiện thường thấy:</Txt>
-                  <SymptomPills symptoms={CURRENT_LEAP.symptoms} />
+                  <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 12 }}>📌 Biểu hiện thường thấy:</Txt>
+                  <WrapPills symptoms={CURRENT_LEAP.symptoms} />
                 </View>
               ) : null}
 
               {locked ? (
                 <Card pad={16} style={{ backgroundColor: colors.bgAccentSoft, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.accentPrimary }}>
-                  <Txt style={{ fontSize: 14.5, fontWeight: '700', color: colors.textPrimary, lineHeight: 22, marginBottom: 8 }}>
-                    Dùng thử miễn phí 1 tháng — sau đó 199.000đ trọn đời 💛
-                  </Txt>
-                  <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20, marginBottom: 14 }}>
+                  <Txt style={{ fontSize: 14.5, color: colors.textPrimary, lineHeight: 22, marginBottom: 12 }}>
                     Đọc đầy đủ dấu hiệu & cách đồng hành cùng bé qua Leap {CURRENT_LEAP.n}…
                   </Txt>
-                  <View style={{ flexDirection: 'row', gap: 10 }}>
-                    <ButtonPrimary full={false} onPress={() => ctx.openPaywall('Mở khóa Leap đầy đủ')} style={{ flex: 1, minHeight: 48 }}>Dùng thử 1 tháng</ButtonPrimary>
-                    <ButtonSecondary full={false} onPress={ctx.back} style={{ flex: 1, minHeight: 48 }}>Để sau</ButtonSecondary>
-                  </View>
+                  <Txt style={{ fontSize: 13.5, fontWeight: '600', color: colors.textSecondary, lineHeight: 20, marginBottom: 14 }}>
+                    Mở khóa trọn đời — 199.000đ 💛
+                  </Txt>
+                  <ButtonPrimary onPress={() => ctx.openPaywall(CURRENT_LEAP.fullName)} style={{ minHeight: 48 }}>Mở khóa</ButtonPrimary>
                 </Card>
               ) : null}
             </View>

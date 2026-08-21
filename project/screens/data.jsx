@@ -3,16 +3,7 @@
    One baby: Bống, ~3.5 months, mid-Leap 4
    ============================================================ */
 (function () {
-  const BABY = {
-    name: 'Bống',
-    ageWeeks: 15,
-    ageLabel: '3 tháng 12 ngày',
-    dob: '21/02/2026',
-    gender: 'Bé gái',
-    weight: 6.4,
-    height: 61,
-    head: 40.2,
-  };
+  let BABY = null; // được tính từ ngày sinh — xem computeAll() bên dưới
 
   // 10 Wonder Weeks leaps — Vietnamese names + skill being learned
   const LEAPS = [
@@ -75,11 +66,18 @@
         { title: 'Thả đồ — nhặt đồ', desc: 'Bé thả, mẹ nhặt, lặp đi lặp lại. Nhàm với mẹ — nhưng là bài học vật lý đầu đời của con!' },
         { title: 'Hát bài có động tác', desc: 'Vừa hát vừa làm động tác quen thuộc — bé sẽ dần đoán được đoạn tiếp theo và cười khúc khích.' },
       ],
+      bloom: [
+        { sign: 'Bé bắt đầu với tay chính xác hơn', game: 'Đặt đồ chơi hơi lệch tầm với — để con tự điều chỉnh. Đừng đưa tận tay nhé.', skill: 'với tay chính xác' },
+        { sign: 'Bé đoán được điều sắp xảy ra', game: 'Làm cùng một chuỗi động tác trước giờ bú — xem con có háo hức đón trước không?', skill: 'đoán trước chuỗi hành động' },
+        { sign: 'Bé nối chuỗi hành động đơn giản', game: 'Lắc xúc xắc → dừng → đưa bé. Xem con có lắc theo không?', skill: 'nối chuỗi hành động' },
+      ],
+      prepSigns: ['bám mẹ hơn hẳn', 'ngủ ngắn, hay tỉnh giấc'],
     },
     { n: 5, world: 'Quan hệ', fullName: 'Thế giới của khoảng cách & quan hệ', wk: 26, range: [22.5, 26.5],
       skill: 'nhận biết khoảng cách có ý nghĩa',
       desc: 'Bé chợt nhận ra: mẹ có thể đi xa khỏi con. Vì thế bé lo lắng khi xa mẹ — đây là dấu hiệu bé gắn bó với mẹ rất tốt, không phải hư.',
       symptoms: ['Khóc khi mẹ rời phòng', 'Giơ tay đòi bế', 'Không chịu người lạ'],
+      prepSigns: ['khóc khi mẹ rời phòng', 'nhát lạ hơn hẳn'],
       actions: [
         { emoji: '🚪', title: 'Bé khóc khi mẹ rời phòng', why: 'Con ĐÃ HIỂU mẹ có thể biến mất — nhưng CHƯA HIỂU mẹ sẽ quay lại.', what: 'Nói “Mẹ ra ngoài rồi quay lại nhé” bằng giọng vui vẻ. Chơi ú òa ở cửa phòng. Đừng lẻn đi nhé.' },
         { emoji: '😰', title: 'Nhát lạ đột ngột', why: 'Bé phân biệt rõ "quen" và "lạ." Người lạ = nguy hiểm tiềm tàng trong logic của bé.', what: 'Cho người mới đến gần TỪ TỪ. Bé ngồi trong lòng mẹ khi gặp người lạ.' },
@@ -127,25 +125,104 @@
     },
   ];
 
-  const CURRENT_LEAP = LEAPS[3]; // Leap 4
-  const LEAP_DAY = 5, LEAP_TOTAL = 14;
+  /* ---- ĐỘNG: mọi dữ liệu suy ra từ ngày sinh của bé ---- */
+  const DOW = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+  const pad2 = (x) => String(x).padStart(2, '0');
+  const fmtD = (d) => `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()}`;
+  const parseD = (s) => { const [d, m, y] = String(s).split('/').map(Number); return new Date(y, m - 1, d); };
 
-  // 7-day forecast
-  const FORECAST = [
-    { day: 'T2', n: 3, today: false },
-    { day: 'T3', n: 4, today: false },
-    { day: 'T4', n: 3, today: true },
-    { day: 'T5', n: 5, today: false },
-    { day: 'T6', n: 4, today: false },
-    { day: 'T7', n: 3, today: false },
-    { day: 'CN', n: 2, today: false },
-  ];
+  function intensityAtWeek(wf) {
+    for (const lp of LEAPS) {
+      if (wf >= lp.range[0] && wf <= lp.range[1]) {
+        return Math.max(1, Math.min(5, 5 - Math.round(Math.abs(wf - lp.wk) * 1.3)));
+      }
+    }
+    return 1;
+  }
+  function ageLabelFrom(dob, now) {
+    let months = (now.getFullYear() - dob.getFullYear()) * 12 + (now.getMonth() - dob.getMonth());
+    let anchor = new Date(dob); anchor.setMonth(dob.getMonth() + months);
+    if (anchor > now) { months--; anchor = new Date(dob); anchor.setMonth(dob.getMonth() + months); }
+    const days = Math.floor((now - anchor) / 86400000);
+    return months > 0 ? `${months} tháng ${days} ngày` : `${days} ngày tuổi`;
+  }
+
+  let CURRENT_LEAP, LEAP_DAY, LEAP_TOTAL, FORECAST, IN_LEAP, DAILY_STATS, NEXT_LEAP, LAST_LEAP, SUNNY;
+
+  function computeAll(dobStr, name, gender) {
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    const dob = parseD(dobStr);
+    const days = Math.max(0, Math.floor((now - dob) / 86400000));
+    const wf = days / 7;
+    let cur = LEAPS.find((lp) => wf >= lp.range[0] && wf <= lp.range[1]);
+    IN_LEAP = !!cur;
+    if (!cur) cur = LEAPS.find((lp) => lp.range[0] > wf) || LEAPS[LEAPS.length - 1];
+    CURRENT_LEAP = cur;
+    LEAP_TOTAL = Math.max(1, Math.round((cur.range[1] - cur.range[0]) * 7));
+    LEAP_DAY = Math.max(1, Math.min(LEAP_TOTAL, Math.floor((wf - cur.range[0]) * 7) + 1));
+    FORECAST = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(now); d.setDate(d.getDate() + i);
+      return { day: DOW[d.getDay()], n: intensityAtWeek((days + i) / 7), today: i === 0 };
+    });
+    const months = Math.floor(days / 30.44);
+    const weight = +(3.3 + 0.62 * Math.min(months, 6) + 0.35 * Math.max(0, Math.min(months - 6, 6))).toFixed(1);
+    const height = +(49.5 + 2.4 * Math.min(months, 6) + 1.3 * Math.max(0, Math.min(months - 6, 6))).toFixed(1);
+    BABY = {
+      name: name || (BABY && BABY.name) || 'Bống',
+      gender: gender || (BABY && BABY.gender) || 'Bé gái',
+      dob: dobStr, ageDays: days, ageWeeks: Math.floor(wf),
+      ageLabel: ageLabelFrom(dob, now), weight, height, head: 40.2,
+    };
+    // Chỉ số hôm nay — khoảng thường gặp theo tháng tuổi của bé
+    const b = months < 3 ? { feed: [7, 12], sleep: [14, 17], diaper: [6, 10] }
+      : months < 6 ? { feed: [5, 8], sleep: [12, 16], diaper: [5, 8] }
+      : months < 9 ? { feed: [4, 6], sleep: [12, 15], diaper: [4, 7] }
+      : { feed: [3, 5], sleep: [11, 14], diaper: [4, 6] };
+    const mL = `Bé ${months < 1 ? 'sơ sinh' : months + '–' + (months + 1) + ' tháng'}`;
+    DAILY_STATS = [
+      { id: 'feed', icon: '🍼', label: 'Cữ ăn hôm nay', value: `${b.feed[0]} cữ · ${b.feed[0] * 92}ml`, num: b.feed[0], lo: b.feed[0], hi: b.feed[1], unit: 'cữ', range: `${mL} thường bú ${b.feed[0]}–${b.feed[1]} cữ mỗi ngày`, note: 'Trong leap, bé có thể bú ít mỗi cữ nhưng đòi ăn nhiều lần — bình thường nhé mama.' },
+      { id: 'sleep', icon: '🌙', label: 'Giấc ngủ hôm nay', value: `3 giấc ngày · ${b.sleep[0] + 2}g tổng`, num: b.sleep[0] + 2, lo: b.sleep[0], hi: b.sleep[1], unit: 'giờ', range: `${mL} thường ngủ ${b.sleep[0]}–${b.sleep[1]} giờ mỗi ngày`, note: 'Ngủ ngắn hơn trong leap là chuyện rất thường gặp.' },
+      { id: 'diaper', icon: '💧', label: 'Tã hôm nay', value: `${b.diaper[0] + 1} lần · ${b.diaper[0]} ướt, 1 bẩn`, num: b.diaper[0] + 1, lo: b.diaper[0], hi: b.diaper[1], unit: 'tã ướt', range: `Bé bú đủ thường có ${b.diaper[0]}–${b.diaper[1]} tã ướt mỗi ngày`, note: 'Tã ướt đều đặn = bé đang bú đủ — dấu hiệu yên tâm nhất.' },
+    ];
+
+    /* ---- Sunny-state engine: next leap, blossoming skills, daily rotation ---- */
+    NEXT_LEAP = LEAPS.find((lp) => lp.range[0] * 7 > days) || null;
+    LAST_LEAP = [...LEAPS].reverse().find((lp) => lp.range[1] * 7 < days) || (IN_LEAP ? null : LEAPS[0]);
+    const refLeap = IN_LEAP ? CURRENT_LEAP : (LAST_LEAP || CURRENT_LEAP);
+    const daysToNext = NEXT_LEAP ? Math.max(0, Math.round(NEXT_LEAP.range[0] * 7 - days)) : null;
+    const nextStart = NEXT_LEAP ? new Date(now.getTime() + daysToNext * 86400000) : null;
+    const dw = now.getDay(); // 0=CN
+    const wk = Math.floor(wf);
+    const MAGIC = {
+      15: 'Tuần này mắt bé bắt đầu nhìn rõ ở khoảng 40cm — đúng khoảng cách từ mặt mẹ khi cho bú. Không phải ngẫu nhiên đâu 💛',
+      16: 'Não bé tuần này tạo hàng triệu kết nối mới mỗi ngày — mỗi lần mama nói chuyện với con là một lần “xây đường” cho não bé.',
+      17: 'Bé giờ nghe được sự khác nhau giữa giọng vui và giọng mệt của mẹ — con đang học cảm xúc qua tai đấy.',
+      18: 'Tay bé tuần này bắt đầu “biết nghe lời” hơn — con nhìn vật, rồi nhìn tay mình, rồi với. Cả một dây chuyền điều khiển!',
+    };
+    const magicText = MAGIC[wk] || `Mỗi ngày tuần này, não bé đang luyện lại kỹ năng ${refLeap.skill} — cả trong lúc ngủ. Giấc ngủ ngon cũng là học đấy mama.`;
+    const game = (refLeap.bloom && refLeap.bloom[2]) || (refLeap.bloom && refLeap.bloom[0]);
+    const daily =
+      dw === 0 ? { kind: 'photo', label: '📸 Khoảnh khắc tuần này', text: `Tuần này nhiều bé bắt đầu cười thành tiếng. Nếu ${BABY ? BABY.name : 'bé'} cười, quay lại 10 giây thôi — sau này xem lại sẽ tan chảy đó.`, action: 'Lưu khoảnh khắc' }
+      : (dw % 2 === 1) ? { kind: 'fact', label: '✨ Điều kỳ diệu hôm nay', text: magicText, action: null }
+      : { kind: 'game', label: '🎲 Trò 5 phút', text: game ? `Bé vừa học ${game.skill}. Thử: ${game.game}` : `Chơi ú òa với khăn — con đang luyện kỹ năng ${refLeap.skill}.`, action: null };
+    SUNNY = {
+      daysToNext, nextLeap: NEXT_LEAP, nextDate: nextStart ? `${pad2(nextStart.getDate())}/${pad2(nextStart.getMonth() + 1)}` : null,
+      refLeap, daily,
+      bloom: refLeap.bloom || [],
+      prep: NEXT_LEAP ? {
+        signs: NEXT_LEAP.prepSigns || (NEXT_LEAP.symptoms || []).slice(0, 2).map((s) => s.toLowerCase()),
+        tips: ['Tuần tới hạn chế xáo trộn lịch — hoãn việc lớn nếu được.', 'Sạc pin cho mama: tranh thủ ngủ bù tuần này, tuần sau con cần mẹ nhiều hơn ☕'],
+      } : null,
+    };
+  }
+  // Demo mặc định: bé ~17 tuần — đang giữa Leap 4. Đổi ngày sinh trong Mama → mọi thứ tính lại.
+  computeAll(fmtD(new Date(Date.now() - 118 * 86400000)), 'Bống', 'Bé gái');
 
   // EASY educational reference (NOT a schedule)
   const EASY_INFO = {
     variant: 'EASY 3',
     desc: 'Eat → Activity → Sleep → Your time. Một chu kỳ lặp lại giúp bé dự đoán được điều gì xảy ra tiếp theo.',
-    detail: 'Ở 3.5 tháng, hầu hết bé theo nhịp EASY 3 (ăn-chơi-ngủ mỗi 3 giờ). Nhưng mỗi bé có nhịp riêng — EASY là khung tham khảo, không phải lịch cứng.',
+    detail: 'Giai đoạn này hầu hết bé theo nhịp EASY 3–4 giờ (ăn-chơi-ngủ rồi lặp lại). Nhưng mỗi bé có nhịp riêng — EASY là khung tham khảo, không phải lịch cứng.',
     note: 'Trong leap, bé có thể ăn thêm hoặc ngủ sớm — điều đó hoàn toàn bình thường.',
   };
 
@@ -158,13 +235,14 @@
   ];
 
   const LOG_HISTORY = [
-    { date: 'Hôm nay · T4', items: [
+    { date: 'Hôm nay · ' + DOW[new Date().getDay()], items: [
+      { type: 'milestone', icon: '🎉', label: 'Khoảnh khắc · Lần đầu với tay chính xác', time: '09:05', photo: true },
       { type: 'feed', icon: '🍼', label: 'Cữ ăn · 80ml', time: '08:15' },
       { type: 'sleep', icon: '🌙', label: 'Giấc ngủ · 1g 40p', time: '06:20' },
       { type: 'diaper', icon: '💧', label: 'Tã · Ướt', time: '06:10' },
       { type: 'mood', icon: '💛', label: 'Cảm xúc · Vui vẻ', time: '05:50' },
     ]},
-    { date: 'Hôm qua · T3', items: [
+    { date: 'Hôm qua · ' + DOW[new Date(Date.now() - 86400000).getDay()], items: [
       { type: 'feed', icon: '🍼', label: 'Cữ ăn · 90ml', time: '21:40' },
       { type: 'soothe', icon: '🎵', label: 'Dỗ bé · Tiếng shh-shh 30p', time: '20:10' },
       { type: 'sleep', icon: '🌙', label: 'Giấc ngủ · 2g 05p', time: '13:30' },
@@ -229,16 +307,16 @@
     return { key: 'end', name: 'đoạn cuối', desc: 'Sắp đến phần vui nhất: bé bắt đầu khoe kỹ năng mới. Để ý nhé — con sắp làm bạn bất ngờ đấy!' };
   }
 
-  // Chỉ số hôm nay — đối chiếu khoảng thường gặp ở bé 3–4 tháng
-  const DAILY_STATS = [
-    { id: 'feed', icon: '🍼', label: 'Cữ ăn hôm nay', value: '5 cữ · 460ml', num: 5, lo: 5, hi: 8, unit: 'cữ', range: 'Bé 3–4 tháng thường bú 5–8 cữ mỗi ngày', note: 'Trong leap, bé có thể bú ít mỗi cữ nhưng đòi ăn nhiều lần — bình thường nhé mama.' },
-    { id: 'sleep', icon: '🌙', label: 'Giấc ngủ hôm nay', value: '3 giấc ngày · 14g tổng', num: 14, lo: 12, hi: 17, unit: 'giờ', range: 'Bé 3–4 tháng thường ngủ 12–17 giờ mỗi ngày', note: 'Ngủ ngắn hơn trong leap là chuyện rất thường gặp.' },
-    { id: 'diaper', icon: '💧', label: 'Tã hôm nay', value: '6 lần · 5 ướt, 1 bẩn', num: 6, lo: 5, hi: 8, unit: 'tã ướt', range: 'Bé bú đủ thường có 5–8 tã ướt mỗi ngày', note: 'Tã ướt đều đặn = bé đang bú đủ — dấu hiệu yên tâm nhất.' },
-  ];
+  // DAILY_STATS được tính động trong computeAll() theo tháng tuổi
 
   window.BWW_DATA = {
-    BABY, LEAPS, CURRENT_LEAP, LEAP_DAY, LEAP_TOTAL, FORECAST, EASY_INFO,
+    BABY, LEAPS, CURRENT_LEAP, LEAP_DAY, LEAP_TOTAL, FORECAST, IN_LEAP, EASY_INFO,
+    NEXT_LEAP, LAST_LEAP, SUNNY,
     RECENT_LOGS, LOG_HISTORY, buildCalendar, LIBRARY,
-    SOOTHING, NOTIFS, INTENSITY_COPY, leapPhase, DAILY_STATS,
+    SOOTHING, NOTIFS, INTENSITY_COPY, leapPhase, DAILY_STATS, fmtD,
+    recompute(dobStr, name, gender) {
+      computeAll(dobStr || BABY.dob, name, gender);
+      Object.assign(window.BWW_DATA, { BABY, CURRENT_LEAP, LEAP_DAY, LEAP_TOTAL, FORECAST, IN_LEAP, DAILY_STATS, NEXT_LEAP, LAST_LEAP, SUNNY });
+    },
   };
 })();

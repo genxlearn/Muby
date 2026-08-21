@@ -164,9 +164,11 @@ export function EasyEducationCard() {
   );
 }
 
-/* Sunny Play section (intensity <= 2) */
+/* Sunny Play section (intensity <= 2) — horizontal step-card carousel (v3) */
+const PLAY_CARD_W = 250;
+
 export function SunnyPlaySection({ leap }: { leap: Leap }) {
-  const { colors, radii } = useTheme();
+  const { colors, radii, shadows } = useTheme();
   const ctx = useApp();
   const plays = leap.sunnyPlay || [];
   if (plays.length === 0) return null;
@@ -174,22 +176,37 @@ export function SunnyPlaySection({ leap }: { leap: Leap }) {
     <View>
       <Txt style={{ fontSize: 15.5, fontWeight: '700', marginBottom: 4, paddingHorizontal: 2 }}>Sunny Play — Bé sẵn sàng học! 🌼</Txt>
       <Txt style={{ fontSize: 13, color: colors.textMuted, marginBottom: 12, paddingHorizontal: 2 }}>Hoạt động nhẹ nhàng cho Leap {leap.n}</Txt>
-      <View style={{ gap: 10 }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={PLAY_CARD_W + 12}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        style={{ marginHorizontal: -20 }}
+        contentContainerStyle={{ gap: 12, paddingHorizontal: 20, paddingBottom: 10, paddingTop: 4 }}
+      >
         {plays.map((a, i) => (
-          <Card key={i} pad={14} onPress={() => !ctx.premium && ctx.openPaywall('Mở khóa hướng dẫn từng bước')}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <View style={{ width: 46, height: 46, borderRadius: radii.md, backgroundColor: colors.intensity[1], alignItems: 'center', justifyContent: 'center' }}>
-                <BongFace emotion="curious" size={36} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Txt style={{ fontSize: 15, fontWeight: '700' }}>{a.title}</Txt>
-                <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>{a.desc}</Txt>
-              </View>
-              <Txt style={{ fontSize: 12.5, color: colors.accentPrimary, fontWeight: '700' }}>Thử ngay →</Txt>
+          <View
+            key={i}
+            style={[
+              { width: PLAY_CARD_W, borderRadius: radii.lg, backgroundColor: colors.bgElevated, borderWidth: 1, borderColor: colors.borderSubtle, padding: 16, gap: 10 },
+              shadows[2],
+            ]}
+          >
+            <View style={{ width: 46, height: 46, borderRadius: radii.md, backgroundColor: colors.intensity[1], alignItems: 'center', justifyContent: 'center' }}>
+              <BongFace emotion="curious" size={36} />
             </View>
-          </Card>
+            <Txt style={{ fontSize: 15, fontWeight: '700' }}>{a.title}</Txt>
+            <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 20, flex: 1 }}>{a.desc}</Txt>
+            <Pressable
+              onPress={() => !ctx.premium && ctx.openPaywall('Mở khóa hướng dẫn từng bước')}
+              style={{ alignSelf: 'flex-start', minHeight: 44, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 999, backgroundColor: colors.bgAccentSoft, alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Txt style={{ fontSize: 13, fontWeight: '700', color: colors.accentPrimary }}>Thử ngay →</Txt>
+            </Pressable>
+          </View>
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 }

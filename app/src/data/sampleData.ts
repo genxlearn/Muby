@@ -13,9 +13,11 @@ export interface LeapAction {
   emoji: string; title: string; why: string; what: string; hasSound?: boolean;
 }
 export interface SunnyPlay { title: string; desc: string }
+export interface BloomSkill { sign: string; game: string; skill: string }
 export interface Leap {
   n: number; world: string; fullName: string; wk: number; range: [number, number];
   skill: string; desc: string; symptoms: string[]; actions: LeapAction[]; sunnyPlay: SunnyPlay[];
+  bloom?: BloomSkill[]; prepSigns?: string[];
 }
 
 export const BABY: Baby = {
@@ -93,12 +95,19 @@ export const LEAPS: Leap[] = [
       { title: 'Thả đồ — nhặt đồ', desc: 'Bé thả, mẹ nhặt, lặp đi lặp lại. Nhàm với mẹ — nhưng là bài học vật lý đầu đời của con!' },
       { title: 'Hát bài có động tác', desc: 'Vừa hát vừa làm động tác quen thuộc — bé sẽ dần đoán được đoạn tiếp theo và cười khúc khích.' },
     ],
+    bloom: [
+      { sign: 'Bé bắt đầu với tay chính xác hơn', game: 'Đặt đồ chơi hơi lệch tầm với — để con tự điều chỉnh. Đừng đưa tận tay nhé.', skill: 'với tay chính xác' },
+      { sign: 'Bé đoán được điều sắp xảy ra', game: 'Làm cùng một chuỗi động tác trước giờ bú — xem con có háo hức đón trước không?', skill: 'đoán trước chuỗi hành động' },
+      { sign: 'Bé nối chuỗi hành động đơn giản', game: 'Lắc xúc xắc → dừng → đưa bé. Xem con có lắc theo không?', skill: 'nối chuỗi hành động' },
+    ],
+    prepSigns: ['bám mẹ hơn hẳn', 'ngủ ngắn, hay tỉnh giấc'],
   },
   {
     n: 5, world: 'Quan hệ', fullName: 'Thế giới của khoảng cách & quan hệ', wk: 26, range: [22.5, 26.5],
     skill: 'nhận biết khoảng cách có ý nghĩa',
     desc: 'Bé chợt nhận ra: mẹ có thể đi xa khỏi con. Vì thế bé lo lắng khi xa mẹ — đây là dấu hiệu bé gắn bó với mẹ rất tốt, không phải hư.',
     symptoms: ['Khóc khi mẹ rời phòng', 'Giơ tay đòi bế', 'Không chịu người lạ'],
+    prepSigns: ['khóc khi mẹ rời phòng', 'nhát lạ hơn hẳn'],
     actions: [
       { emoji: '🚪', title: 'Bé khóc khi mẹ rời phòng', why: 'Con ĐÃ HIỂU mẹ có thể biến mất — nhưng CHƯA HIỂU mẹ sẽ quay lại.', what: 'Nói "Mẹ ra ngoài rồi quay lại nhé" bằng giọng vui vẻ. Chơi ú òa ở cửa phòng. Đừng lẻn đi nhé.' },
       { emoji: '😰', title: 'Nhát lạ đột ngột', why: 'Bé phân biệt rõ "quen" và "lạ." Người lạ = nguy hiểm tiềm tàng trong logic của bé.', what: 'Cho người mới đến gần TỪ TỪ. Bé ngồi trong lòng mẹ khi gặp người lạ.' },
@@ -174,7 +183,7 @@ export const FORECAST: ForecastDay[] = [
 export const EASY_INFO = {
   variant: 'EASY 3',
   desc: 'Eat → Activity → Sleep → Your time. Một chu kỳ lặp lại giúp bé dự đoán được điều gì xảy ra tiếp theo.',
-  detail: 'Ở 3.5 tháng, hầu hết bé theo nhịp EASY 3 (ăn-chơi-ngủ mỗi 3 giờ). Nhưng mỗi bé có nhịp riêng — EASY là khung tham khảo, không phải lịch cứng.',
+  detail: 'Giai đoạn này hầu hết bé theo nhịp EASY 3–4 giờ (ăn-chơi-ngủ rồi lặp lại). Nhưng mỗi bé có nhịp riêng — EASY là khung tham khảo, không phải lịch cứng.',
   note: 'Trong leap, bé có thể ăn thêm hoặc ngủ sớm — điều đó hoàn toàn bình thường.',
 };
 
@@ -189,9 +198,11 @@ export const RECENT_LOGS: RecentLog[] = [
 
 export interface LogItem { type: string; icon: string; label: string; time: string }
 export interface LogGroup { date: string; items: LogItem[] }
+const VN_DOW = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 export const LOG_HISTORY: LogGroup[] = [
   {
-    date: 'Hôm nay · T4', items: [
+    date: 'Hôm nay · ' + VN_DOW[new Date().getDay()], items: [
+      { type: 'milestone', icon: '🎉', label: 'Khoảnh khắc · Lần đầu với tay chính xác', time: '09:05' },
       { type: 'feed', icon: '🍼', label: 'Cữ ăn · 80ml', time: '08:15' },
       { type: 'sleep', icon: '🌙', label: 'Giấc ngủ · 1g 40p', time: '06:20' },
       { type: 'diaper', icon: '💧', label: 'Tã · Ướt', time: '06:10' },
@@ -199,7 +210,7 @@ export const LOG_HISTORY: LogGroup[] = [
     ],
   },
   {
-    date: 'Hôm qua · T3', items: [
+    date: 'Hôm qua · ' + VN_DOW[new Date(Date.now() - 86400000).getDay()], items: [
       { type: 'feed', icon: '🍼', label: 'Cữ ăn · 90ml', time: '21:40' },
       { type: 'soothe', icon: '🎵', label: 'Dỗ bé · Tiếng shh-shh 30p', time: '20:10' },
       { type: 'sleep', icon: '🌙', label: 'Giấc ngủ · 2g 05p', time: '13:30' },

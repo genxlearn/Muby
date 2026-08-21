@@ -49,6 +49,7 @@ const Icon = {
   pause: (p) => <path d="M8 5v14M16 5v14" {...p} />,
   lock: (p) => <path d="M17 10V8A5 5 0 0 0 7 8v2M8.8 21h6.4c1.68 0 2.52 0 3.16-.33a3 3 0 0 0 1.31-1.31c.33-.64.33-1.48.33-3.16v-.4c0-1.68 0-2.52-.33-3.16a3 3 0 0 0-1.31-1.31C17.72 11 16.88 11 15.2 11H8.8c-1.68 0-2.52 0-3.16.33a3 3 0 0 0-1.31 1.31C4 13.28 4 14.12 4 15.8v.4c0 1.68 0 2.52.33 3.16a3 3 0 0 0 1.31 1.31c.64.33 1.48.33 3.16.33Z" {...p} />,
   check: (p) => <path d="M20 6 9 17l-5-5" {...p} />,
+  faceid: (p) => <><path d="M3 8V6.5C3 4.6 4.6 3 6.5 3H8M16 3h1.5C19.4 3 21 4.6 21 6.5V8M21 16v1.5c0 1.9-1.6 3.5-3.5 3.5H16M8 21H6.5C4.6 21 3 19.4 3 17.5V16" {...p} /><path d="M8.6 14.5a4.5 4.5 0 0 0 6.8 0" {...p} /><path d="M8.75 9.2v1M15.25 9.2v1" {...p} /></>,
   music: (p) => <path d="M9 18V6.35c0-.74 0-1.11.14-1.4a1.4 1.4 0 0 1 .59-.61c.28-.15.65-.19 1.38-.28l6.78-.85c.4-.05.6-.07.76-.01.14.05.26.15.34.28.09.14.09.35.09.75V16M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm11-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" {...p} />,
   camera: (p) => <path d="M2 8.94c0-.68 0-1.02.06-1.3a3 3 0 0 1 2.38-2.38c.28-.06.62-.06 1.3-.06.26 0 .4 0 .52-.02a2 2 0 0 0 1.46-1.02c.06-.1.12-.23.24-.47.11-.24.17-.35.24-.46a2 2 0 0 1 1.46-1.02C9.77 2.2 9.9 2.2 10.16 2.2h3.68c.26 0 .4 0 .52.02a2 2 0 0 1 1.46 1.02c.06.1.12.22.24.46.11.24.17.36.24.47a2 2 0 0 0 1.46 1.02c.12.02.26.02.52.02.68 0 1.02 0 1.3.06a3 3 0 0 1 2.38 2.38c.06.28.06.62.06 1.3v7.66c0 1.68 0 2.52-.33 3.16a3 3 0 0 1-1.31 1.31c-.64.33-1.48.33-3.16.33H6.8c-1.68 0-2.52 0-3.16-.33a3 3 0 0 1-1.31-1.31C2 19.13 2 18.29 2 16.61V8.94ZM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" {...p} />,
   cal: (p) => <path d="M21 10H3M16 2v4M8 2v4M7.8 22h8.4c1.68 0 2.52 0 3.16-.33a3 3 0 0 0 1.31-1.31c.33-.64.33-1.48.33-3.16V8.8c0-1.68 0-2.52-.33-3.16a3 3 0 0 0-1.31-1.31C18.72 4 17.88 4 16.2 4H7.8c-1.68 0-2.52 0-3.16.33a3 3 0 0 0-1.31 1.31C3 6.28 3 7.12 3 8.8v8.4c0 1.68 0 2.52.33 3.16a3 3 0 0 0 1.31 1.31c.64.33 1.48.33 3.16.33Z" {...p} />
@@ -373,7 +374,7 @@ function Sheet({ open, onClose, height = '65%', children, title, sub }) {
         opacity: open ? 1 : 0, transition: 'opacity .3s'
       }} />
       <div style={{
-        position: 'absolute', left: 0, right: 0, bottom: 0, height, maxHeight: '92%',
+        position: 'absolute', left: 0, right: 0, bottom: 0, height: 'auto', maxHeight: '92%',
         background: 'var(--bg-elevated)', borderRadius: 'var(--r-xl) var(--r-xl) 0 0',
         boxShadow: 'var(--shadow-4)', transform: open ? 'translateY(0)' : 'translateY(101%)',
         transition: 'transform .34s cubic-bezier(.2,.8,.2,1)', display: 'flex', flexDirection: 'column',
@@ -393,7 +394,7 @@ function Sheet({ open, onClose, height = '65%', children, title, sub }) {
             </button>
           </div>
         }
-        <div className="no-sb" style={{ flex: 1, overflowY: 'auto', padding: '0 22px 40px' }}>{children}</div>
+        <div className="no-sb" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 22px 36px' }}>{children}</div>
       </div>
     </div>);
 
@@ -417,44 +418,53 @@ function StatusBar({ dark }) {
 
 }
 
-/* ---------- Bottom Nav — modern floating pill ---------- */
-function BottomNav({ active, onNav }) {
-  const items = [
+/* ---------- Bottom Nav — floating pill, 4 tabs + FAB giữa ---------- */
+function BottomNav({ active, onNav, onFab }) {
+  const left = [
   { id: 'today', icon: 'home', label: 'Hôm nay' },
-  { id: 'leap', icon: 'leap', label: 'Leap' },
-  { id: 'growth', icon: 'growth', label: 'Phát triển' },
-  { id: 'market', icon: 'market', label: 'Market' }];
+  { id: 'leap', icon: 'leap', label: 'Leap' }];
+  const right = [
+  { id: 'growth', icon: 'growth', label: 'Lớn khôn' },
+  { id: 'me', icon: 'me', label: 'Mama' }];
+
+  const Item = ({ it }) => {
+    const on = active === it.id;
+    return (
+      <button onClick={() => onNav(it.id)} aria-label={it.label} style={{
+        flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3,
+        minHeight: 52, borderRadius: 'var(--r-full)',
+        color: on ? 'var(--accent-primary)' : 'var(--text-muted)',
+        transition: 'color .2s', whiteSpace: 'nowrap'
+      }}>
+        <Ic name={it.icon} size={23} sw={on ? 2.4 : 1.8} />
+        <span style={{ fontSize: 10.5, fontWeight: on ? 700 : 500 }}>{it.label}</span>
+      </button>);
+  };
 
   return (
     <div style={{
       position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 40,
-      padding: '28px 18px 26px',
+      padding: '28px 16px 24px',
       background: 'linear-gradient(to top, color-mix(in srgb, var(--bg-canvas) 88%, transparent) 30%, transparent)',
       pointerEvents: 'none'
     }}>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 4,
+        display: 'flex', alignItems: 'center', gap: 2,
         background: 'color-mix(in srgb, var(--bg-elevated) 90%, transparent)',
         backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
         border: '1px solid var(--border-subtle)', borderRadius: 'var(--r-full)',
-        padding: 6, boxShadow: 'var(--shadow-3)', pointerEvents: 'auto'
+        padding: '6px 8px', boxShadow: 'var(--shadow-3)', pointerEvents: 'auto', position: 'relative'
       }}>
-        {items.map((it) => {
-          const on = active === it.id;
-          return (
-            <button key={it.id} onClick={() => onNav(it.id)} aria-label={it.label} style={{
-              flex: on ? 'none' : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-              minHeight: 48, padding: on ? '0 18px' : '0 6px', borderRadius: 'var(--r-full)',
-              background: on ? 'var(--accent-primary)' : 'transparent',
-              color: on ? '#fff' : 'var(--text-muted)',
-              boxShadow: on ? '0 6px 16px rgba(249,107,38,0.35)' : 'none',
-              transition: 'all .25s cubic-bezier(.2,.8,.2,1)', whiteSpace: 'nowrap'
-            }}>
-              <Ic name={it.icon} size={23} sw={on ? 2.4 : 1.8} />
-              {on && <span style={{ fontSize: 13, fontWeight: 700 }}>{it.label}</span>}
-            </button>
-          );
-        })}
+        {left.map((it) => <Item key={it.id} it={it} />)}
+        {/* FAB — Ghi nhanh */}
+        <button onClick={onFab} aria-label="Ghi nhanh" style={{
+          width: 58, height: 58, borderRadius: '50%', flexShrink: 0, margin: '-14px 6px 0',
+          background: 'var(--accent-primary)', color: '#fff', display: 'grid', placeItems: 'center',
+          boxShadow: '0 8px 20px rgba(216,114,66,0.4), 0 0 0 5px color-mix(in srgb, var(--bg-canvas) 80%, transparent)'
+        }}>
+          <Ic name="plus" size={26} sw={2.6} />
+        </button>
+        {right.map((it) => <Item key={it.id} it={it} />)}
       </div>
     </div>);
 

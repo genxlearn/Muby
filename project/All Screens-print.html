@@ -65,6 +65,7 @@ function mkCtx(o = {}) {
     route: { flow: 'app', tab: 'today', stack: null }, sheet: null, paywall: null, toastVal: null,
     setTab: noop, go: noop, back: noop, goFlow: noop, setRoute: noop, openSheet: noop, closeSheet: noop,
     setIntensity: noop, setEmpty: noop, setPremium: noop, setTheme: noop, openPaywall: noop, closePaywall: noop, toast: noop,
+    startTrial: noop, cancelTrial: noop, updateBaby: noop, setFaceId: noop, faceId: true,
     ...o,
   };
 }

@@ -69,17 +69,169 @@ function GreetRow() {
 /* faces used by the symptoms grid, cycled per index */
 const SYMPTOM_EMO: Emotion[] = ['crying', 'snug', 'sleeping', 'eating', 'uncertain', 'fussy'];
 
+/* ---- Sunny: "Hôm nay của bé" — rotating daily card (fact / game / photo) ---- */
+function TodayOfBabyCard() {
+  const { colors } = useTheme();
+  const ctx = useApp();
+  const { state } = useBaby();
+  const d = state.sunny.daily;
+  return (
+    <Card pad={16}>
+      <Txt style={{ fontSize: 12, fontWeight: '700', letterSpacing: 0.6, color: colors.accentPrimary, marginBottom: 8 }}>{d.label}</Txt>
+      <Txt style={{ fontSize: 15.5, lineHeight: 25, color: colors.textPrimary }}>{d.text}</Txt>
+      {d.action ? (
+        <Pressable
+          onPress={() => ctx.toast('Đã lưu vào Khoảnh khắc 🎉')}
+          style={{ marginTop: 12, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 999, backgroundColor: colors.bgAccentSoft }}
+        >
+          <Txt style={{ fontSize: 13.5, fontWeight: '700', color: colors.accentPrimary }}>📸 {d.action}</Txt>
+        </Pressable>
+      ) : null}
+    </Card>
+  );
+}
+
+/* ---- Sunny: "Kỹ năng đang nở" — blossoming skills + milestone button ---- */
+const BLOOM_CARD_W = 264;
+
+function BloomSection() {
+  const { colors, radii, shadows } = useTheme();
+  const ctx = useApp();
+  const { state } = useBaby();
+  const S = state.sunny;
+  const [saved, setSaved] = useState<Record<number, boolean>>({});
+  if (!S.bloom.length) return null;
+  return (
+    <View>
+      <Txt style={{ fontSize: 15.5, fontWeight: '700', marginBottom: 12, paddingHorizontal: 2 }}>Kỹ năng đang nở sau Leap {S.refLeap.n} 🌱</Txt>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={BLOOM_CARD_W + CARD_GAP}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        style={{ marginHorizontal: -20 }}
+        contentContainerStyle={{ gap: CARD_GAP, paddingHorizontal: 20, paddingBottom: 10, paddingTop: 4 }}
+      >
+        {S.bloom.map((b, i) => (
+          <View
+            key={i}
+            style={[
+              { width: BLOOM_CARD_W, borderRadius: radii.lg, backgroundColor: colors.bgElevated, borderWidth: 1, borderColor: colors.borderSubtle, padding: 16, gap: 8 },
+              shadows[2],
+            ]}
+          >
+            <Txt style={{ fontSize: 14.5, fontWeight: '700', lineHeight: 19 }}>{b.sign}</Txt>
+            <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 21, flex: 1 }}>{b.game}</Txt>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
+              <Pressable
+                disabled={!!saved[i]}
+                onPress={() => {
+                  setSaved((s) => ({ ...s, [i]: true }));
+                  ctx.toast(`Đã lưu khoảnh khắc đầu tiên con ${b.skill} 🎉`);
+                }}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 999, backgroundColor: saved[i] ? colors.successSoft : colors.bgAccentSoft }}
+              >
+                <Txt style={{ fontSize: 13, fontWeight: '700', color: saved[i] ? colors.success : colors.accentPrimary }}>
+                  {saved[i] ? '✓ Đã lưu vào Nhật ký' : '🎉 Con làm được rồi!'}
+                </Txt>
+              </Pressable>
+              {!ctx.premium ? (
+                <Pressable onPress={() => ctx.openPaywall('Mở khóa hướng dẫn từng bước')} style={{ minHeight: 44, paddingVertical: 10, paddingHorizontal: 4, justifyContent: 'center' }}>
+                  <Txt style={{ fontSize: 12.5, fontWeight: '700', color: colors.textMuted }}>Từng bước →</Txt>
+                </Pressable>
+              ) : null}
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+/* ---- "Chuẩn bị cho Leap {n+1}" — pre-leap prep card ---- */
+function PrepCard() {
+  const { colors } = useTheme();
+  const ctx = useApp();
+  const { state } = useBaby();
+  const S = state.sunny;
+  if (!S.prep || !S.nextLeap) return null;
+  return (
+    <Card pad={16} style={{ backgroundColor: colors.bgAccentSoft }}>
+      <Txt style={{ fontSize: 12, fontWeight: '700', letterSpacing: 0.6, color: colors.accentPrimary, marginBottom: 8 }}>☁️ CHUẨN BỊ CHO LEAP {S.nextLeap.n}</Txt>
+      <Txt style={{ fontSize: 14.5, lineHeight: 22, color: colors.textPrimary }}>
+        Leap {S.nextLeap.n} sắp đến (dự kiến ngày {S.nextDate}). Vài dấu hiệu sớm:{' '}
+        <Txt style={{ fontWeight: '700' }}>{S.prep.signs.join(', ')}</Txt>.
+      </Txt>
+      <View style={{ gap: 8, marginTop: 12 }}>
+        {S.prep.tips.map((t, i) => (
+          <View key={i} style={{ flexDirection: 'row', gap: 8 }}>
+            <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 20 }}>·</Txt>
+            <Txt style={{ flex: 1, fontSize: 13, color: colors.textSecondary, lineHeight: 20 }}>{t}</Txt>
+          </View>
+        ))}
+      </View>
+      <Pressable onPress={() => ctx.go('leapdetail')} style={{ marginTop: 12, alignSelf: 'flex-start', minHeight: 44, paddingVertical: 10, paddingHorizontal: 2, justifyContent: 'center' }}>
+        <Txt style={{ fontSize: 13.5, fontWeight: '700', color: colors.accentPrimary }}>Đọc trước về Leap {S.nextLeap.n} →</Txt>
+      </Pressable>
+    </Card>
+  );
+}
+
+/* ---- Post-leap premium moment (one-time, dismissible, never at intensity ≥ 4) ---- */
+function PostLeapCard({ onDismiss }: { onDismiss: () => void }) {
+  const { colors } = useTheme();
+  const ctx = useApp();
+  const { state, displayName } = useBaby();
+  const S = state.sunny;
+  const done = S.refLeap;
+  if (!done || ctx.intensity >= 4 || ctx.purchased) return null;
+  return (
+    <Card pad={16}>
+      <View style={{ flexDirection: 'row', gap: 12 }}>
+        <Bong emotion="blissful" onesie="sage" size={64} />
+        <View style={{ flex: 1 }}>
+          <Txt style={{ fontSize: 14.5, fontWeight: '700', lineHeight: 20 }}>
+            Leap {done.n} đã qua rồi 🌼 Mama và {displayName} đã cùng nhau vượt qua.
+          </Txt>
+          <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 20, marginTop: 6 }}>
+            {S.nextLeap
+              ? `Leap ${S.nextLeap.n} sẽ đến trong khoảng ${Math.max(1, Math.round((S.daysToNext || 7) / 7))} tuần nữa. Mở khóa toàn bộ 10 leap để luôn sẵn sàng nhé.`
+              : 'Mở khóa toàn bộ 10 leap để luôn sẵn sàng nhé.'}
+          </Txt>
+          <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+            <Pressable
+              onPress={() => ctx.openPaywall('Luôn sẵn sàng cho leap tiếp theo')}
+              style={{ minHeight: 44, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 999, backgroundColor: colors.accentPrimary, alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Txt style={{ fontSize: 13, fontWeight: '700', color: '#fff' }}>Xem Muby Premium</Txt>
+            </Pressable>
+            <Pressable onPress={onDismiss} style={{ minHeight: 44, paddingVertical: 10, paddingHorizontal: 12, justifyContent: 'center' }}>
+              <Txt style={{ fontSize: 13, fontWeight: '700', color: colors.textMuted }}>Để sau</Txt>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Card>
+  );
+}
+
 export function TodayScreen() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
   const { intensity, empty } = ctx;
-  const { state: st } = useBaby();
+  const { state: st, displayName } = useBaby();
   const CURRENT_LEAP = st.leap;
   const inLeap = st.status === 'in-leap';
   const PHASE = D.leapPhase(Math.max(1, st.leapDay), st.leapTotal);
   const [loading, setLoading] = useState(!_todayLoaded);
   const [symptomPick, setSymptomPick] = useState<string | null>(null);
   const [actionIdx, setActionIdx] = useState(0);
+  const [postLeapDismissed, setPostLeapDismissed] = useState(false);
+  // sunny mode: calm days — the home screen turns to celebration + prep
+  const sunny = intensity <= 2 && st.status !== 'after-all';
+  const S = st.sunny;
+  const C = D.INTENSITY_COPY[intensity];
 
   useEffect(() => {
     if (_todayLoaded) return;
@@ -130,31 +282,42 @@ export function TodayScreen() {
         <HeroCard pad={0}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, paddingHorizontal: 20 }}>
             <Txt style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1.2, color: colors.textOnHero, opacity: 0.65 }}>DỰ BÁO HÔM NAY</Txt>
-            <Txt style={{ fontSize: 11.5, fontWeight: '600', color: colors.textOnHero, opacity: 0.75 }}>
-              {inLeap
-                ? `Ngày ${st.leapDay}/${st.leapTotal} · còn ~${st.leapTotal - st.leapDay} ngày`
-                : st.status === 'after-all'
-                  ? 'Đã qua 10 leaps 🎉'
-                  : `Leap ${CURRENT_LEAP.n} sau ~${st.daysUntilLeap} ngày`}
-            </Txt>
+            {!sunny ? (
+              <Txt style={{ fontSize: 11.5, fontWeight: '600', color: colors.textOnHero, opacity: 0.75 }}>
+                {inLeap
+                  ? `Ngày ${st.leapDay}/${st.leapTotal} · còn khoảng ${st.leapTotal - st.leapDay} ngày`
+                  : st.status === 'after-all'
+                    ? 'Đã qua 10 leaps 🎉'
+                    : `Leap ${CURRENT_LEAP.n} sau ~${st.daysUntilLeap} ngày`}
+              </Txt>
+            ) : null}
           </View>
           <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 20, paddingRight: 14, gap: 6 }}>
             <View style={{ flex: 1, minWidth: 0 }}>
               <IntensityBadge level={intensity} size="sm" />
               <Txt serif style={{ fontSize: 20, fontWeight: '600', lineHeight: 25, marginTop: 10, color: colors.textOnHero }}>
-                {inLeap
-                  ? `Bé đang ở ${PHASE.name} của Leap ${CURRENT_LEAP.n}`
-                  : st.status === 'after-all'
-                    ? 'Bé đã đi qua 10 leaps kỳ diệu'
-                    : 'Bé đang giữa hai leap — tuần nắng 🌼'}
+                {sunny
+                  ? `Tuần nắng của ${displayName} 🌼`
+                  : inLeap
+                    ? `Bé đang ở ${PHASE.name} của Leap ${CURRENT_LEAP.n}`
+                    : st.status === 'after-all'
+                      ? 'Bé đã đi qua 10 leaps kỳ diệu'
+                      : 'Bé đang giữa hai leap — tuần nắng 🌼'}
               </Txt>
               <Txt style={{ fontSize: 13, color: colors.textOnHero, opacity: 0.85, lineHeight: 20, marginTop: 6 }}>
-                {inLeap
-                  ? PHASE.desc
-                  : st.status === 'after-all'
-                    ? 'Hành trình Wonder Weeks đã trọn vẹn. Giờ là lúc tận hưởng từng khoảnh khắc lớn khôn của con.'
-                    : `Tranh thủ nghỉ ngơi và chơi cùng con nhé. Leap ${CURRENT_LEAP.n} · ${CURRENT_LEAP.world} dự kiến bắt đầu trong ~${st.daysUntilLeap} ngày.`}
+                {sunny
+                  ? C.copy
+                  : inLeap
+                    ? PHASE.desc
+                    : st.status === 'after-all'
+                      ? 'Hành trình Wonder Weeks đã trọn vẹn. Giờ là lúc tận hưởng từng khoảnh khắc lớn khôn của con.'
+                      : `Tranh thủ nghỉ ngơi và chơi cùng con nhé. Leap ${CURRENT_LEAP.n} · ${CURRENT_LEAP.world} dự kiến bắt đầu trong ~${st.daysUntilLeap} ngày.`}
               </Txt>
+              {sunny && S.nextLeap ? (
+                <Txt style={{ fontSize: 12.5, fontWeight: '600', color: colors.textOnHero, opacity: 0.85, marginTop: 8 }}>
+                  🌤️ Leap {S.nextLeap.n} dự kiến bắt đầu ngày {S.nextDate} — còn {S.daysToNext} ngày nữa
+                </Txt>
+              ) : null}
               {intensity >= 4 ? (
                 <Pressable
                   onPress={() => ctx.openSheet('soothing')}
@@ -178,7 +341,13 @@ export function TodayScreen() {
           ) : null}
           {/* 7 days — inset panel at the hero's bottom */}
           <View style={{ marginTop: 12, marginHorizontal: 6, marginBottom: 6, backgroundColor: colors.bgElevated, borderRadius: radii.xl - 6, paddingTop: 10, paddingHorizontal: 10, paddingBottom: 6 }}>
-            <Txt style={{ fontSize: 11.5, fontWeight: '700', color: colors.textMuted, marginHorizontal: 6, marginBottom: 6 }}>7 ngày tới</Txt>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 6, marginBottom: 6 }}>
+              <Txt style={{ fontSize: 11.5, fontWeight: '700', color: colors.textMuted }}>7 ngày tới</Txt>
+              <Pressable onPress={() => ctx.setTab('leap')} style={{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingVertical: 4, paddingHorizontal: 2 }}>
+                <Txt style={{ fontSize: 12, fontWeight: '700', color: colors.accentPrimary }}>Xem chi tiết</Txt>
+                <Ic name="chevron" size={13} sw={2.4} color={colors.accentPrimary} />
+              </Pressable>
+            </View>
             <ForecastStrip data={st.forecast} onPick={() => ctx.setTab('leap')} />
           </View>
         </HeroCard>
@@ -197,8 +366,17 @@ export function TodayScreen() {
           </Card>
         ) : null}
 
+        {/* ===== POST-LEAP PREMIUM MOMENT (sunny, one-time, dismissible) ===== */}
+        {sunny && !postLeapDismissed ? <PostLeapCard onDismiss={() => setPostLeapDismissed(true)} /> : null}
+
+        {/* ===== PRE-LEAP PREP (từ 5 ngày trước leap kế) ===== */}
+        {sunny && S.prep && S.daysToNext != null && S.daysToNext <= 5 ? <PrepCard /> : null}
+
+        {/* ===== SLOT 2: stormy = symptoms · sunny = "Hôm nay của bé" ===== */}
+        {sunny ? <TodayOfBabyCard /> : null}
+
         {/* ===== SYMPTOMS — 2-col grid with Bống faces ===== */}
-        {st.status !== 'after-all' && CURRENT_LEAP.symptoms.length > 0 ? (
+        {!sunny && st.status !== 'after-all' && CURRENT_LEAP.symptoms.length > 0 ? (
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingHorizontal: 2 }}>
               <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary }}>
@@ -238,8 +416,11 @@ export function TodayScreen() {
           </View>
         ) : null}
 
+        {/* ===== SLOT 3: stormy = action cards · sunny = "Kỹ năng đang nở" ===== */}
+        {sunny ? <BloomSection /> : null}
+
         {/* ===== ACTION CARDS — horizontal carousel with full content ===== */}
-        {st.status !== 'after-all' && CURRENT_LEAP.actions.length > 0 ? (
+        {!sunny && st.status !== 'after-all' && CURRENT_LEAP.actions.length > 0 ? (
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingHorizontal: 2 }}>
               <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary }}>
@@ -357,12 +538,30 @@ export function EasyScreen() {
     <View style={{ flex: 1 }}>
       <AppBar title="Phương pháp EASY" onBack={ctx.back} />
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 44 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 24 }}>
           <Bong emotion="snug" onesie="sage" size={92} float />
           <Txt style={{ flex: 1, fontSize: 14, color: colors.textSecondary, lineHeight: 22 }}>
-            Một vòng lặp <Txt style={{ color: colors.textPrimary, fontWeight: '700' }}>Ăn → Chơi → Ngủ → Của mama</Txt> giúp bé đoán được điều gì đến tiếp theo — và mẹ cũng vậy.
+            Trong Leap {st.leap.n}, thế giới của bé đang thay đổi — một nhịp <Txt style={{ color: colors.textPrimary, fontWeight: '700' }}>quen thuộc</Txt> giúp con đoán được điều gì đến tiếp theo, nên bớt bất an hơn.
           </Txt>
         </View>
+
+        <Card pad={16} style={{ backgroundColor: colors.bgAccentSoft, marginBottom: 24 }}>
+          <Txt style={{ fontSize: 12, fontWeight: '700', letterSpacing: 0.6, color: colors.accentPrimary, marginBottom: 12 }}>
+            EASY GIÚP GÌ TRONG LEAP {st.leap.n}?
+          </Txt>
+          <View style={{ gap: 10 }}>
+            {([
+              ['🍼', 'Bé có thể bú ít mỗi cữ nhưng đòi ăn nhiều lần — cứ theo nhịp E, không ép đủ lượng.'],
+              ['🌙', 'Trong leap bé dễ mệt sớm — đặt ngủ sớm hơn 30 phút so với lịch quen.'],
+              ['✨', 'Giữ nguyên trình tự Ăn → Chơi → Ngủ — sự quen thuộc chính là điểm tựa của con lúc này.'],
+            ] as [string, string][]).map(([e, t], i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 10 }}>
+                <Txt style={{ fontSize: 13.5, lineHeight: 21 }}>{e}</Txt>
+                <Txt style={{ flex: 1, fontSize: 13.5, color: colors.textPrimary, lineHeight: 21 }}>{t}</Txt>
+              </View>
+            ))}
+          </View>
+        </Card>
 
         <View style={{ gap: 10, marginBottom: 24 }}>
           {EASY_STEPS.map((s) => (

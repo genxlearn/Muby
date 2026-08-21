@@ -20,6 +20,7 @@ import {
   Input,
   ListRow,
   NAV_CLEARANCE,
+  Sheet,
 } from '../components';
 import * as D from '../data/sampleData';
 import { Bong, BongFace } from '../mascot/Bong';
@@ -95,8 +96,39 @@ const METRIC_TABS: { id: Metric; label: string }[] = [
   { id: 'height', label: 'Chiều cao' },
   { id: 'feed', label: 'Cữ ăn' },
   { id: 'sleep', label: 'Giấc ngủ' },
-  { id: 'diaper', label: 'Tã' },
 ];
+
+/** Per-metric empty-state copy (v3). */
+const EMPTY_META: Record<Metric, { heading: string; helper: string; cta: string; measure?: boolean }> = {
+  weight: { heading: 'Chưa có số đo nào', helper: 'Thêm số đo đầu tiên để bắt đầu vẽ đường lớn của bé nhé mama 💛', cta: '+ Thêm số đo đầu tiên', measure: true },
+  height: { heading: 'Chưa có số đo nào', helper: 'Thêm số đo đầu tiên để bắt đầu vẽ đường lớn của bé nhé mama 💛', cta: '+ Thêm số đo đầu tiên', measure: true },
+  feed: { heading: 'Chưa có cữ ăn nào', helper: 'Ghi cữ ăn đầu tiên để thấy nhịp bú của bé nhé mama 💛', cta: '+ Ghi cữ ăn' },
+  sleep: { heading: 'Chưa có giấc ngủ nào', helper: 'Ghi giấc ngủ đầu tiên để thấy nhịp ngủ của bé 🌙', cta: '+ Ghi giấc ngủ' },
+  diaper: { heading: 'Chưa có lần thay tã nào', helper: 'Tã ướt đều đặn là dấu hiệu bé bú đủ — ghi lại để cùng theo dõi nhé 💛', cta: '+ Ghi tã' },
+};
+
+/** Metric chip strip — shared by the normal and empty growth screens. */
+function MetricChips({ metric, onPick }: { metric: Metric; onPick: (m: Metric) => void }) {
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={{ marginHorizontal: -20, marginTop: -8, marginBottom: 14, flexGrow: 0 }}
+      contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingTop: 8, paddingBottom: 14 }}
+    >
+      {METRIC_TABS.map((t) => (
+        <Chip key={t.id} active={metric === t.id} onPress={() => onPick(t.id)}>{t.label}</Chip>
+      ))}
+    </ScrollView>
+  );
+}
+
+/** Today's date in Vietnamese dd/mm/yyyy format. */
+function todayVN(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+}
 
 const LOG_TITLE: Record<Metric, string> = {
   weight: 'đo lường',
@@ -106,18 +138,17 @@ const LOG_TITLE: Record<Metric, string> = {
   diaper: 'tã',
 };
 
-const MEASURE_LOG = [
-  { date: 'Hôm nay · 04/07', label: '6.4 kg · 61 cm' },
-  { date: '20/06', label: '6.1 kg · 60.5 cm' },
-  { date: '05/06', label: '5.8 kg · 59 cm' },
-];
-
-export function GrowthScreen() {
+export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {}) {
   const { colors, radii } = useTheme();
   const ctx = useApp();
-  const [metric, setMetric] = useState<Metric>('weight');
+  const [metric, setMetric] = useState<Metric>(initialMetric || 'weight');
   const { BABY } = D;
   const { state: st } = useBaby();
+  const MEASURE_LOG = [
+    { date: 'Hôm nay', label: `${BABY.weight} kg · ${BABY.height} cm` },
+    { date: '20/06', label: '6.1 kg · 60.5 cm' },
+    { date: '05/06', label: '5.8 kg · 59 cm' },
+  ];
   const META: Record<Metric, { latest: string; sub: string; band: string }> = {
     weight: { latest: `${BABY.weight} kg`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
     height: { latest: `${BABY.height} cm`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
@@ -126,32 +157,37 @@ export function GrowthScreen() {
     diaper: { latest: '6 tã/ngày', sub: 'Tã ướt đều đặn = bé bú đủ 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
   };
   const m = META[metric];
-  // sample "today" logs merged with the typical range for THIS baby's real age
-  const baseStat = D.DAILY_STATS.find((s) => s.id === metric);
-  const ageRange = baseStat ? st.statRanges[metric as 'feed' | 'sleep' | 'diaper'] : null;
-  const stat = baseStat && ageRange ? { ...baseStat, lo: ageRange.lo, hi: ageRange.hi, range: ageRange.range } : undefined;
+  // "today" stats and typical ranges come from the engine — age-appropriate for THIS baby
+  const stat = st.dailyStats.find((s) => s.id === metric);
   const inRange = stat ? stat.num >= stat.lo && stat.num <= stat.hi : false;
   const pos = stat ? Math.min(100, Math.max(0, ((stat.num - stat.lo) / (stat.hi - stat.lo)) * 60 + 20)) : 0;
   const dailyLog = stat
     ? D.LOG_HISTORY.map((g) => ({ date: g.date, items: g.items.filter((it) => it.type === metric) })).filter((g) => g.items.length)
     : null;
   const isMeasure = metric === 'weight' || metric === 'height';
+
+  if (ctx.empty) {
+    const em = EMPTY_META[metric];
+    return (
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
+        <View style={{ paddingTop: 6, paddingHorizontal: 20, paddingBottom: 16 }}>
+          <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, marginBottom: 24 }}>Bé lớn lên</Txt>
+          <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary, marginBottom: 12, marginHorizontal: 2 }}>Đường lớn của bé</Txt>
+          <MetricChips metric={metric} onPick={setMetric} />
+          <EmptyState emotion="curious" onesie="sage" heading={em.heading} helper={em.helper} />
+          <ButtonPrimary onPress={() => (em.measure ? ctx.go('measure') : ctx.openSheet('quicklog'))}>{em.cta}</ButtonPrimary>
+        </View>
+      </ScrollView>
+    );
+  }
+
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
       <View style={{ paddingTop: 6, paddingHorizontal: 20 }}>
         <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, marginBottom: 24 }}>Bé lớn lên</Txt>
 
         <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary, marginBottom: 12, marginHorizontal: 2 }}>Đường lớn của bé</Txt>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ marginHorizontal: -20, marginTop: -6, marginBottom: 18, flexGrow: 0 }}
-          contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingTop: 6, paddingBottom: 10 }}
-        >
-          {METRIC_TABS.map((t) => (
-            <Chip key={t.id} active={metric === t.id} onPress={() => setMetric(t.id)}>{t.label}</Chip>
-          ))}
-        </ScrollView>
+        <MetricChips metric={metric} onPick={setMetric} />
 
         {/* HÔM NAY — chỉ số đối chiếu của tab đang chọn (cữ ăn / ngủ / tã) */}
         {stat ? (
@@ -352,7 +388,7 @@ export function MeasureScreen() {
         <View style={{ gap: 14 }}>
           <Input
             label="Ngày đo"
-            value="Hôm nay · 05/06/2026"
+            value={'Hôm nay · ' + todayVN()}
             onChange={() => {}}
             editable={false}
             rightSlot={<Ic name="cal" size={20} color={colors.textMuted} />}
@@ -390,7 +426,7 @@ export function HistoryScreen() {
     ['diaper', 'Tã'],
     ['mood', 'Cảm xúc'],
   ];
-  const groups = D.LOG_HISTORY.map((g) => ({ ...g, items: g.items.filter((it) => filter === 'all' || it.type === filter) })).filter((g) => g.items.length);
+  const groups = (ctx.empty ? [] : D.LOG_HISTORY).map((g) => ({ ...g, items: g.items.filter((it) => filter === 'all' || it.type === filter) })).filter((g) => g.items.length);
   return (
     <View style={{ flex: 1 }}>
       <AppBar title="Nhật ký của bé" onBack={ctx.back} />
@@ -441,10 +477,22 @@ function resolveColorKey(colors: ReturnType<typeof useTheme>['colors'], key: str
   }
 }
 
+interface Article {
+  tag: string;
+  title: string;
+  mins: number;
+  locked: boolean;
+}
+
+const FEATURED = { tag: 'LEAP 4', title: 'Vì sao bé bám mẹ hơn trong Leap 4', mins: 4 };
+
 export function LibraryScreen() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
   const [tab, setTab] = useState('leap');
+  const [art, setArt] = useState<Article | null>(null);
+  const openArt = (a: { tag: string; title: string; mins: number }, locked: boolean) =>
+    setArt({ tag: a.tag, title: a.title, mins: a.mins, locked });
   const chips: [string, string][] = [
     ['leap', 'Theo Leap'],
     ['age', 'Theo Tuổi'],
@@ -456,14 +504,17 @@ export function LibraryScreen() {
       <AppBar title="Thư viện" onBack={ctx.back} />
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}>
         {/* Hero card */}
-        <View style={{ borderRadius: radii.xl, overflow: 'hidden', backgroundColor: colors.accentPrimary, padding: 20, marginBottom: 24 }}>
+        <Pressable
+          onPress={() => openArt(FEATURED, false)}
+          style={{ borderRadius: radii.xl, overflow: 'hidden', backgroundColor: colors.accentPrimary, padding: 20, marginBottom: 24 }}
+        >
           <FlowerField items={[{ x: 250, y: -6, s: 60, c: 'rgba(255,255,255,0.18)', r: 10 }, { x: 300, y: 90, s: 40, c: 'rgba(255,255,255,0.14)' }]} />
           <View>
             <Txt style={{ fontSize: 11.5, fontWeight: '700', letterSpacing: 1.2, color: colors.textOnAccent, opacity: 0.85 }}>CHO TUẦN NÀY CỦA BẠN</Txt>
             <Txt serif style={{ fontSize: 23, fontWeight: '600', color: colors.textOnAccent, marginTop: 8, lineHeight: 29, maxWidth: 240 }}>Vì sao bé bám mẹ hơn trong Leap 4</Txt>
             <Txt style={{ fontSize: 13, color: colors.textOnAccent, opacity: 0.9, marginTop: 10 }}>4 phút đọc · dành cho mama</Txt>
           </View>
-        </View>
+        </Pressable>
         {/* Filter chips */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ flexGrow: 0, marginBottom: 20 }}>
           {chips.map(([id, l]) => (
@@ -477,7 +528,7 @@ export function LibraryScreen() {
             {D.LIBRARY.map((a, i) => {
               const locked = i >= 3 && !ctx.premium;
               return (
-                <Card key={i} pad={0} style={{ overflow: 'hidden' }} onPress={locked ? () => ctx.openPaywall('Mở khóa toàn bộ thư viện') : undefined}>
+                <Card key={i} pad={0} style={{ overflow: 'hidden' }} onPress={() => openArt(a, locked)}>
                   <View style={{ flexDirection: 'row', alignItems: 'stretch' }}>
                     <View style={{ width: 84, backgroundColor: resolveColorKey(colors, a.colorKey), alignItems: 'center', justifyContent: 'center' }}>
                       <Flower size={34} color="rgba(255,255,255,0.5)" />
@@ -499,6 +550,51 @@ export function LibraryScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* ---- Article reader sheet ---- */}
+      <Sheet open={!!art} onClose={() => setArt(null)} height="82%" title={art ? art.title : ''} sub={art ? `${art.tag} · ${art.mins} phút đọc` : ''}>
+        {art ? (
+          <View style={{ gap: 14, paddingTop: 4 }}>
+            <Txt style={{ fontSize: 14.5, lineHeight: 25, color: colors.textPrimary }}>
+              Tuần này, não bé đang mở ra một cách nhìn thế giới hoàn toàn mới. Những điều quen thuộc bỗng trở nên lạ lẫm — và người duy nhất con thấy an toàn lúc này chính là mẹ.
+            </Txt>
+            <Txt style={{ fontSize: 14.5, lineHeight: 25, color: colors.textPrimary }}>
+              Đó là lý do bé bám mẹ hơn, khóc khi mẹ rời phòng, và đòi bế nhiều hơn hẳn. Đây không phải thói quen xấu — đây là nhu cầu thật của một bộ não đang lớn rất nhanh.
+            </Txt>
+            {art.locked ? (
+              <Card pad={16} style={{ backgroundColor: colors.bgAccentSoft, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.accentPrimary }}>
+                <Txt style={{ fontSize: 14, lineHeight: 22, color: colors.textPrimary, marginBottom: 12 }}>
+                  Đọc đầy đủ bài này và toàn bộ thư viện — Muby Premium 199.000đ trọn đời 💛
+                </Txt>
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                  <ButtonPrimary
+                    full={false}
+                    onPress={() => {
+                      setArt(null);
+                      ctx.openPaywall('Mở khóa toàn bộ thư viện');
+                    }}
+                    style={{ flex: 1, minHeight: 48 }}
+                  >
+                    Mở khóa
+                  </ButtonPrimary>
+                  <ButtonSecondary full={false} onPress={() => setArt(null)} style={{ flex: 1, minHeight: 48 }}>
+                    Để sau
+                  </ButtonSecondary>
+                </View>
+              </Card>
+            ) : (
+              <>
+                <Txt style={{ fontSize: 14.5, lineHeight: 25, color: colors.textPrimary }}>
+                  Điều mẹ có thể làm: giữ nhịp sinh hoạt quen thuộc, ôm con nhiều hơn, và nhớ rằng giai đoạn này sẽ qua. Sau mỗi leap, bé lại biết thêm một kỹ năng mới — và nụ cười của con sẽ cho mẹ biết ngay.
+                </Txt>
+                <Banner icon="💛" tone="soft">
+                  Mẹo nhỏ: đọc xong bài này, thử ôm con thêm 5 phút trước giờ ngủ — cả hai mẹ con đều sẽ dễ chịu hơn.
+                </Banner>
+              </>
+            )}
+          </View>
+        ) : null}
+      </Sheet>
     </View>
   );
 }

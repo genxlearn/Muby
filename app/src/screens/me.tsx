@@ -1,32 +1,33 @@
 /* ============================================================
-   SCREEN 9A Notifications · 9B Profile/Me · Premium Paywall
-   · Market tab (Coming Soon)
-   Ported from project/screens/me.jsx (Muby App Final).
+   SCREEN 9A Notifications · 9B Profile/Me · Muby Premium Paywall
+   Ported from project/screens/me.jsx (Muby v3).
+   Premium is a reverse trial: 7 days open automatically at signup
+   (no card, no auto-charge), then Free; unlock is a one-time
+   199.000đ purchase via ctx.buyPremium().
    ============================================================ */
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import {
   AppBar,
+  Banner,
   ButtonPrimary,
-  ButtonSecondary,
   ButtonText,
   Card,
   EmptyState,
   Ic,
   Input,
-  NAV_CLEARANCE,
   Sheet,
   Toggle,
 } from '../components';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../auth/AuthContext';
 import * as D from '../data/sampleData';
-import { formatDobDisplay, parseDobInput } from '../data/leapEngine';
+import { formatDobDisplay, parseDobInput, parseDueDateInput } from '../data/leapEngine';
 import { Bong, BongFace } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
 import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
+import { DueDateField } from './auth';
 
 /* ============================================================
    9A — NOTIFICATIONS
@@ -166,26 +167,44 @@ export function MeScreen() {
   const auth = useAuth();
   const { baby, displayName, state: st, saveBaby } = useBaby();
   const [reminders, setReminders] = useState(true);
-  const [sheet, setSheet] = useState<null | 'baby' | 'invite' | 'units' | 'terms'>(null);
+  const [sheet, setSheet] = useState<null | 'baby' | 'units' | 'terms'>(null);
   const [units, setUnits] = useState('kg · cm');
-  const [inviteMail, setInviteMail] = useState('');
   const [babyName, setBabyName] = useState(displayName);
   const [babyDob, setBabyDob] = useState(baby ? formatDobDisplay(baby.dob) : '');
+  const [babyDue, setBabyDue] = useState(baby?.dueDate ? formatDobDisplay(baby.dueDate) : '');
   const dark = ctx.theme === 'dark';
   const dobOk = parseDobInput(babyDob);
+  const dueIso = parseDueDateInput(babyDue);
+  const dueErr = babyDue.length >= 8 && !dueIso ? 'Ngày dự sinh chưa đúng — nhập dạng DD/MM/YYYY nhé' : '';
 
   const openBabySheet = () => {
     setBabyName(baby?.name || displayName);
     setBabyDob(baby ? formatDobDisplay(baby.dob) : '');
+    setBabyDue(baby?.dueDate ? formatDobDisplay(baby.dueDate) : '');
     setSheet('baby');
   };
 
   const saveBabySheet = async () => {
     const dobIso = parseDobInput(babyDob);
     if (!dobIso) return;
-    await saveBaby({ name: babyName.trim(), dob: dobIso, gender: baby?.gender ?? '' });
+    await saveBaby({
+      name: babyName.trim(),
+      dob: dobIso,
+      gender: baby?.gender ?? '',
+      dueDate: dueIso ?? undefined,
+    });
     setSheet(null);
-    ctx.toast('Đã lưu thông tin bé 💚');
+    ctx.toast('Đã lưu. Mọi dự báo đã tính lại theo bé 💚');
+  };
+
+  const toggleFaceId = async () => {
+    const next = !auth.faceIdEnabled;
+    const ok = await auth.setFaceIdEnabled(next);
+    if (!ok) {
+      ctx.toast('Chưa bật được Face ID — thử lại nhé.');
+      return;
+    }
+    ctx.toast(next ? 'Đã bật Face ID 💚' : 'Đã tắt Face ID. Lần sau đăng nhập bằng mã SMS nhé.');
   };
 
   const logout = async () => {
@@ -196,56 +215,47 @@ export function MeScreen() {
   return (
     <View style={{ flex: 1 }}>
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 6, paddingHorizontal: 20, paddingBottom: 44 }}>
-      <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, marginBottom: 16 }}>Mama & Bống</Txt>
+      <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, marginBottom: 16 }}>Mama & {displayName}</Txt>
 
       {/* Premium / trial state */}
       {ctx.purchased ? (
         <View style={{ alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 11, paddingHorizontal: 16, minHeight: 44, borderRadius: 999, backgroundColor: colors.accentSoftBg, marginBottom: 24 }}>
           <Ic name="check" size={17} sw={2.6} color={colors.accentPrimary} />
-          <Txt style={{ fontWeight: '700', fontSize: 14, color: colors.textPrimary }}>Wonder Premium ✓</Txt>
+          <Txt style={{ fontWeight: '700', fontSize: 14, color: colors.textPrimary }}>Muby Premium ✓</Txt>
         </View>
-      ) : ctx.trial ? (
-        <Card pad={16} style={{ marginBottom: 24 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.successSoft, alignItems: 'center', justifyContent: 'center' }}>
-              <Txt style={{ fontSize: 20 }}>✨</Txt>
+      ) : (
+        <>
+          {ctx.trial ? (
+            <Banner icon="✨" style={{ marginBottom: 12 }}>
+              <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20 }}>
+                7 ngày đầu: mọi thứ đang mở · còn <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>{ctx.trial.daysLeft} ngày</Txt> · sau đó về gói Miễn phí — không trừ tiền 💛
+              </Txt>
+            </Banner>
+          ) : null}
+          <View style={{ borderRadius: radii.xl, overflow: 'hidden', backgroundColor: colors.textPrimary, padding: 20, marginBottom: 24 }}>
+            <View style={{ position: 'absolute', right: 12, bottom: 0 }}>
+              <Bong emotion="excited" onesie="orange" size={92} />
             </View>
-            <View style={{ flex: 1 }}>
-              <Txt style={{ fontSize: 15, fontWeight: '700', color: colors.textPrimary }}>Đang dùng thử Premium</Txt>
-              <Txt style={{ fontSize: 12.5, color: colors.textMuted, marginTop: 2 }}>Còn {ctx.trial.daysLeft} ngày · sau đó trừ 199.000đ nếu không hủy</Txt>
+            <Txt serif style={{ fontSize: 22, fontWeight: '600', color: colors.bgCanvas }}>Muby Premium</Txt>
+            <Txt style={{ fontSize: 13.5, color: colors.bgCanvas, opacity: 0.7, marginTop: 4, fontWeight: '600' }}>199.000đ · Một lần · Trọn đời</Txt>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
+              {['10 leaps đầy đủ', 'Sunny Play từng bước', '3 âm thanh dỗ bé', 'Đồng bộ gia đình (sắp có)'].map((p) => (
+                <View key={p} style={{ backgroundColor: colors.bgCanvas + '33', borderWidth: 1, borderColor: colors.bgCanvas + '4D', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 999 }}>
+                  <Txt style={{ fontSize: 11.5, fontWeight: '600', color: colors.bgCanvas }}>{p}</Txt>
+                </View>
+              ))}
             </View>
             <Pressable
-              onPress={() => { ctx.cancelTrial(); ctx.toast('Đã hủy dùng thử. Bạn vẫn dùng bản Free thoải mái 💛'); }}
-              style={{ paddingVertical: 11, paddingHorizontal: 15, minHeight: 44, justifyContent: 'center', borderRadius: 999, backgroundColor: colors.bgSunken, borderWidth: 1, borderColor: colors.borderDefault }}
+              onPress={() => ctx.openPaywall('Mở khóa Muby Premium')}
+              style={{ alignSelf: 'flex-start', marginTop: 16, paddingVertical: 13, paddingHorizontal: 22, minHeight: 48, justifyContent: 'center', borderRadius: 999, backgroundColor: colors.accentPrimary }}
             >
-              <Txt style={{ fontWeight: '700', fontSize: 13, color: colors.textSecondary }}>Hủy dùng thử</Txt>
+              <Txt style={{ fontWeight: '700', fontSize: 15, color: '#fff' }}>Mở khóa trọn đời — 199.000đ</Txt>
             </Pressable>
+            <Txt style={{ fontSize: 11.5, color: colors.bgCanvas, opacity: 0.55, marginTop: 12, maxWidth: 235 }}>
+              Trả một lần. Không gia hạn. Không trừ tiền tự động.
+            </Txt>
           </View>
-        </Card>
-      ) : (
-        <View style={{ borderRadius: radii.xl, overflow: 'hidden', backgroundColor: colors.textPrimary, padding: 20, marginBottom: 24 }}>
-          <View style={{ position: 'absolute', right: 12, bottom: 0 }}>
-            <Bong emotion="excited" onesie="orange" size={92} />
-          </View>
-          <Txt serif style={{ fontSize: 22, fontWeight: '600', color: colors.bgCanvas }}>Wonder Premium</Txt>
-          <Txt style={{ fontSize: 13.5, color: colors.bgCanvas, opacity: 0.7, marginTop: 4, fontWeight: '600' }}>199.000đ · Một lần · Trọn đời</Txt>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
-            {['10 leaps đầy đủ', 'Sunny Play', '3 tiếng ồn trắng', 'Đồng bộ gia đình'].map((p) => (
-              <View key={p} style={{ backgroundColor: colors.bgCanvas + '33', borderWidth: 1, borderColor: colors.bgCanvas + '4D', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 999 }}>
-                <Txt style={{ fontSize: 11.5, fontWeight: '600', color: colors.bgCanvas }}>{p}</Txt>
-              </View>
-            ))}
-          </View>
-          <Pressable
-            onPress={() => ctx.openPaywall('Mở khóa Wonder Premium')}
-            style={{ alignSelf: 'flex-start', marginTop: 16, paddingVertical: 13, paddingHorizontal: 22, minHeight: 48, justifyContent: 'center', borderRadius: 999, backgroundColor: colors.accentPrimary }}
-          >
-            <Txt style={{ fontWeight: '700', fontSize: 15, color: '#fff' }}>Dùng thử miễn phí 1 tháng</Txt>
-          </Pressable>
-          <Txt style={{ fontSize: 11.5, color: colors.bgCanvas, opacity: 0.55, marginTop: 12 }}>
-            Miễn phí 1 tháng đầu — hủy lúc nào cũng được. Không hủy: 199.000đ một lần, trọn đời.
-          </Txt>
-        </View>
+        </>
       )}
 
       {/* Baby card */}
@@ -263,7 +273,13 @@ export function MeScreen() {
       {/* Caregivers */}
       <SettingsGroup title="Người chăm bé">
         <SettingRow first icon="👩" label="Mama (bạn)" sub="Chủ tài khoản" />
-        <SettingRow icon="➕" label="Mời bố vào cùng" sub="Đồng bộ mọi ghi chép" onPress={() => setSheet('invite')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
+        <SettingRow
+          icon="➕"
+          label="Mời bố vào cùng"
+          sub="Đồng bộ gia đình — sắp có"
+          onPress={() => ctx.toast('Sắp có rồi — mình sẽ báo mama ngay khi mở nhé 💛')}
+          right={<Ic name="chevron" size={18} color={colors.textMuted} />}
+        />
       </SettingsGroup>
 
       {/* Display */}
@@ -271,14 +287,34 @@ export function MeScreen() {
         <SettingRow first icon="🌙" label="Chế độ tối" sub="Luôn miễn phí" right={<Toggle on={dark} onPress={() => ctx.setTheme(dark ? 'light' : 'dark')} />} />
       </SettingsGroup>
 
+      {/* Security */}
+      <SettingsGroup title="Bảo mật">
+        {auth.faceIdSupported ? (
+          <SettingRow
+            first
+            icon="🙂"
+            label="Đăng nhập bằng Face ID"
+            sub="Vào nhanh, không cần chờ SMS"
+            right={<Toggle on={auth.faceIdEnabled} onPress={toggleFaceId} />}
+          />
+        ) : (
+          <SettingRow
+            first
+            icon="🙂"
+            label="Đăng nhập bằng Face ID"
+            sub="Thiết bị này chưa hỗ trợ Face ID / vân tay"
+          />
+        )}
+      </SettingsGroup>
+
       {/* Info & reminders */}
       <SettingsGroup title="Thông tin & Nhắc">
-        <SettingRow first icon="🔔" label="Nhắc nhẹ nhàng" sub="Cữ ăn, giấc ngủ" right={<Toggle on={reminders} onPress={() => setReminders((r) => !r)} />} />
+        <SettingRow first icon="🔔" label="Nhắc nhẹ nhàng" sub="Từ chính ghi chép của bạn · báo trước leap" right={<Toggle on={reminders} onPress={() => setReminders((r) => !r)} />} />
         <SettingRow icon="📏" label="Đơn vị đo" sub={units} onPress={() => setSheet('units')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
       </SettingsGroup>
 
       {/* About */}
-      <SettingsGroup title="Về Baby Wonder Weeks">
+      <SettingsGroup title="Về Muby">
         <SettingRow first icon="💛" label="Đánh giá ứng dụng" onPress={() => ctx.toast('Cảm ơn mama! Chờ chút để mở App Store nhé 💛')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
         <SettingRow icon="📄" label="Điều khoản & Quyền riêng tư" onPress={() => setSheet('terms')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
       </SettingsGroup>
@@ -289,12 +325,12 @@ export function MeScreen() {
         </Pressable>
       </View>
       <Pressable onPress={() => ctx.go('designsystem')} style={{ alignSelf: 'center', padding: 6 }}>
-        <Txt style={{ textAlign: 'center', color: colors.textMuted, fontSize: 12 }}>Baby Wonder Weeks v3 · 1.0.0</Txt>
+        <Txt style={{ textAlign: 'center', color: colors.textMuted, fontSize: 12 }}>Muby · 1.0.0</Txt>
       </Pressable>
     </ScrollView>
 
     {/* --- Sheets --- */}
-    <Sheet open={sheet === 'baby'} onClose={() => setSheet(null)} height="52%" title={displayName} sub="Thông tin bé">
+    <Sheet open={sheet === 'baby'} onClose={() => setSheet(null)} height="72%" title={displayName} sub="Thông tin bé">
       <View style={{ gap: 14, paddingTop: 6 }}>
         <View style={{ alignItems: 'center' }}>
           <BongFace emotion="happy" size={72} ring />
@@ -308,22 +344,8 @@ export function MeScreen() {
           placeholder="DD/MM/YYYY"
           error={babyDob.length >= 8 && !dobOk ? 'Ngày sinh chưa đúng — nhập dạng DD/MM/YYYY nhé' : ''}
         />
-        <ButtonPrimary disabled={!dobOk} onPress={saveBabySheet}>Lưu thay đổi</ButtonPrimary>
-      </View>
-    </Sheet>
-
-    <Sheet open={sheet === 'invite'} onClose={() => setSheet(null)} height="46%" title="Mời bố vào cùng" sub="Bố cũng thấy mọi ghi chép, dự báo của bé">
-      <View style={{ gap: 14, paddingTop: 6 }}>
-        <Input label="Email của bố" type="email" placeholder="bo@email.com" value={inviteMail} onChange={setInviteMail} />
-        <ButtonPrimary
-          disabled={!inviteMail.includes('@')}
-          onPress={() => { setSheet(null); setInviteMail(''); ctx.toast('Đã gửi lời mời tới bố 💛'); }}
-        >
-          Gửi lời mời
-        </ButtonPrimary>
-        <ButtonText onPress={() => setSheet(null)} style={{ alignSelf: 'center' }} textStyle={{ textAlign: 'center' }}>
-          Để sau cũng được
-        </ButtonText>
+        <DueDateField value={babyDue} onChange={setBabyDue} error={dueErr} />
+        <ButtonPrimary disabled={!dobOk || (babyDue.trim().length > 0 && !dueIso)} onPress={saveBabySheet}>Lưu thay đổi</ButtonPrimary>
       </View>
     </Sheet>
 
@@ -359,7 +381,7 @@ export function MeScreen() {
     <Sheet open={sheet === 'terms'} onClose={() => setSheet(null)} height="62%" title="Điều khoản & Quyền riêng tư">
       <View style={{ gap: 12, paddingTop: 4 }}>
         <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
-          <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Dữ liệu của bé là của bạn.</Txt> Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, ảnh) thuộc về bạn mãi mãi — kể cả khi không dùng Premium.
+          <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Dữ liệu của bé là của bạn.</Txt> Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, khoảnh khắc, ảnh) thuộc về bạn mãi mãi — kể cả khi không dùng Premium.
         </Txt>
         <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
           <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Không bán dữ liệu.</Txt> Chúng mình không chia sẻ thông tin của bạn và bé cho bên thứ ba.
@@ -368,7 +390,7 @@ export function MeScreen() {
           <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Nội dung tham khảo.</Txt> Dự báo leap và gợi ý EASY mang tính tham khảo, không thay thế tư vấn y khoa. Khi lo lắng về sức khoẻ của bé, hãy hỏi bác sĩ nhi.
         </Txt>
         <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
-          <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Premium một lần.</Txt> 199.000đ trọn đời. Không tự gia hạn, không phí ẩn.
+          <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Muby Premium.</Txt> 7 ngày đầu sau đăng ký, mọi tính năng đều mở — không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 199.000đ, trọn đời, không gia hạn.
         </Txt>
       </View>
     </Sheet>
@@ -377,191 +399,63 @@ export function MeScreen() {
 }
 
 /* ============================================================
-   PREMIUM PAYWALL (soft gate)
+   MUBY PREMIUM PAYWALL (one-time 199k)
    ============================================================ */
 const PAYWALL_BENEFITS: [string, string, string][] = [
-  ['📖', '10 leaps đầy đủ', 'Dấu hiệu, mẹo & hoạt động cho từng leap'],
+  ['📖', '10 leaps đầy đủ', 'Dấu hiệu, mẹo & cách đồng hành cho từng leap'],
   ['🌼', 'Sunny Play từng bước', 'Hướng dẫn chi tiết cho mỗi hoạt động'],
   ['🌧️', '3 âm thanh dỗ bé', 'Mưa, suối & shh-shh, phát không cần mạng'],
-  ['👨‍👩‍👧', 'Đồng bộ gia đình', 'Cả nhà cùng chăm bé trên một tài khoản'],
+  ['👨‍👩‍👧', 'Đồng bộ gia đình', 'Sắp có — cả nhà cùng chăm bé'],
 ];
-
-/** One "Continue with …" button for the store-account linking step. */
-function LinkButton({
-  label,
-  icon,
-  dark,
-  onPress,
-  busy,
-}: {
-  label: string;
-  icon: 'apple' | 'google';
-  dark?: boolean;
-  onPress: () => void;
-  busy?: boolean;
-}) {
-  const { colors } = useTheme();
-  return (
-    <Pressable
-      onPress={busy ? undefined : onPress}
-      style={({ pressed }) => [
-        {
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 10,
-          minHeight: 56,
-          borderRadius: 999,
-          backgroundColor: dark ? '#000000' : colors.bgElevated,
-          borderWidth: dark ? 0 : 1.5,
-          borderColor: colors.borderDefault,
-          opacity: pressed || busy ? 0.7 : 1,
-        },
-      ]}
-    >
-      <MaterialCommunityIcons name={icon} size={22} color={dark ? '#fff' : colors.textPrimary} />
-      <Txt style={{ fontSize: 16, fontWeight: '700', color: dark ? '#fff' : colors.textPrimary }}>{label}</Txt>
-    </Pressable>
-  );
-}
 
 export function Paywall() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
-  // 'intro' → benefits + trial CTA · 'link' → connect Apple/Google before the trial starts
-  const [step, setStep] = useState<'intro' | 'link'>('intro');
-  const [linking, setLinking] = useState<null | 'apple' | 'google'>(null);
 
-  // audit #16: never gate comfort when baby is crying (intensity >= 4).
+  // audit: never gate comfort when baby is crying (intensity >= 4).
   // Close in an effect (not during render) to avoid a setState-in-render warning.
   useEffect(() => {
     if (ctx.paywall && ctx.intensity >= 4) ctx.closePaywall();
   }, [ctx.paywall, ctx.intensity]);
   const open = !!ctx.paywall && ctx.intensity < 4;
 
-  // reset to the first step whenever the sheet reopens
-  useEffect(() => {
-    if (open) {
-      setStep('intro');
-      setLinking(null);
-    }
-  }, [open]);
-
-  const link = (provider: 'apple' | 'google') => {
-    setLinking(provider);
-    // Prototype: simulates the App Store / Play Store linking handshake.
-    // Real IAP (StoreKit / Play Billing) needs a dev build — not Expo Go.
-    setTimeout(() => {
-      setLinking(null);
-      ctx.startTrial();
-      ctx.closePaywall();
-      ctx.toast(`Đã liên kết ${provider === 'apple' ? 'Apple' : 'Google'} — dùng thử 1 tháng bắt đầu 💛`);
-    }, 900);
+  const buy = () => {
+    ctx.buyPremium();
+    ctx.closePaywall();
+    ctx.toast('Muby Premium là của bạn mãi mãi 💛');
   };
 
   return (
-    <Sheet
-      open={open}
-      onClose={ctx.closePaywall}
-      height="72%"
-      title="Wonder Premium"
-      sub={step === 'intro' ? 'Miễn phí 1 tháng đầu · 199.000đ trọn đời' : 'Liên kết để bắt đầu dùng thử'}
-    >
-      {step === 'intro' ? (
-        <>
-          <View style={{ alignItems: 'center', paddingTop: 4 }}>
-            <Bong emotion="excited" onesie="orange" size={130} float />
-            <Txt serif style={{ fontSize: 30, fontWeight: '600', color: colors.textPrimary, marginTop: 8 }}>199.000đ</Txt>
-            <Txt style={{ fontSize: 13.5, color: colors.textMuted, marginTop: 2 }}>{ctx.paywall?.title || ''}</Txt>
-          </View>
-
-          <View style={{ gap: 10, marginTop: 20 }}>
-            {PAYWALL_BENEFITS.map(([e, t, d], i) => (
-              <View key={i} style={{ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 4, paddingHorizontal: 2 }}>
-                <View style={{ width: 42, height: 42, borderRadius: radii.md, backgroundColor: colors.bgSunken, alignItems: 'center', justifyContent: 'center' }}>
-                  <Txt style={{ fontSize: 19 }}>{e}</Txt>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Txt style={{ fontSize: 14.5, fontWeight: '700', color: colors.textPrimary }}>{t}</Txt>
-                  <Txt style={{ fontSize: 12.5, color: colors.textSecondary }}>{d}</Txt>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          <View style={{ gap: 10, marginTop: 22 }}>
-            <ButtonPrimary onPress={() => setStep('link')}>Dùng thử miễn phí 1 tháng</ButtonPrimary>
-            <ButtonText onPress={ctx.closePaywall} style={{ alignSelf: 'center' }} textStyle={{ textAlign: 'center' }}>
-              Để sau
-            </ButtonText>
-          </View>
-
-          <Txt style={{ textAlign: 'center', fontSize: 11.5, color: colors.textMuted, marginTop: 6, paddingBottom: 8, lineHeight: 17 }}>
-            Không trừ tiền trong 1 tháng đầu. Nếu không hủy, sau 1 tháng sẽ trừ 199.000đ — một lần, trọn đời.
-            Dữ liệu bé đã ghi luôn thuộc về bạn — mãi mãi.
-          </Txt>
-        </>
-      ) : (
-        <>
-          <View style={{ alignItems: 'center', paddingTop: 4 }}>
-            <Bong emotion="curious" onesie="cream" size={120} float />
-            <Txt serif style={{ fontSize: 21, fontWeight: '600', color: colors.textPrimary, marginTop: 10, textAlign: 'center' }}>
-              Liên kết tài khoản để bắt đầu
-            </Txt>
-            <Txt style={{ fontSize: 13.5, color: colors.textSecondary, marginTop: 6, textAlign: 'center', lineHeight: 20, maxWidth: 300 }}>
-              Chọn tài khoản thanh toán của bạn. <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>Không trừ tiền trong 1 tháng đầu</Txt> — hủy lúc nào cũng được trong màn Mama.
-            </Txt>
-          </View>
-
-          <View style={{ gap: 12, marginTop: 24 }}>
-            <LinkButton icon="apple" dark label={linking === 'apple' ? 'Đang liên kết…' : 'Tiếp tục với Apple'} busy={!!linking} onPress={() => link('apple')} />
-            <LinkButton icon="google" label={linking === 'google' ? 'Đang liên kết…' : 'Tiếp tục với Google'} busy={!!linking} onPress={() => link('google')} />
-          </View>
-
-          <View style={{ marginTop: 18, padding: 14, borderRadius: radii.md, backgroundColor: colors.bgSunken, gap: 6 }}>
-            {[
-              ['🗓️', 'Hôm nay: bắt đầu 1 tháng miễn phí'],
-              ['🔔', 'Trước khi hết hạn: mình sẽ nhắc bạn'],
-              ['💛', 'Sau 1 tháng: trừ 199.000đ nếu bạn không hủy — trọn đời, không phí nào khác'],
-            ].map(([e, t], i) => (
-              <View key={i} style={{ flexDirection: 'row', gap: 9, alignItems: 'flex-start' }}>
-                <Txt style={{ fontSize: 13 }}>{e}</Txt>
-                <Txt style={{ flex: 1, fontSize: 12.5, color: colors.textSecondary, lineHeight: 18 }}>{t}</Txt>
-              </View>
-            ))}
-          </View>
-
-          <ButtonText onPress={() => setStep('intro')} style={{ alignSelf: 'center', marginTop: 10 }} textStyle={{ textAlign: 'center' }}>
-            ← Quay lại
-          </ButtonText>
-        </>
-      )}
-    </Sheet>
-  );
-}
-
-/* ============================================================
-   MARKET TAB — Coming Soon (sau MVP)
-   ============================================================ */
-export function MarketScreen() {
-  const { colors } = useTheme();
-  const ctx = useApp();
-  return (
-    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 6, paddingHorizontal: 20, paddingBottom: NAV_CLEARANCE }}>
-      <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, marginBottom: 24 }}>Market</Txt>
-      <View style={{ alignItems: 'center', paddingVertical: 32, paddingHorizontal: 24, gap: 6 }}>
-        <Bong emotion="curious" onesie="sage" size={160} float />
-        <View style={{ marginTop: 16, paddingVertical: 8, paddingHorizontal: 16, borderRadius: 999, backgroundColor: colors.bgAccentSoft }}>
-          <Txt style={{ fontSize: 12.5, fontWeight: '700', letterSpacing: 0.5, color: colors.accentPrimary }}>SẮP RA MẮT</Txt>
-        </View>
-        <Txt serif style={{ fontSize: 22, fontWeight: '600', color: colors.textPrimary, marginTop: 10 }}>Đồ tốt cho mẹ & bé</Txt>
-        <Txt style={{ fontSize: 14.5, color: colors.textSecondary, maxWidth: 260, textAlign: 'center', lineHeight: 22 }}>
-          Mình đang chuẩn bị góc mua sắm nhỏ — chỉ những món thật sự hữu ích theo từng leap của bé.
-        </Txt>
-        <ButtonSecondary style={{ marginTop: 20 }} onPress={() => ctx.toast('Đã ghi nhớ. Mình sẽ báo bạn ngay khi mở nhé 💛')}>
-          Báo mình khi mở nhé
-        </ButtonSecondary>
+    <Sheet open={open} onClose={ctx.closePaywall} height="76%" title="Muby Premium" sub="199.000đ · Một lần · Trọn đời">
+      <View style={{ alignItems: 'center', paddingTop: 4 }}>
+        <Bong emotion="excited" onesie="orange" size={124} float />
+        <Txt style={{ fontSize: 13.5, color: colors.textMuted, marginTop: 8 }}>{ctx.paywall?.title || ''}</Txt>
       </View>
-    </ScrollView>
+
+      <View style={{ gap: 10, marginTop: 18 }}>
+        {PAYWALL_BENEFITS.map(([e, t, d], i) => (
+          <View key={i} style={{ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 4, paddingHorizontal: 2 }}>
+            <View style={{ width: 42, height: 42, borderRadius: radii.md, backgroundColor: colors.bgSunken, alignItems: 'center', justifyContent: 'center' }}>
+              <Txt style={{ fontSize: 19 }}>{e}</Txt>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Txt style={{ fontSize: 14.5, fontWeight: '700', color: colors.textPrimary }}>{t}</Txt>
+              <Txt style={{ fontSize: 12.5, color: colors.textSecondary }}>{d}</Txt>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={{ gap: 10, marginTop: 22 }}>
+        <ButtonPrimary onPress={buy}>Mở khóa trọn đời — 199.000đ</ButtonPrimary>
+        <ButtonText onPress={ctx.closePaywall} style={{ alignSelf: 'center' }} textStyle={{ textAlign: 'center' }}>
+          Để sau
+        </ButtonText>
+      </View>
+
+      <Txt style={{ textAlign: 'center', fontSize: 11.5, color: colors.textMuted, marginTop: 8, paddingBottom: 8, lineHeight: 17 }}>
+        Trả một lần. Không gia hạn. Không trừ tiền tự động. Kỷ niệm của bé luôn miễn phí.
+      </Txt>
+    </Sheet>
   );
 }

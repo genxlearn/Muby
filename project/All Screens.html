@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>BWW v3 — All Screens</title>
+<title>Muby — All Screens (MVP v6)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -32,18 +32,21 @@
   body.darkpage .frame-label { color: #F5EFE2; }
   .frame-label span { color: #9b8d7d; font-weight: 500; }
   .frame { width: 393px; background: var(--bg-canvas); border-radius: 20px; overflow: visible; position: relative; box-shadow: 0 4px 24px rgba(0,0,0,0.10); border: 1px solid rgba(0,0,0,0.06); }
+  .frame > .inner { display: flex; flex-direction: column; min-height: 852px; }
+  .frame > .inner > div:first-child { flex: 1; display: flex; flex-direction: column; }
   body.darkpage .frame { box-shadow: 0 4px 24px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.06); }
-  .frame > .inner { display: flex; flex-direction: column; }
   .island { display: none; }
   /* Override inner scroll containers to show all content */
   .frame .screen-scroll, .frame .no-sb { overflow: visible !important; max-height: none !important; height: auto !important; flex: none !important; }
   .frame [style*="overflowY"] { overflow: visible !important; }
   .frame [style*="overflow"] { overflow: visible !important; }
+  /* Wrap horizontal scroll rows so nothing bleeds outside the 393px frame */
+  .frame .no-sb[style*="overflowX"], .frame [style*="overflow-x"], .frame [style*="overflowX"] { flex-wrap: wrap !important; row-gap: 10px; }
 </style>
 </head>
 <body>
 <div class="top">
-  <div class="title"><span id="bf"></span> Baby Wonder Weeks v4 — Toàn bộ màn hình</div>
+  <div class="title"><span id="bf"></span> Muby — MVP v6 · Toàn bộ màn hình</div>
   <button class="btn" id="themeBtn">🌙 Xem chế độ tối</button>
 </div>
 <div class="wrap"><div id="root"></div></div>
@@ -68,6 +71,7 @@ function mkCtx(o = {}) {
     route: { flow: 'app', tab: 'today', stack: null }, sheet: null, paywall: null, toastVal: null,
     setTab: noop, go: noop, back: noop, goFlow: noop, setRoute: noop, openSheet: noop, closeSheet: noop,
     setIntensity: noop, setEmpty: noop, setPremium: noop, setTheme: noop, openPaywall: noop, closePaywall: noop, toast: noop,
+    startTrial: noop, cancelTrial: noop, updateBaby: noop, setFaceId: noop, faceId: true,
     ...o,
   };
 }
@@ -86,6 +90,12 @@ function Frame({ label, note, nav, children }) {
   );
 }
 
+function CardDemo({ children }) {
+  return <div style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>{children}</div>;
+}
+
+function IntroAt({ i }) { return null; }
+
 function Section({ title, desc, children }) {
   return (
     <div className="sec">
@@ -99,25 +109,32 @@ function Section({ title, desc, children }) {
 function Canvas() {
   return (
     <div>
-      <Section title="Auth · A1–A6" desc="Cổng vào — giọng văn của một người chị thân thiết, không bao giờ trách mẹ.">
-        <Frame label="A1" note="Welcome"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A1' } })} /></Frame>
-        <Frame label="A2" note="Đăng ký"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A2' } })} /></Frame>
-        <Frame label="A3" note="Đăng nhập"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A3' } })} /></Frame>
-        <Frame label="A4" note="OTP"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A4' } })} /></Frame>
-        <Frame label="A5" note="Khôi phục mật khẩu"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A5' } })} /></Frame>
-        <Frame label="A6" note="Đặt lại mật khẩu"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A6' } })} /></Frame>
+      <Section title="Auth · A1–A3" desc="Passwordless — số điện thoại + OTP, không mật khẩu. Face ID cho lần sau.">
+        <Frame label="A1" note="Welcome · Muby"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A1' } })} /></Frame>
+        <Frame label="A2" note="Nhập SĐT"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A2' } })} /></Frame>
+        <Frame label="A3" note="OTP"><AuthFlow ctx={mkCtx({ route: { flow: 'auth', authStep: 'A3' } })} /></Frame>
+        <Frame label="A3" note="OTP — lỗi mạng"><A3 go={() => {}} ctx={mkCtx()} demoNetError={true} /></Frame>
       </Section>
 
-      <Section title="Onboarding · 10A–10C" desc="Sau khi đăng nhập — thêm bé, mời bố.">
-        <Frame label="10A" note="Chào mừng"><OnboardFlow ctx={mkCtx({ route: { flow: 'onboard', obStep: 'ob1' } })} /></Frame>
-        <Frame label="10B" note="Thêm bé"><OnboardFlow ctx={mkCtx({ route: { flow: 'onboard', obStep: 'ob2' } })} /></Frame>
-        <Frame label="10C" note="Mời bố"><OnboardFlow ctx={mkCtx({ route: { flow: 'onboard', obStep: 'ob3' } })} /></Frame>
+      <Section title="Onboarding · 10A–10B" desc="2 màn — thêm bé kèm câu hỏi ngày dự sinh (leap tính theo dự sinh).">
+        <Frame label="10A" note="Mừng mama"><OnboardFlow ctx={mkCtx({ route: { flow: 'onboard', obStep: 'ob1' } })} /></Frame>
+        <Frame label="10B" note="Thêm bé + dự sinh"><OnboardFlow ctx={mkCtx({ route: { flow: 'onboard', obStep: 'ob2' } })} /></Frame>
       </Section>
 
-      <Section title="1 · Hôm nay" desc="3 trạng thái: tuần nắng đẹp, tuần khó, và khi chưa có ghi chép.">
-        <Frame label="1" note="Nắng (mức 2)" nav="today"><TodayScreen ctx={mkCtx({ intensity: 2 })} /></Frame>
+      <Section title="1 · Hôm nay" desc="Cùng một khung — nội dung đổi theo thời tiết leap. Nắng: đếm ngày nắng + Hôm nay của bé + Kỹ năng đang nở.">
+        <Frame label="1" note="Nắng (mức 2) — sunny redesign" nav="today"><TodayScreen ctx={mkCtx({ intensity: 2 })} /></Frame>
         <Frame label="1" note="Khó (mức 4)" nav="today"><TodayScreen ctx={mkCtx({ intensity: 4 })} /></Frame>
         <Frame label="1" note="Trống" nav="today"><TodayScreen ctx={mkCtx({ empty: true })} /></Frame>
+        <Frame label="1" note="Đang tải (skeleton)" nav="today"><TodayScreen ctx={mkCtx({ loading: true })} /></Frame>
+        <Frame label="1" note="Lỗi mạng — có bản lưu" nav="today"><TodayScreen ctx={mkCtx({ error: true })} /></Frame>
+      </Section>
+
+      <Section title="1B · Thẻ theo chu kỳ leap" desc="Hôm nay của bé (3 biến thể xoay theo ngày) · Chuẩn bị leap kế · Khoảnh khắc sau leap.">
+        <Frame label="✨" note="T2/T4/T6 — Điều kỳ diệu"><CardDemo><TodayOfBabyCard ctx={mkCtx()} variant={{ kind: 'fact', label: '✨ Điều kỳ diệu hôm nay', text: 'Tuần này mắt bé bắt đầu nhìn rõ ở khoảng 40cm — đúng khoảng cách từ mặt mẹ khi cho bú. Không phải ngẫu nhiên đâu 💛' }} /></CardDemo></Frame>
+        <Frame label="🎲" note="T3/T5/T7 — Trò 5 phút"><CardDemo><TodayOfBabyCard ctx={mkCtx()} variant={{ kind: 'game', label: '🎲 Trò 5 phút', text: 'Bé vừa học nối chuỗi hành động. Thử: lắc xúc xắc → dừng → đưa bé. Xem con có lắc theo không?' }} /></CardDemo></Frame>
+        <Frame label="📸" note="CN — Khoảnh khắc tuần này"><CardDemo><TodayOfBabyCard ctx={mkCtx()} variant={{ kind: 'photo', label: '📸 Khoảnh khắc tuần này', text: 'Tuần này nhiều bé bắt đầu cười thành tiếng. Nếu Bống cười, quay lại 10 giây thôi — sau này xem lại sẽ tan chảy đó.', action: 'Lưu khoảnh khắc' }} /></CardDemo></Frame>
+        <Frame label="☁️" note="Chuẩn bị cho Leap kế (5 ngày trước)"><CardDemo><PrepCard ctx={mkCtx()} /></CardDemo></Frame>
+        <Frame label="🌼" note="Sau leap — premium moment"><CardDemo><PostLeapCard ctx={mkCtx({ intensity: 2 })} onDismiss={() => {}} /></CardDemo></Frame>
       </Section>
 
       <Section title="2 · Ghi nhanh & Dỗ bé" desc="Một chạm là xong. Soothing sheet với tiếng ồn trắng.">
@@ -132,18 +149,23 @@ function Canvas() {
         <Frame label="4" note="Leap chi tiết"><LeapDetailScreen ctx={mkCtx({ intensity: 4 })} /></Frame>
       </Section>
 
-      <Section title="5–8 · Tăng trưởng, Nhật ký, Thư viện">
-        <Frame label="5" note="Tăng trưởng" nav="growth"><GrowthScreen ctx={mkCtx()} /></Frame>
-        <Frame label="6" note="Thêm đo lường"><MeasureScreen ctx={mkCtx()} /></Frame>
+      <Section title="5–8 · Lớn khôn, Nhật ký, Thư viện" desc="3 tab đối chiếu: cân nặng (WHO) · cữ ăn · giấc ngủ. Nhật ký có Khoảnh khắc 🎉 — không bao giờ bị khóa.">
+        <Frame label="5" note="Cân nặng (WHO)" nav="growth"><GrowthScreen ctx={mkCtx()} /></Frame>
+        <Frame label="5" note="Cữ ăn (đối chiếu)" nav="growth"><GrowthScreen ctx={mkCtx()} initialMetric="feed" /></Frame>
+        <Frame label="5" note="Trống — chưa có số đo" nav="growth"><GrowthScreen ctx={mkCtx({ empty: true })} /></Frame>
+        <Frame label="6" note="Thêm số đo"><MeasureScreen ctx={mkCtx()} /></Frame>
         <Frame label="7" note="Nhật ký"><HistoryScreen ctx={mkCtx()} /></Frame>
+        <Frame label="7" note="Nhật ký — trống"><HistoryScreen ctx={mkCtx({ empty: true })} /></Frame>
         <Frame label="8" note="Thư viện"><LibraryScreen ctx={mkCtx()} /></Frame>
       </Section>
 
-      <Section title="9 · Thông báo · Tôi · Premium">
+      <Section title="9 · Thông báo · Mama · Premium" desc="Reverse trial: 7 ngày đầu mở hết, không thẻ, không tự trừ tiền. Premium = mua một lần 199k.">
         <Frame label="9A" note="Thông báo"><NotificationsScreen ctx={mkCtx()} /></Frame>
-        <Frame label="9B" note="Tôi (Free)" nav="me"><MeScreen ctx={mkCtx()} /></Frame>
-        <Frame label="9B" note="Tôi (Premium)" nav="me"><MeScreen ctx={mkCtx({ premium: true })} /></Frame>
-        <Frame label="—" note="Paywall (soft gate)"><MeScreen ctx={mkCtx()} /><Paywall ctx={mkCtx({ paywall: { title: 'Mở khóa Wonder Premium' } })} /></Frame>
+        <Frame label="9A" note="Thông báo — trống"><NotificationsScreen ctx={mkCtx({ empty: true })} /></Frame>
+        <Frame label="9B" note="Mama (Free)" nav="me"><MeScreen ctx={mkCtx()} /></Frame>
+        <Frame label="9B" note="Mama — 7 ngày đầu (trải nghiệm mở)" nav="me"><MeScreen ctx={mkCtx({ trial: { daysLeft: 5 } })} /></Frame>
+        <Frame label="9B" note="Mama (Premium)" nav="me"><MeScreen ctx={mkCtx({ premium: true, purchased: true })} /></Frame>
+        <Frame label="—" note="Paywall — mua một lần"><MeScreen ctx={mkCtx()} /><Paywall ctx={mkCtx({ paywall: { title: 'Mở khóa Muby Premium' } })} /></Frame>
       </Section>
     </div>
   );
