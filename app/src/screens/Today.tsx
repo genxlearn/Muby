@@ -220,7 +220,7 @@ export function TodayScreen() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
   const { intensity, empty } = ctx;
-  const { state: st, displayName } = useBaby();
+  const { state: st, displayName, error: babyError, reload: reloadBaby } = useBaby();
   const CURRENT_LEAP = st.leap;
   const inLeap = st.status === 'in-leap';
   const PHASE = D.leapPhase(Math.max(1, st.leapDay), st.leapTotal);
@@ -252,6 +252,41 @@ export function TodayScreen() {
         <SkeletonCard h={90} />
         <SkeletonCard h={180} />
       </View>
+    );
+  }
+
+  /* Stored profile could not be read — keep the last known forecast on screen,
+     dimmed, and offer a retry (the design's "BẢN LƯU GẦN NHẤT" state). */
+  if (babyError) {
+    return (
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
+        <View style={{ paddingTop: 4, paddingHorizontal: 20, gap: 24 }}>
+          <GreetRow />
+          <Banner icon="☁️">
+            <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20 }}>
+              Không tải được. Thử lại nhé 💛{' '}
+              <Txt
+                onPress={() => { ctx.toast('Đang tải lại…'); reloadBaby(); }}
+                style={{ color: colors.accentPrimary, fontWeight: '700' }}
+              >
+                Thử lại
+              </Txt>
+            </Txt>
+          </Banner>
+          <View style={{ opacity: 0.55 }}>
+            <HeroCard pad={0}>
+              <View style={{ paddingTop: 16, paddingHorizontal: 20, paddingBottom: 18 }}>
+                <Txt style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1.2, color: colors.textOnHero, opacity: 0.65 }}>BẢN LƯU GẦN NHẤT</Txt>
+                <Txt serif style={{ fontSize: 19, fontWeight: '600', marginTop: 8, color: colors.textOnHero }}>
+                  {inLeap
+                    ? `Bé đang ở ${PHASE.name} của Leap ${CURRENT_LEAP.n}`
+                    : `Bé đang giữa hai leap — Leap ${CURRENT_LEAP.n} sắp tới`}
+                </Txt>
+              </View>
+            </HeroCard>
+          </View>
+        </View>
+      </ScrollView>
     );
   }
 

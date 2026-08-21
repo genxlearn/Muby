@@ -549,7 +549,7 @@ export function LeapDetailScreen() {
                   <Txt style={{ fontSize: 13.5, fontWeight: '600', color: colors.textSecondary, lineHeight: 20, marginBottom: 14 }}>
                     Mở khóa trọn đời — 199.000đ 💛
                   </Txt>
-                  <ButtonPrimary onPress={() => ctx.openPaywall(CURRENT_LEAP.fullName)} style={{ minHeight: 48 }}>Mở khóa</ButtonPrimary>
+                  <ButtonPrimary onPress={() => ctx.openPaywall('Mở khóa Leap đầy đủ')} style={{ minHeight: 48 }}>Mở khóa</ButtonPrimary>
                 </Card>
               ) : null}
             </View>

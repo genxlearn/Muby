@@ -28,6 +28,10 @@ const SAMPLE_DOB = (() => {
 
 export interface BabyApi {
   ready: boolean;
+  /** True when the stored profile could not be read — Today shows the retry banner. */
+  error: boolean;
+  /** Re-attempt the load after an error. */
+  reload(): void;
   /** Null until onboarding has saved a baby. */
   baby: BabyProfile | null;
   /** Display name — baby's name or the affectionate default. */
@@ -50,6 +54,8 @@ export function BabyProvider({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
   const phone = auth.session?.phone ?? null;
   const [ready, setReady] = useState(false);
+  const [error, setError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [baby, setBaby] = useState<BabyProfile | null>(null);
   // re-derive at least daily so the age rolls over correctly on long-running apps
   const [dayStamp, setDayStamp] = useState(() => new Date().toDateString());
@@ -61,13 +67,17 @@ export function BabyProvider({ children }: { children: React.ReactNode }) {
       .then((raw) => {
         if (!alive) return;
         setBaby(raw ? (JSON.parse(raw) as BabyProfile) : null);
+        setError(false);
       })
-      .catch(() => {})
+      .catch(() => {
+        // Keep whatever is already on screen and let Today offer a retry.
+        if (alive) setError(true);
+      })
       .finally(() => alive && setReady(true));
     return () => {
       alive = false;
     };
-  }, [phone]);
+  }, [phone, attempt]);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -94,13 +104,15 @@ export function BabyProvider({ children }: { children: React.ReactNode }) {
   const api = useMemo<BabyApi>(
     () => ({
       ready,
+      error,
+      reload: () => setAttempt((n) => n + 1),
       baby,
       displayName: baby?.name?.trim() || 'Bé yêu',
       state,
       saveBaby,
       clear: () => setBaby(null),
     }),
-    [ready, baby, state, saveBaby]
+    [ready, error, baby, state, saveBaby]
   );
 
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
