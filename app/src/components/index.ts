@@ -17,6 +17,7 @@ export {
   SkeletonCard,
   Toggle,
 } from './primitives';
+export { DateField, maskDateInput } from './DateField';
 export { EmptyState } from './EmptyState';
 export { Toast } from './Toast';
 export { Sheet } from './Sheet';

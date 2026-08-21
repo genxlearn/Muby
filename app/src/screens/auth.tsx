@@ -21,9 +21,11 @@ import {
   ButtonPrimary,
   ButtonText,
   Chip,
+  DateField,
   FlowerField,
   Ic,
   Input,
+  Sheet,
 } from '../components';
 import { parseDobInput, parseDueDateInput } from '../data/leapEngine';
 import { Bong } from '../mascot/Bong';
@@ -107,11 +109,32 @@ function A1({ go }: StepProps) {
   );
 }
 
+/* Terms & privacy content — same copy as the sheet in Mama. */
+function TermsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { colors } = useTheme();
+  const P = ({ b, t }: { b: string; t: string }) => (
+    <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+      <Txt style={{ fontWeight: '700', color: colors.textPrimary }}>{b}</Txt> {t}
+    </Txt>
+  );
+  return (
+    <Sheet open={open} onClose={onClose} height="62%" title="Điều khoản & Quyền riêng tư">
+      <View style={{ gap: 12, paddingTop: 4 }}>
+        <P b="Dữ liệu của bé là của bạn." t="Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, khoảnh khắc, ảnh) thuộc về bạn mãi mãi — kể cả khi không dùng Premium." />
+        <P b="Không bán dữ liệu." t="Chúng mình không chia sẻ thông tin của bạn và bé cho bên thứ ba." />
+        <P b="Nội dung tham khảo." t="Dự báo leap và gợi ý EASY mang tính tham khảo, không thay thế tư vấn y khoa. Khi lo lắng về sức khoẻ của bé, hãy hỏi bác sĩ nhi." />
+        <P b="Muby Premium." t="7 ngày đầu sau đăng ký, mọi tính năng đều mở — không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 199.000đ, trọn đời, không gia hạn." />
+      </View>
+    </Sheet>
+  );
+}
+
 /* ---- A2 Phone entry (passwordless) ---- */
 function A2({ go, ctx, auth, setDraft }: StepProps) {
   const { colors } = useTheme();
   const [phone, setPhone] = useState('');
   const [busy, setBusy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const phoneOk = phoneOkRe.test(phone.replace(/\s/g, ''));
 
   const submit = async () => {
@@ -150,11 +173,13 @@ function A2({ go, ctx, auth, setDraft }: StepProps) {
         <View style={{ paddingTop: 20, paddingBottom: 44 }}>
           <ButtonPrimary disabled={!phoneOk || busy} onPress={submit}>{busy ? 'Đang gửi mã…' : 'Gửi mã'}</ButtonPrimary>
           <Txt style={{ fontSize: 12, color: colors.textMuted, textAlign: 'center', marginTop: 14, lineHeight: 18 }}>
-            Khi tiếp tục, bạn đồng ý với <Txt style={{ color: colors.accentPrimary, fontWeight: '600' }}>Điều khoản</Txt> &{' '}
-            <Txt style={{ color: colors.accentPrimary, fontWeight: '600' }}>Quyền riêng tư</Txt>.
+            Khi tiếp tục, bạn đồng ý với{' '}
+            <Txt onPress={() => setShowTerms(true)} style={{ color: colors.accentPrimary, fontWeight: '600' }}>Điều khoản</Txt> &{' '}
+            <Txt onPress={() => setShowTerms(true)} style={{ color: colors.accentPrimary, fontWeight: '600' }}>Quyền riêng tư</Txt>.
           </Txt>
         </View>
       </View>
+      <TermsSheet open={showTerms} onClose={() => setShowTerms(false)} />
     </AuthScaffold>
   );
 }
@@ -423,28 +448,36 @@ function OB1({ go }: ObProps) {
   );
 }
 
+/** Due dates realistically sit within a few weeks of the birth date. */
+export const DUE_WINDOW_DAYS = 120;
+
 /** Ngày dự sinh — leaps count from the due date, so this matters for
- *  bé sinh sớm/muộn. Optional, with a gentle explainer underneath. */
+ *  bé sinh sớm/muộn. Optional, with a gentle explainer underneath.
+ *  Pass `anchorDob` (ISO) to center the calendar around the birth date. */
 export function DueDateField({
   value,
   onChange,
   error,
+  anchorDob,
 }: {
   value: string;
   onChange: (v: string) => void;
   error?: string;
+  anchorDob?: string | null;
 }) {
   const { colors } = useTheme();
+  const dob = anchorDob ? new Date(anchorDob) : null;
+  const win = DUE_WINDOW_DAYS * 86400000;
   return (
     <View>
-      <Input
+      <DateField
         label="Ngày dự sinh (không bắt buộc)"
         value={value}
         onChange={onChange}
-        placeholder="DD/MM/YYYY"
-        type="tel"
-        error={error || ''}
-        rightSlot={<Ic name="cal" size={20} color={colors.textMuted} />}
+        error={error}
+        minDate={dob ? new Date(dob.getTime() - win) : undefined}
+        maxDate={dob ? new Date(dob.getTime() + win) : undefined}
+        initialMonth={dob ?? undefined}
       />
       <Txt style={{ fontSize: 12.5, color: colors.textSecondary, lineHeight: 19, marginTop: 8 }}>
         Leap tính theo ngày dự sinh — vì não bé phát triển từ trong bụng mẹ. Với bé sinh sớm/muộn 2 tuần trở lên, điền ngày dự sinh giúp dự báo đúng hơn nhiều 💛
@@ -457,9 +490,20 @@ function OB2({ go, draft, setDraft, finish }: ObProps) {
   const { colors } = useTheme();
   const [busy, setBusy] = useState(false);
   const dobIso = parseDobInput(draft.dobInput);
-  const dobErr = draft.dobInput.length >= 8 && !dobIso ? 'Ngày sinh chưa đúng — nhập dạng DD/MM/YYYY nhé' : '';
+  const dobErr =
+    draft.dobInput.length >= 8 && !dobIso
+      ? 'Ngày sinh chưa hợp lệ — bé cần đã chào đời và dưới 5 tuổi nhé'
+      : '';
   const dueIso = parseDueDateInput(draft.dueInput);
-  const dueErr = draft.dueInput.length >= 8 && !dueIso ? 'Ngày dự sinh chưa đúng — nhập dạng DD/MM/YYYY nhé' : '';
+  const dueFar =
+    !!dobIso && !!dueIso &&
+    Math.abs(new Date(dueIso).getTime() - new Date(dobIso).getTime()) > DUE_WINDOW_DAYS * 86400000;
+  const dueErr =
+    draft.dueInput.length >= 8 && !dueIso
+      ? 'Ngày dự sinh chưa đúng — nhập dạng DD/MM/YYYY nhé'
+      : dueFar
+        ? 'Ngày dự sinh thường chỉ cách ngày sinh vài tuần — mama kiểm tra lại nhé'
+        : '';
   const submit = async () => {
     setBusy(true);
     try {
@@ -477,16 +521,20 @@ function OB2({ go, draft, setDraft, finish }: ObProps) {
         </View>
         <View style={{ gap: 16 }}>
           <Input label="Tên bé (không bắt buộc)" value={draft.name} onChange={(v) => setDraft((d) => ({ ...d, name: v }))} placeholder="VD: Bống" />
-          <Input
+          <DateField
             label="Ngày sinh"
             value={draft.dobInput}
             onChange={(v) => setDraft((d) => ({ ...d, dobInput: v }))}
-            placeholder="DD/MM/YYYY"
-            type="tel"
             error={dobErr}
-            rightSlot={<Ic name="cal" size={20} color={colors.textMuted} />}
+            minDate={new Date(Date.now() - 5 * 365 * 86400000)}
+            maxDate={new Date()}
           />
-          <DueDateField value={draft.dueInput} onChange={(v) => setDraft((d) => ({ ...d, dueInput: v }))} error={dueErr} />
+          <DueDateField
+            value={draft.dueInput}
+            onChange={(v) => setDraft((d) => ({ ...d, dueInput: v }))}
+            error={dueErr}
+            anchorDob={dobIso}
+          />
           <View>
             <Txt style={{ fontSize: 13.5, fontWeight: '600', color: colors.textSecondary, marginBottom: 7 }}>Giới tính (không bắt buộc)</Txt>
             <View style={{ flexDirection: 'row', gap: 9 }}>
@@ -498,7 +546,7 @@ function OB2({ go, draft, setDraft, finish }: ObProps) {
         </View>
         <Banner icon="💛" tone="soft" style={{ marginTop: 18 }}>Chỉ ngày sinh là cần thiết — còn lại để sau cũng được.</Banner>
         <View style={{ paddingTop: 24, paddingBottom: 44 }}>
-          <ButtonPrimary disabled={!dobIso || (!!draft.dueInput && !dueIso) || busy} onPress={submit}>Tiếp tục</ButtonPrimary>
+          <ButtonPrimary disabled={!dobIso || (!!draft.dueInput && !dueIso) || dueFar || busy} onPress={submit}>Tiếp tục</ButtonPrimary>
         </View>
       </View>
     </AuthScaffold>

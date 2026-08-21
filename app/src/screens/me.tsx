@@ -13,6 +13,7 @@ import {
   ButtonPrimary,
   ButtonText,
   Card,
+  DateField,
   EmptyState,
   Ic,
   Input,
@@ -27,7 +28,7 @@ import { useApp } from '../navigation/AppContext';
 import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
-import { DueDateField } from './auth';
+import { DueDateField, DUE_WINDOW_DAYS } from './auth';
 
 /* ============================================================
    9A — NOTIFICATIONS
@@ -175,7 +176,15 @@ export function MeScreen() {
   const dark = ctx.theme === 'dark';
   const dobOk = parseDobInput(babyDob);
   const dueIso = parseDueDateInput(babyDue);
-  const dueErr = babyDue.length >= 8 && !dueIso ? 'Ngày dự sinh chưa đúng — nhập dạng DD/MM/YYYY nhé' : '';
+  const dueFar =
+    !!dobOk && !!dueIso &&
+    Math.abs(new Date(dueIso).getTime() - new Date(dobOk).getTime()) > DUE_WINDOW_DAYS * 86400000;
+  const dueErr =
+    babyDue.length >= 8 && !dueIso
+      ? 'Ngày dự sinh chưa đúng — nhập dạng DD/MM/YYYY nhé'
+      : dueFar
+        ? 'Ngày dự sinh thường chỉ cách ngày sinh vài tuần — mama kiểm tra lại nhé'
+        : '';
 
   const openBabySheet = () => {
     setBabyName(baby?.name || displayName);
@@ -336,16 +345,16 @@ export function MeScreen() {
           <BongFace emotion="happy" size={72} ring />
         </View>
         <Input label="Tên bé" value={babyName} onChange={setBabyName} placeholder="VD: Bống" />
-        <Input
+        <DateField
           label="Ngày sinh"
           value={babyDob}
           onChange={setBabyDob}
-          type="tel"
-          placeholder="DD/MM/YYYY"
-          error={babyDob.length >= 8 && !dobOk ? 'Ngày sinh chưa đúng — nhập dạng DD/MM/YYYY nhé' : ''}
+          error={babyDob.length >= 8 && !dobOk ? 'Ngày sinh chưa hợp lệ — bé cần đã chào đời và dưới 5 tuổi nhé' : ''}
+          minDate={new Date(Date.now() - 5 * 365 * 86400000)}
+          maxDate={new Date()}
         />
-        <DueDateField value={babyDue} onChange={setBabyDue} error={dueErr} />
-        <ButtonPrimary disabled={!dobOk || (babyDue.trim().length > 0 && !dueIso)} onPress={saveBabySheet}>Lưu thay đổi</ButtonPrimary>
+        <DueDateField value={babyDue} onChange={setBabyDue} error={dueErr} anchorDob={dobOk} />
+        <ButtonPrimary disabled={!dobOk || (babyDue.trim().length > 0 && !dueIso) || dueFar} onPress={saveBabySheet}>Lưu thay đổi</ButtonPrimary>
       </View>
     </Sheet>
 
