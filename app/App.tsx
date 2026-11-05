@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, UIManager, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppFlow } from './src/AppFlow';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
@@ -14,6 +14,12 @@ import { BabyProvider, useBaby } from './src/state/BabyContext';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 import { ThemeMode } from './src/theme/tokens';
 import { useAppFonts } from './src/theme/useAppFonts';
+
+// LayoutAnimation (disclosure panels, the date picker) needs opting in on the
+// old Android architecture; the flag is absent on Fabric, where it just works.
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 /** Keeps ctx.intensity in sync with the intensity derived from the baby's DOB. */
 function IntensitySync() {

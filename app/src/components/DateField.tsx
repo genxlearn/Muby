@@ -5,15 +5,11 @@
    modal, so it works inside bottom sheets too).
    ============================================================ */
 import React, { useMemo, useState } from 'react';
-import { LayoutAnimation, Platform, Pressable, UIManager, View } from 'react-native';
+import { LayoutAnimation, Pressable, View } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
 import { Ic } from './Icon';
 import { Input } from './primitives';
-
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 /** Progressive DD/MM/YYYY mask — a slash appears only once the next group
  *  has a digit, so deleting characters never gets stuck on a separator. */

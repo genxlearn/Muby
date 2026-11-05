@@ -8,11 +8,13 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.genxlearn.muby",
       "infoPlist": {
         "NSFaceIDUsageDescription": "Cho phép Muby dùng Face ID để mở khóa ứng dụng."
       }
     },
     "android": {
+      "package": "com.genxlearn.muby",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
