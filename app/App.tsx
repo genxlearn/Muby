@@ -53,8 +53,9 @@ function Shell() {
 }
 
 function Splash() {
+  const { colors } = useTheme();
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFF9F4', alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas, alignItems: 'center', justifyContent: 'center' }}>
       <Bong emotion="happy" onesie="orange" size={140} float />
     </View>
   );
@@ -63,6 +64,7 @@ function Splash() {
 /** Face ID gate — shown when a session restored with biometric lock on. */
 function LockScreen() {
   const auth = useAuth();
+  const { colors } = useTheme();
   const tried = React.useRef(false);
   useEffect(() => {
     if (tried.current) return;
@@ -71,14 +73,15 @@ function LockScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFF9F4', alignItems: 'center', justifyContent: 'center', padding: 28 }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas, alignItems: 'center', justifyContent: 'center', padding: 28 }}>
       <Bong emotion="snug" onesie="orange" size={150} float />
-      <Txt serif style={{ fontSize: 26, fontWeight: '600', marginTop: 18, color: '#3D2C21' }}>Muby</Txt>
+      <Txt serif style={{ fontSize: 34, marginTop: 18, color: colors.textPrimary }}>Muby</Txt>
+      <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 6 }}>Mở khoá để xem nhật ký của bé</Txt>
       <View style={{ width: '100%', marginTop: 30, gap: 10 }}>
         <ButtonPrimary onPress={() => auth.unlock()}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
             <Ic name="faceid" size={22} color="#FFFFFF" sw={2.2} />
-            <Txt style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>Mở khóa bằng Face ID</Txt>
+            <Txt style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>Mở khóa bằng Face ID</Txt>
           </View>
         </ButtonPrimary>
         <ButtonText onPress={() => auth.signOut()} style={{ alignSelf: 'center' }}>Đăng nhập bằng SMS</ButtonText>
@@ -127,7 +130,7 @@ export default function App() {
   const fontsLoaded = useAppFonts();
   if (!fontsLoaded) {
     // Keep the canvas color while fonts load to avoid a white flash.
-    return <View style={{ flex: 1, backgroundColor: '#FFF9F4' }} />;
+    return <View style={{ flex: 1, backgroundColor: '#FAFAFA' }} />;
   }
   return (
     <SafeAreaProvider>

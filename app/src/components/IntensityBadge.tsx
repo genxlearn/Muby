@@ -12,25 +12,26 @@ export function IntensityBadge({ level = 2, size = 'md' }: { level?: number; siz
   const { colors } = useTheme();
   const lv = (Math.min(5, Math.max(1, level)) as Level);
   const C = INTENSITY_COPY[lv];
-  const pad = { sm: { pv: 4, ph: 10 }, md: { pv: 6, ph: 13 }, lg: { pv: 9, ph: 18 } }[size];
-  const fs = { sm: 12, md: 13.5, lg: 16 }[size];
-  const dot = { sm: 8, md: 10, lg: 13 }[size];
-  const ink = colors.intensityInk[lv];
+  const pad = { sm: { pv: 4, ph: 10 }, md: { pv: 5, ph: 12 }, lg: { pv: 8, ph: 16 } }[size];
+  const fs = { sm: 12, md: 13, lg: 15 }[size];
+  const dot = { sm: 7, md: 8, lg: 10 }[size];
   return (
     <View
       style={{
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'flex-start',
-        gap: 8,
+        gap: 6,
         paddingVertical: pad.pv,
         paddingHorizontal: pad.ph,
         borderRadius: 999,
-        backgroundColor: colors.intensity[lv],
+        backgroundColor: colors.bgElevated,
+        borderWidth: 1,
+        borderColor: colors.borderDefault,
       }}
     >
-      <View style={{ width: dot, height: dot, borderRadius: dot / 2, backgroundColor: ink, opacity: 0.55 }} />
-      <Txt style={{ fontSize: fs, fontWeight: '600', color: ink }}>{`${C.label} ${C.emoji}`}</Txt>
+      <View style={{ width: dot, height: dot, borderRadius: dot / 2, backgroundColor: colors.leap[lv] }} />
+      <Txt style={{ fontSize: fs, fontWeight: '600', color: colors.textPrimary }}>{C.label}</Txt>
     </View>
   );
 }

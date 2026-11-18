@@ -1,5 +1,6 @@
 import {
   Fraunces_400Regular,
+  Fraunces_400Regular_Italic,
   Fraunces_500Medium,
   Fraunces_600SemiBold,
   Fraunces_700Bold,
@@ -16,6 +17,7 @@ import { useFonts } from 'expo-font';
 export function useAppFonts(): boolean {
   const [loaded] = useFonts({
     Fraunces_400Regular,
+    Fraunces_400Regular_Italic,
     Fraunces_500Medium,
     Fraunces_600SemiBold,
     Fraunces_700Bold,

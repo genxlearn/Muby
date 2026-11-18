@@ -27,9 +27,9 @@ export function Toast({ toast, topInset = 0 }: { toast: ToastData | null; topIns
           maxWidth: '88%',
           flexDirection: 'row',
           alignItems: 'center',
-          paddingVertical: 11,
+          paddingVertical: 12,
           paddingHorizontal: 18,
-          backgroundColor: colors.textPrimary,
+          backgroundColor: colors.bgInverse,
           borderRadius: 999,
           opacity: v,
           transform: [{ translateY }],
@@ -38,7 +38,7 @@ export function Toast({ toast, topInset = 0 }: { toast: ToastData | null; topIns
         shadows[4],
       ]}
     >
-      <Txt style={{ fontSize: 14.5, fontWeight: '600', color: colors.bgCanvas }}>{toast.text}</Txt>
+      <Txt style={{ fontSize: 15, fontWeight: '500', color: colors.textInverse }}>{toast.text}</Txt>
     </Animated.View>
   );
 }

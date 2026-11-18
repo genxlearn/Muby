@@ -15,13 +15,17 @@ import {
   Chip,
   EmptyState,
   Flower,
-  FlowerField,
   Ic,
+  IconTile,
   Input,
+  LargeTitle,
   ListRow,
   NAV_CLEARANCE,
+  ScreenGlow,
+  SectionHeader,
   Sheet,
 } from '../components';
+import type { TileTone } from '../components';
 import * as D from '../data/sampleData';
 import { Bong, BongFace } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
@@ -79,9 +83,9 @@ function GrowthChart({ metric }: { metric: Metric }) {
           strokeDasharray="3 4"
         />
       ))}
-      <Polygon points={`${bandTop} ${bandBot}`} fill={colors.intensity[1]} opacity={0.5} />
-      <Polyline points={d.hi.map((v, i) => `${xs(i, n)},${ys(v)}`).join(' ')} fill="none" stroke={colors.success} strokeWidth={1.5} opacity={0.5} />
-      <Polyline points={d.lo.map((v, i) => `${xs(i, n)},${ys(v)}`).join(' ')} fill="none" stroke={colors.success} strokeWidth={1.5} opacity={0.5} />
+      <Polygon points={`${bandTop} ${bandBot}`} fill={colors.activity.diaper.bg} />
+      <Polyline points={d.hi.map((v, i) => `${xs(i, n)},${ys(v)}`).join(' ')} fill="none" stroke={colors.activity.diaper.fg} strokeWidth={1} strokeDasharray="4 4" opacity={0.5} />
+      <Polyline points={d.lo.map((v, i) => `${xs(i, n)},${ys(v)}`).join(' ')} fill="none" stroke={colors.activity.diaper.fg} strokeWidth={1} strokeDasharray="4 4" opacity={0.5} />
       <Path d={userPath} fill="none" stroke={colors.accentPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
       {d.user.map((v, i) => (
         <Circle key={i} cx={xs(i, d.user.length)} cy={ys(v)} r={3.5} fill={colors.accentPrimary} stroke={colors.bgElevated} strokeWidth={2} />
@@ -130,6 +134,9 @@ function todayVN(): string {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
 
+const METRIC_TONE: Record<Metric, TileTone> = { weight: 'growth', height: 'growth', feed: 'feed', sleep: 'sleep', diaper: 'diaper' };
+const METRIC_ICON = { weight: 'growth', height: 'ruler', feed: 'bottle', sleep: 'moon', diaper: 'diaper' } as const;
+
 const LOG_TITLE: Record<Metric, string> = {
   weight: 'đo lường',
   height: 'đo lường',
@@ -170,9 +177,9 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
     const em = EMPTY_META[metric];
     return (
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
-        <View style={{ paddingTop: 6, paddingHorizontal: 20, paddingBottom: 16 }}>
-          <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, marginBottom: 24 }}>Bé lớn lên</Txt>
-          <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary, marginBottom: 12, marginHorizontal: 2 }}>Đường lớn của bé</Txt>
+        <ScreenGlow height={260} />
+        <LargeTitle title="Lớn khôn" sub={`Đường lớn của bé · ${st.ageLabel}`} />
+        <View style={{ paddingTop: 20, paddingHorizontal: 20, paddingBottom: 16 }}>
           <MetricChips metric={metric} onPick={setMetric} />
           <EmptyState emotion="curious" onesie="sage" heading={em.heading} helper={em.helper} />
           <ButtonPrimary onPress={() => (em.measure ? ctx.go('measure') : ctx.openSheet('quicklog'))}>{em.cta}</ButtonPrimary>
@@ -183,27 +190,24 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
 
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
-      <View style={{ paddingTop: 6, paddingHorizontal: 20 }}>
-        <Txt serif style={{ fontSize: 24, fontWeight: '600', color: colors.textPrimary, marginBottom: 24 }}>Bé lớn lên</Txt>
-
-        <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary, marginBottom: 12, marginHorizontal: 2 }}>Đường lớn của bé</Txt>
+      <ScreenGlow height={260} />
+      <LargeTitle title="Lớn khôn" sub={`Đường lớn của bé · ${st.ageLabel}`} />
+      <View style={{ paddingTop: 20, paddingHorizontal: 20 }}>
         <MetricChips metric={metric} onPick={setMetric} />
 
         {/* HÔM NAY — chỉ số đối chiếu của tab đang chọn (cữ ăn / ngủ / tã) */}
         {stat ? (
           <Card pad={16} style={{ marginBottom: 24 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <View style={{ width: 44, height: 44, borderRadius: radii.md, backgroundColor: colors.bgSunken, alignItems: 'center', justifyContent: 'center' }}>
-                <Txt style={{ fontSize: 20 }}>{stat.icon}</Txt>
-              </View>
+              <IconTile tone={METRIC_TONE[metric]} icon={METRIC_ICON[metric]} size={44} />
               <View style={{ flex: 1, minWidth: 0 }}>
-                <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600' }}>{stat.label}</Txt>
-                <Txt style={{ fontSize: 16.5, fontWeight: '700', color: colors.textPrimary, marginTop: 2 }}>{stat.value}</Txt>
+                <Txt style={{ fontSize: 13, color: colors.textSecondary }}>{stat.label}</Txt>
+                <Txt serif style={{ fontSize: 24, color: colors.textPrimary, marginTop: 2 }}>{stat.value}</Txt>
               </View>
               {inRange ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 6, paddingHorizontal: 11, borderRadius: 999, backgroundColor: colors.successSoft }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 6, paddingHorizontal: 11, borderRadius: radii.sm, backgroundColor: colors.successSoft }}>
                   <Ic name="check" size={13} sw={3} color={colors.success} />
-                  <Txt style={{ fontSize: 12, fontWeight: '700', color: colors.success }}>Trong khoảng</Txt>
+                  <Txt style={{ fontSize: 12, fontWeight: '600', color: colors.success }}>Trong khoảng</Txt>
                 </View>
               ) : null}
             </View>
@@ -233,11 +237,12 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
           </Card>
         ) : (
           /* Số mới nhất — cho cân nặng / chiều cao */
-          <Card pad={16} style={{ marginBottom: 24, backgroundColor: colors.bgAccentSoft }}>
+          <Card pad={20} style={{ marginBottom: 24, borderRadius: radii.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-              <BongFace emotion="blissful" size={56} ring />
-              <View>
-                <Txt serif style={{ fontSize: 26, fontWeight: '600', color: colors.textPrimary }}>{m.latest}</Txt>
+              <BongFace emotion="blissful" size={64} ring />
+              <View style={{ flex: 1 }}>
+                <Txt style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 2 }}>Số đo mới nhất</Txt>
+                <Txt serif style={{ fontSize: 34, lineHeight: 40, color: colors.textPrimary }}>{m.latest}</Txt>
                 <Txt style={{ fontSize: 14, color: colors.textSecondary, marginTop: 2 }}>{m.sub}</Txt>
               </View>
             </View>
@@ -245,13 +250,13 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
         )}
 
         {/* CHART */}
-        <Card pad={14} style={{ marginBottom: 24 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: colors.intensity[1], opacity: 0.7 }} />
+        <Card pad={20} style={{ marginBottom: 24 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: colors.activity.diaper.bg, borderWidth: 1, borderColor: colors.activity.diaper.fg }} />
             <Txt style={{ fontSize: 12.5, color: colors.textSecondary, fontWeight: '600' }}>{m.band}</Txt>
             <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <View style={{ width: 16, height: 3, borderRadius: 2, backgroundColor: colors.accentPrimary }} />
-              <Txt style={{ fontSize: 12.5, color: colors.accentPrimary, fontWeight: '600' }}>Bé</Txt>
+              <Txt style={{ fontSize: 12.5, color: colors.textBrand, fontWeight: '600' }}>Bé</Txt>
             </View>
           </View>
           <GrowthChart metric={metric} />
@@ -263,15 +268,12 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
 
         {/* NHẬT KÝ theo tab */}
         <View style={{ marginBottom: 24 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingHorizontal: 2 }}>
-            <Txt style={{ fontSize: 15.5, fontWeight: '700', color: colors.textPrimary }}>Nhật ký {LOG_TITLE[metric]}</Txt>
-            <ButtonText onPress={() => ctx.go('history')} style={{ padding: 0 }}>Xem tất cả →</ButtonText>
-          </View>
+          <SectionHeader title={`Nhật ký ${LOG_TITLE[metric]}`} link="Xem tất cả" onLink={() => ctx.go('history')} />
           {dailyLog ? (
             dailyLog.length ? (
               dailyLog.map((g, gi) => (
                 <View key={gi} style={{ marginBottom: 12 }}>
-                  <Txt style={{ fontSize: 12.5, fontWeight: '700', color: colors.textMuted, marginHorizontal: 2, marginBottom: 8 }}>{g.date}</Txt>
+                  <Txt style={{ fontSize: 12.5, fontWeight: '600', color: colors.textMuted, marginHorizontal: 2, marginBottom: 8 }}>{g.date}</Txt>
                   <Card pad={6}>
                     {g.items.map((it, i) => (
                       <View key={i} style={{ borderTopWidth: i ? 1 : 0, borderTopColor: colors.borderSubtle }}>
@@ -441,7 +443,7 @@ export function HistoryScreen() {
         ) : (
           groups.map((g, gi) => (
             <View key={gi} style={{ marginBottom: 24 }}>
-              <Txt style={{ fontSize: 12.5, fontWeight: '700', color: colors.textMuted, marginTop: 4, marginBottom: 8, marginHorizontal: 2, letterSpacing: 0.3 }}>{g.date}</Txt>
+              <Txt serif style={{ fontSize: 22, color: colors.textPrimary, marginTop: 4, marginBottom: 12, marginHorizontal: 2 }}>{g.date}</Txt>
               <Card pad={6}>
                 {g.items.map((it, i) => (
                   <View key={i} style={{ borderTopWidth: i ? 1 : 0, borderTopColor: colors.borderSubtle }}>
@@ -506,13 +508,15 @@ export function LibraryScreen() {
         {/* Hero card */}
         <Pressable
           onPress={() => openArt(FEATURED, false)}
-          style={{ borderRadius: radii.xl, overflow: 'hidden', backgroundColor: colors.accentPrimary, padding: 20, marginBottom: 24 }}
+          style={{ borderRadius: radii.xl, overflow: 'hidden', backgroundColor: colors.bgAccentSoft, padding: 20, marginBottom: 24, minHeight: 168 }}
         >
-          <FlowerField items={[{ x: 250, y: -6, s: 60, c: 'rgba(255,255,255,0.18)', r: 10 }, { x: 300, y: 90, s: 40, c: 'rgba(255,255,255,0.14)' }]} />
-          <View>
-            <Txt style={{ fontSize: 11.5, fontWeight: '700', letterSpacing: 1.2, color: colors.textOnAccent, opacity: 0.85 }}>CHO TUẦN NÀY CỦA BẠN</Txt>
-            <Txt serif style={{ fontSize: 23, fontWeight: '600', color: colors.textOnAccent, marginTop: 8, lineHeight: 29, maxWidth: 240 }}>Vì sao bé bám mẹ hơn trong Leap 4</Txt>
-            <Txt style={{ fontSize: 13, color: colors.textOnAccent, opacity: 0.9, marginTop: 10 }}>4 phút đọc · dành cho mama</Txt>
+          <View style={{ position: 'absolute', right: 8, bottom: 0 }}>
+            <Bong emotion="snug" onesie="lavender" size={104} />
+          </View>
+          <View style={{ maxWidth: 220 }}>
+            <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.6, color: colors.textBrand }}>CHO TUẦN NÀY CỦA BẠN</Txt>
+            <Txt serif style={{ fontSize: 22, color: colors.textPrimary, marginTop: 8, lineHeight: 28 }}>Vì sao bé bám mẹ hơn trong Leap 4</Txt>
+            <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 10 }}>4 phút đọc · dành cho mama</Txt>
           </View>
         </Pressable>
         {/* Filter chips */}
@@ -528,9 +532,9 @@ export function LibraryScreen() {
             {D.LIBRARY.map((a, i) => {
               const locked = i >= 3 && !ctx.premium;
               return (
-                <Card key={i} pad={0} style={{ overflow: 'hidden' }} onPress={() => openArt(a, locked)}>
-                  <View style={{ flexDirection: 'row', alignItems: 'stretch' }}>
-                    <View style={{ width: 84, backgroundColor: resolveColorKey(colors, a.colorKey), alignItems: 'center', justifyContent: 'center' }}>
+                <Card key={i} pad={12} onPress={() => openArt(a, locked)}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ width: 72, height: 72, borderRadius: radii.md, backgroundColor: resolveColorKey(colors, a.colorKey), alignItems: 'center', justifyContent: 'center' }}>
                       <Flower size={34} color="rgba(255,255,255,0.5)" />
                       {locked ? (
                         <View style={{ position: 'absolute', top: 6, right: 6 }}>
@@ -538,9 +542,9 @@ export function LibraryScreen() {
                         </View>
                       ) : null}
                     </View>
-                    <View style={{ flex: 1, paddingVertical: 13, paddingHorizontal: 14 }}>
-                      <Txt style={{ fontSize: 10.5, fontWeight: '700', letterSpacing: 0.8, color: colors.accentPrimary }}>{a.tag}</Txt>
-                      <Txt style={{ fontSize: 14.5, fontWeight: '600', color: colors.textPrimary, marginTop: 5, lineHeight: 20 }}>{a.title}</Txt>
+                    <View style={{ flex: 1, paddingHorizontal: 14 }}>
+                      <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.4, color: colors.textBrand }}>{a.tag}</Txt>
+                      <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.textPrimary, marginTop: 4, lineHeight: 20 }}>{a.title}</Txt>
                       <Txt style={{ fontSize: 12, color: colors.textMuted, marginTop: 6 }}>{a.mins} phút đọc</Txt>
                     </View>
                   </View>
@@ -562,7 +566,7 @@ export function LibraryScreen() {
               Đó là lý do bé bám mẹ hơn, khóc khi mẹ rời phòng, và đòi bế nhiều hơn hẳn. Đây không phải thói quen xấu — đây là nhu cầu thật của một bộ não đang lớn rất nhanh.
             </Txt>
             {art.locked ? (
-              <Card pad={16} style={{ backgroundColor: colors.bgAccentSoft, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.accentPrimary }}>
+              <Card pad={20} style={{ backgroundColor: colors.aiSubtle, borderWidth: 1, borderColor: colors.aiTonal }}>
                 <Txt style={{ fontSize: 14, lineHeight: 22, color: colors.textPrimary, marginBottom: 12 }}>
                   Đọc đầy đủ bài này và toàn bộ thư viện — Muby Premium 199.000đ trọn đời 💛
                 </Txt>
@@ -573,11 +577,11 @@ export function LibraryScreen() {
                       setArt(null);
                       ctx.openPaywall('Mở khóa toàn bộ thư viện');
                     }}
-                    style={{ flex: 1, minHeight: 48 }}
+                    style={{ flex: 1 }}
                   >
                     Mở khóa
                   </ButtonPrimary>
-                  <ButtonSecondary full={false} onPress={() => setArt(null)} style={{ flex: 1, minHeight: 48 }}>
+                  <ButtonSecondary full={false} onPress={() => setArt(null)} style={{ flex: 1 }}>
                     Để sau
                   </ButtonSecondary>
                 </View>

@@ -31,7 +31,7 @@ const EMOTIONS: Emotion[] = [
 
 function SectionTitle({ children }: { children: string }) {
   const { colors } = useTheme();
-  return <Txt style={{ fontSize: 12.5, fontWeight: '700', letterSpacing: 1, color: colors.textMuted, marginBottom: 12 }}>{children}</Txt>;
+  return <Txt style={{ fontSize: 12.5, fontWeight: '600', letterSpacing: 1, color: colors.textMuted, marginBottom: 12 }}>{children}</Txt>;
 }
 
 function Swatch({ label, color, ink }: { label: string; color: string; ink?: string }) {
@@ -39,7 +39,7 @@ function Swatch({ label, color, ink }: { label: string; color: string; ink?: str
   return (
     <View style={{ width: 96 }}>
       <View style={{ height: 56, borderRadius: radii.md, backgroundColor: color, borderWidth: 1, borderColor: colors.borderSubtle, alignItems: 'center', justifyContent: 'center' }}>
-        {ink ? <Txt style={{ color: ink, fontWeight: '700', fontSize: 13 }}>Aa</Txt> : null}
+        {ink ? <Txt style={{ color: ink, fontWeight: '600', fontSize: 13 }}>Aa</Txt> : null}
       </View>
       <Txt style={{ fontSize: 11, color: colors.textSecondary, marginTop: 5 }}>{label}</Txt>
     </View>
@@ -126,7 +126,7 @@ export function DesignSystemScreen() {
             </View>
             <Input label="Input" value="" onChange={() => {}} placeholder="Placeholder" />
             <Card pad={16}>
-              <Txt style={{ fontSize: 15, fontWeight: '700', color: colors.textPrimary }}>Card</Txt>
+              <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.textPrimary }}>Card</Txt>
               <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>radius-lg · shadow-2 · no border</Txt>
               <View style={{ marginTop: 12 }}><MiniIntensityCurve w={280} h={40} /></View>
             </Card>

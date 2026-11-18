@@ -56,7 +56,7 @@ export function Sheet({
     <View pointerEvents={open ? 'auto' : 'none'} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 50 }}>
       <AnimatedPressable
         onPress={onClose}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(20,12,8,0.42)', opacity: backdrop }}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(23,23,23,0.4)', opacity: backdrop }}
       />
       <Animated.View
         onLayout={onLayout}
@@ -69,31 +69,32 @@ export function Sheet({
             height,
             maxHeight: '92%',
             backgroundColor: colors.bgElevated,
-            borderTopLeftRadius: radii.xl,
-            borderTopRightRadius: radii.xl,
+            borderTopLeftRadius: radii.xxl,
+            borderTopRightRadius: radii.xxl,
             transform: [{ translateY: ty }],
           },
           shadows[4],
         ]}
       >
-        <View style={{ paddingTop: 12, paddingBottom: 4, alignItems: 'center' }}>
-          <View style={{ width: 40, height: 5, borderRadius: 3, backgroundColor: colors.borderDefault }} />
+        <View style={{ paddingTop: 8, paddingBottom: 6, alignItems: 'center' }}>
+          <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: colors.borderDefault }} />
         </View>
         {title ? (
-          <View style={{ paddingHorizontal: 22, paddingTop: 6, paddingBottom: 10, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
             <View style={{ flex: 1, paddingRight: 12 }}>
-              <Txt serif style={{ fontSize: 21, fontWeight: '600', color: colors.textPrimary }}>{title}</Txt>
-              {sub ? <Txt style={{ fontSize: 13.5, color: colors.textSecondary, marginTop: 3 }}>{sub}</Txt> : null}
+              <Txt serif style={{ fontSize: 22, lineHeight: 28, color: colors.textPrimary }}>{title}</Txt>
+              {sub ? <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>{sub}</Txt> : null}
             </View>
             <Pressable
               onPress={onClose}
-              style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.bgSunken, alignItems: 'center', justifyContent: 'center' }}
+              accessibilityLabel="Đóng"
+              style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.bgSunken, alignItems: 'center', justifyContent: 'center' }}
             >
-              <Ic name="close" size={18} sw={2} color={colors.textSecondary} />
+              <Ic name="close" size={16} sw={2} color={colors.textPrimary} />
             </Pressable>
           </View>
         ) : null}
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 22, paddingBottom: 24 }}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }}>
           {children}
         </ScrollView>
       </Animated.View>
