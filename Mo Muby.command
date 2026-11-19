@@ -48,7 +48,7 @@ echo "→ Bản đã chọn: $CHOICE ($BRANCH)"
 
 # 3. Lấy code mới nhất của nhánh đó
 echo "→ Đang tải code mới nhất…"
-git fetch origin "$BRANCH" --quiet || say_err "Không tải được code từ GitHub. Kiểm tra mạng, hoặc mở GitHub Desktop đăng nhập lại."
+git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH" --quiet || say_err "Không tải được code từ GitHub. Kiểm tra mạng, hoặc mở GitHub Desktop đăng nhập lại."
 git checkout -B "$BRANCH" "origin/$BRANCH" --quiet 2>/dev/null \
   || say_err "Có file đang sửa dở trên máy nên chưa đổi bản được. Mở GitHub Desktop, chọn Discard changes (hoặc Stash), rồi thử lại."
 
