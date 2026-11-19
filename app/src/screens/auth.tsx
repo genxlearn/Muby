@@ -7,11 +7,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
-  NativeSyntheticEvent,
   Platform,
   ScrollView,
   TextInput,
-  TextInputKeyPressEventData,
+  TextInputInstance,
+  TextInputKeyPressEvent,
   View,
 } from 'react-native';
 import { AuthApi, useAuth } from '../auth/AuthContext';
@@ -179,7 +179,7 @@ function A2({ go, ctx, auth, setDraft }: StepProps) {
 /* ---- OTP boxes ---- */
 function OtpBoxes({ value, onChange, success }: { value: string; onChange: (v: string) => void; success?: boolean }) {
   const { colors, radii } = useTheme();
-  const refs = useRef<Array<TextInput | null>>([]);
+  const refs = useRef<Array<TextInputInstance | null>>([]);
   const set = (i: number, raw: string) => {
     const digits = raw.replace(/\D/g, '');
     if (digits.length === 0) {
@@ -202,7 +202,7 @@ function OtpBoxes({ value, onChange, success }: { value: string; onChange: (v: s
     onChange(arr.join('').slice(0, 6));
     if (i < 5) refs.current[i + 1]?.focus();
   };
-  const onKey = (i: number, e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+  const onKey = (i: number, e: TextInputKeyPressEvent) => {
     if (e.nativeEvent.key === 'Backspace' && !value[i] && i > 0) refs.current[i - 1]?.focus();
   };
   return (
