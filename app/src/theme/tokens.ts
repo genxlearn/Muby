@@ -1,6 +1,6 @@
 /* ============================================================
-   MUBY DESIGN SYSTEM v2.0 — TOKENS (React Native)
-   Peachy iOS UI Kit foundations · Figma: Muby — UI v2.0 (MJWQvXPYVgGdwpZ2KlzuHw).
+   MUBY DESIGN SYSTEM v2.0 - TOKENS (React Native)
+   Peachy iOS UI Kit foundations · Figma: Muby - UI v2.0 (MJWQvXPYVgGdwpZ2KlzuHw).
    CSS custom properties become a typed JS theme object because
    React Native has no CSS variables. light = default, dark = override.
    ============================================================ */
@@ -29,13 +29,13 @@ export interface ThemeColors {
   accentHover: string;
   accentSoftBg: string; // bg/brand-tonal
 
-  /* "Bống nhận thấy" — AI lavender */
+  /* "Bống nhận thấy" - AI lavender */
   aiPrimary: string;
   aiSubtle: string;
   aiTonal: string;
   aiText: string;
 
-  /* Activity colors — Ăn · Ngủ · Tã · Lớn */
+  /* Activity colors - Ăn · Ngủ · Tã · Lớn */
   activity: Record<'feed' | 'sleep' | 'diaper' | 'growth', { bg: string; fg: string }>;
 
   /* Semantic status + soft backgrounds */
@@ -49,7 +49,7 @@ export interface ThemeColors {
   /* Top-of-screen glow (peach → pink → transparent) */
   glow: [string, string, string];
 
-  /* Legacy hero fields — v2 heroes are white cards, so these resolve to card colors */
+  /* Legacy hero fields - v2 heroes are white cards, so these resolve to card colors */
   gradientHero: [string, string];
   textOnHero: string;
 
@@ -79,7 +79,7 @@ export interface ThemeColors {
   onesieLavender: string;
 }
 
-/* Muby UI v2.0 — Peachy iOS UI Kit palette (light) */
+/* Muby UI v2.0 - Peachy iOS UI Kit palette (light) */
 const lightColors: ThemeColors = {
   bgCanvas: '#FAFAFA',
   bgElevated: '#FFFFFF',
@@ -209,7 +209,7 @@ const darkColors: ThemeColors = {
   onesieLavender: '#9C8FB0',
 };
 
-/* Radii — Peachy: chip 8 · tile 12 · card/input 16 · hero 24 · sheet 32 */
+/* Radii - Peachy: chip 8 · tile 12 · card/input 16 · hero 24 · sheet 32 */
 export const radii = { sm: 8, md: 12, lg: 16, xl: 24, xxl: 32, full: 999 } as const;
 
 /* Spacing scale (Peachy: screen margin 20 · card padding 20 · card gap 16) */

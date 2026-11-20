@@ -1,5 +1,5 @@
 /* ============================================================
-   AUTH CONTEXT — passwordless session state + Face ID.
+   AUTH CONTEXT - passwordless session state + Face ID.
    Restores the persisted session on boot (ready=false until done).
    When Face ID is enabled for the account, the app boots locked and
    unlock() runs the biometric prompt.
@@ -16,7 +16,7 @@ export interface AuthApi {
   session: Session | null;
   /** Send OTP; returns the demo code when running without SMS. */
   sendOtp(rawPhone: string): Promise<{ demoCode?: string }>;
-  /** Verify the code — on success the session is set (account created if new). */
+  /** Verify the code - on success the session is set (account created if new). */
   verifyOtp(rawPhone: string, code: string): Promise<boolean>;
   signOut(): Promise<void>;
 

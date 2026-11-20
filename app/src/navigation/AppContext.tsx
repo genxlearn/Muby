@@ -1,5 +1,5 @@
 /* ============================================================
-   APP CONTEXT — state machine ported from app-clean.jsx.
+   APP CONTEXT - state machine ported from app-clean.jsx.
    Pure immersive flow (no external controls): Auth → Onboarding → App.
    Premium is a reverse trial: 7 days start automatically at signup
    (no card), then the app falls back to Free until the one-time
@@ -40,9 +40,9 @@ export interface AppCtx {
   purchased: boolean;
   trial: Trial | null;
 
-  /** One-time 199k unlock — persists for this account. */
+  /** One-time 199k unlock - persists for this account. */
   buyPremium: () => void;
-  /** (Re)start the 7-day reverse trial — normally only fired at signup. */
+  /** (Re)start the 7-day reverse trial - normally only fired at signup. */
   startTrial: () => void;
   cancelTrial: () => void;
   setTheme: (m: ThemeMode) => void;
@@ -90,7 +90,7 @@ export function AppProvider({
   themeMode: ThemeMode;
   setThemeMode: (m: ThemeMode) => void;
   initialRoute?: Route;
-  /** Normalized phone of the signed-in account — premium/trial persist per account. */
+  /** Normalized phone of the signed-in account - premium/trial persist per account. */
   accountKey?: string;
   children: React.ReactNode;
 }) {

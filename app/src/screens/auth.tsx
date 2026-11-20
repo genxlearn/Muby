@@ -1,5 +1,5 @@
 /* ============================================================
-   MUBY AUTH (A1 Welcome · A2 Phone · A3 OTP — passwordless)
+   MUBY AUTH (A1 Welcome · A2 Phone · A3 OTP - passwordless)
    + ONBOARDING (OB1 Mừng mama · OB2 Thêm bé + ngày dự sinh)
    Wired to the real auth service (src/auth) and baby profile store.
    In demo mode the OTP code is shown inside the app (no SMS is sent).
@@ -101,7 +101,7 @@ function A1({ go }: StepProps) {
   );
 }
 
-/* Terms & privacy content — same copy as the sheet in Mama. */
+/* Terms & privacy content - same copy as the sheet in Mama. */
 function TermsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { colors } = useTheme();
   const P = ({ b, t }: { b: string; t: string }) => (
@@ -112,10 +112,10 @@ function TermsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Sheet open={open} onClose={onClose} height="62%" title="Điều khoản & Quyền riêng tư">
       <View style={{ gap: 12, paddingTop: 4 }}>
-        <P b="Dữ liệu của bé là của bạn." t="Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, khoảnh khắc, ảnh) thuộc về bạn mãi mãi — kể cả khi không dùng Premium." />
+        <P b="Dữ liệu của bé là của bạn." t="Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, khoảnh khắc, ảnh) thuộc về bạn mãi mãi - kể cả khi không dùng Premium." />
         <P b="Không bán dữ liệu." t="Chúng mình không chia sẻ thông tin của bạn và bé cho bên thứ ba." />
         <P b="Nội dung tham khảo." t="Dự báo leap và gợi ý EASY mang tính tham khảo, không thay thế tư vấn y khoa. Khi lo lắng về sức khoẻ của bé, hãy hỏi bác sĩ nhi." />
-        <P b="Muby Premium." t="7 ngày đầu sau đăng ký, mọi tính năng đều mở — không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 199.000đ, trọn đời, không gia hạn." />
+        <P b="Muby Premium." t="7 ngày đầu sau đăng ký, mọi tính năng đều mở - không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 199.000đ, trọn đời, không gia hạn." />
       </View>
     </Sheet>
   );
@@ -149,7 +149,7 @@ function A2({ go, ctx, auth, setDraft }: StepProps) {
         <View style={{ marginTop: 8, marginBottom: 28 }}>
           <Txt serif style={{ fontSize: 34, lineHeight: 41, color: colors.textPrimary }}>Số điện thoại{'\n'}của mama</Txt>
           <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginTop: 8 }}>
-            Mình gửi mã xác nhận qua SMS — không cần mật khẩu 💛
+            Mình gửi mã xác nhận qua SMS - không cần mật khẩu 💛
           </Txt>
         </View>
         <Input
@@ -309,7 +309,7 @@ function A3({ go, ctx, auth, draft, setDraft }: StepProps) {
   const finish = async (useFace: boolean) => {
     if (useFace) {
       const on = await auth.setFaceIdEnabled(true);
-      if (!on) ctx.toast('Chưa bật được Face ID — thử lại trong Mama nhé.');
+      if (!on) ctx.toast('Chưa bật được Face ID - thử lại trong Mama nhé.');
     }
     await enterApp();
   };
@@ -334,7 +334,7 @@ function A3({ go, ctx, auth, draft, setDraft }: StepProps) {
             Dùng Face ID cho lần sau?
           </Txt>
           <Txt style={{ fontSize: 14.5, color: colors.textSecondary, marginTop: 8, maxWidth: 280, lineHeight: 22, textAlign: 'center' }}>
-            Lần sau chỉ cần nhìn máy là vào — không cần chờ SMS. Bật/tắt được trong Mama.
+            Lần sau chỉ cần nhìn máy là vào - không cần chờ SMS. Bật/tắt được trong Mama.
           </Txt>
         </View>
         <View style={{ paddingHorizontal: 24, paddingBottom: 48, gap: 10 }}>
@@ -404,7 +404,7 @@ export function AuthFlow() {
 }
 
 /* ============================================================
-   ONBOARDING OB1 / OB2 — saves the real baby profile (+ due date)
+   ONBOARDING OB1 / OB2 - saves the real baby profile (+ due date)
    ============================================================ */
 interface ObDraft {
   name: string;
@@ -430,7 +430,7 @@ function OB1({ go }: ObProps) {
           Mừng mama{'\n'}đã đến!
         </Txt>
         <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 12, maxWidth: 290, lineHeight: 23, textAlign: 'center' }}>
-          Cùng nhau, mình sẽ hiểu bé hơn mỗi ngày — nhẹ nhàng và không vội vã.
+          Mỗi ngày mình sẽ hiểu bé thêm một chút.
         </Txt>
       </View>
       <View style={{ paddingHorizontal: 24, paddingBottom: 48 }}>
@@ -443,7 +443,7 @@ function OB1({ go }: ObProps) {
 /** Due dates realistically sit within a few weeks of the birth date. */
 export const DUE_WINDOW_DAYS = 120;
 
-/** Ngày dự sinh — leaps count from the due date, so this matters for
+/** Ngày dự sinh - leaps count from the due date, so this matters for
  *  bé sinh sớm/muộn. Optional, with a gentle explainer underneath.
  *  Pass `anchorDob` (ISO) to center the calendar around the birth date. */
 export function DueDateField({
@@ -472,7 +472,7 @@ export function DueDateField({
         initialMonth={dob ?? undefined}
       />
       <Txt style={{ fontSize: 12.5, color: colors.textSecondary, lineHeight: 19, marginTop: 8 }}>
-        Leap tính theo ngày dự sinh — vì não bé phát triển từ trong bụng mẹ. Với bé sinh sớm/muộn 2 tuần trở lên, điền ngày dự sinh giúp dự báo đúng hơn nhiều 💛
+        Leap tính theo ngày dự sinh vì não bé bắt đầu phát triển từ trong bụng mẹ. Với bé sinh sớm/muộn 2 tuần trở lên, điền ngày dự sinh giúp dự báo đúng hơn nhiều 💛
       </Txt>
     </View>
   );
@@ -484,7 +484,7 @@ function OB2({ go, draft, setDraft, finish }: ObProps) {
   const dobIso = parseDobInput(draft.dobInput);
   const dobErr =
     draft.dobInput.length >= 8 && !dobIso
-      ? 'Ngày sinh chưa hợp lệ — bé cần đã chào đời và dưới 5 tuổi nhé'
+      ? 'Ngày sinh chưa hợp lệ - bé cần đã chào đời và dưới 5 tuổi nhé'
       : '';
   const dueIso = parseDueDateInput(draft.dueInput);
   const dueFar =
@@ -492,9 +492,9 @@ function OB2({ go, draft, setDraft, finish }: ObProps) {
     Math.abs(new Date(dueIso).getTime() - new Date(dobIso).getTime()) > DUE_WINDOW_DAYS * 86400000;
   const dueErr =
     draft.dueInput.length >= 8 && !dueIso
-      ? 'Ngày dự sinh chưa đúng — nhập dạng DD/MM/YYYY nhé'
+      ? 'Ngày dự sinh chưa đúng - nhập dạng DD/MM/YYYY nhé'
       : dueFar
-        ? 'Ngày dự sinh thường chỉ cách ngày sinh vài tuần — mama kiểm tra lại nhé'
+        ? 'Ngày dự sinh thường chỉ cách ngày sinh vài tuần - mama kiểm tra lại nhé'
         : '';
   const submit = async () => {
     setBusy(true);
@@ -511,7 +511,7 @@ function OB2({ go, draft, setDraft, finish }: ObProps) {
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: 24, gap: 8 }}>
           <View style={{ flex: 1 }}>
             <Txt serif style={{ fontSize: 34, lineHeight: 41, color: colors.textPrimary }}>Chào bé yêu!</Txt>
-            <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginTop: 6 }}>Kể mình nghe về bé nhé — chỉ ngày sinh là cần thiết.</Txt>
+            <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginTop: 6 }}>Kể mình nghe về bé nhé - chỉ ngày sinh là cần thiết.</Txt>
           </View>
           <Bong emotion="curious" onesie="sage" size={88} />
         </View>
@@ -540,7 +540,7 @@ function OB2({ go, draft, setDraft, finish }: ObProps) {
             </View>
           </View>
         </View>
-        <Banner icon="💛" tone="soft" style={{ marginTop: 18 }}>Chỉ ngày sinh là cần thiết — còn lại để sau cũng được.</Banner>
+        <Banner icon="💛" tone="soft" style={{ marginTop: 18 }}>Chỉ ngày sinh là cần thiết - còn lại để sau cũng được.</Banner>
         <View style={{ paddingTop: 24, paddingBottom: 44 }}>
           <ButtonPrimary disabled={!dobIso || (!!draft.dueInput && !dueIso) || dueFar || busy} onPress={submit}>Tiếp tục</ButtonPrimary>
         </View>

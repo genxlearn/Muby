@@ -1,5 +1,5 @@
 /* ============================================================
-   SCREEN 2 — Quick Log Sheet · 2B — Soothing Sheet — Muby UI v2.0
+   SCREEN 2 - Quick Log Sheet · 2B - Soothing Sheet - Muby UI v2.0
    Figma: B3 (Ghi nhanh) · B4 (chọn chi tiết) · B5 (Hộp dỗ bé).
    Two taps: pick a category tile → pick a detail. No forms.
    ============================================================ */
@@ -59,7 +59,7 @@ export function QuickLogSheet({ open }: { open: boolean }) {
       onClose={ctx.closeSheet}
       height="74%"
       title={detail ? (OD ? OD.q : 'Ghi thêm') : 'Ghi cho bé'}
-      sub={detail ? 'Chọn một ô là xong — không cần điền gì thêm.' : 'Chọn một mục, rồi chọn chi tiết. Hai chạm là xong.'}
+      sub={detail ? 'Chọn một ô là xong.' : 'Chọn một mục, rồi chọn chi tiết. Hai chạm là xong.'}
     >
       {!detail ? (
         <View style={{ gap: 16 }}>
@@ -176,7 +176,7 @@ export function QuickLogSheet({ open }: { open: boolean }) {
   );
 }
 
-/** Static volume track (visual only — no slider dependency). */
+/** Static volume track (visual only - no slider dependency). */
 function VolumeTrack({ disabled, on }: { disabled?: boolean; on?: boolean }) {
   const { colors } = useTheme();
   return (

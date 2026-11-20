@@ -17,7 +17,7 @@ export function EmptyState({
   heading: string;
   helper?: string;
   action?: React.ReactNode;
-  /** 'sm' — compact variant for use inside cards/sections. */
+  /** 'sm' - compact variant for use inside cards/sections. */
   size?: 'md' | 'sm';
 }) {
   const { colors } = useTheme();

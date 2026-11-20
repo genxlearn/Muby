@@ -1,5 +1,5 @@
 /* ============================================================
-   Icon3D — semi-3D gradient badge that replaces emojis.
+   Icon3D - semi-3D gradient badge that replaces emojis.
    Web prototype uses Phosphor fill icons; RN uses the equivalent
    MaterialCommunityIcons glyph on the same gradient chip.
    ============================================================ */

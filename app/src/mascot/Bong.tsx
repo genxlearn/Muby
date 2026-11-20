@@ -1,5 +1,5 @@
 /* ============================================================
-   BỐNG — semi-3D baby mascot (Muby v1.0), ported to react-native-svg.
+   BỐNG - semi-3D baby mascot (Muby v1.0), ported to react-native-svg.
    <Bong emotion="happy" onesie="orange" size={130} />
    ViewBox 0 0 200 240. CSS variables resolved from the active theme.
    ============================================================ */
@@ -152,7 +152,7 @@ const BrowAngry = ({ c }: { c: ThemeColors }) => (
   </G>
 );
 
-/* accentPrimary needed by Sparkle — extend the color set locally */
+/* accentPrimary needed by Sparkle - extend the color set locally */
 type FaceColors = ThemeColors;
 
 /* ---------- FACE BY EMOTION ---------- */

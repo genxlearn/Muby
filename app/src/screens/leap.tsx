@@ -1,6 +1,6 @@
 /* ============================================================
-   SCREEN 3 — LEAP TAB (3A Hôm nay · 3B Hành trình · 3C Lịch)
-   SCREEN 4 — LEAP DETAIL
+   SCREEN 3 - LEAP TAB (3A Hôm nay · 3B Hành trình · 3C Lịch)
+   SCREEN 4 - LEAP DETAIL
    Ported from project/screens/leap.jsx.
    ============================================================ */
 import React, { useState } from 'react';
@@ -33,7 +33,7 @@ import { ActionCard, ForecastStrip, SunnyPlaySection } from './shared';
 
 const clampLv = (n: number) => (Math.min(5, Math.max(1, n)) as 1 | 2 | 3 | 4 | 5);
 
-/** Symptom pills that wrap onto multiple lines (v3 layout — no horizontal scroll). */
+/** Symptom pills that wrap onto multiple lines (v3 layout - no horizontal scroll). */
 function WrapPills({ symptoms }: { symptoms: string[] }) {
   const { colors } = useTheme();
   return (
@@ -81,7 +81,7 @@ function LeapToday() {
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
       <View style={{ paddingTop: 4, paddingHorizontal: 20, gap: 24 }}>
-        {/* HERO — phase-based framing (Muby App Final) */}
+        {/* HERO - phase-based framing (Muby App Final) */}
         <Card pad={0} style={{ overflow: 'hidden', borderRadius: 24 }}>
           <View style={{ flexDirection: 'row', gap: 6, paddingVertical: 20, paddingHorizontal: 20 }}>
             <View style={{ flex: 1, minWidth: 0 }}>
@@ -98,7 +98,7 @@ function LeapToday() {
                   ? PHASE.desc
                   : st.status === 'after-all'
                     ? 'Hành trình Wonder Weeks đã trọn vẹn. Tận hưởng từng khoảnh khắc lớn khôn của con nhé.'
-                    : 'Bé đang ở tuần nắng giữa hai leap — thời điểm tuyệt vời để chơi và nghỉ ngơi cùng con.'}
+                    : 'Bé đang ở tuần nắng giữa hai leap. Lúc này hợp để chơi và nghỉ ngơi cùng con.'}
               </Txt>
               <Txt style={{ fontSize: 12, color: colors.textMuted, fontWeight: '600', marginTop: 8 }}>
                 {inLeap
@@ -114,13 +114,13 @@ function LeapToday() {
           </View>
         </Card>
 
-        {/* FORECAST — swipeable strip */}
+        {/* FORECAST - swipeable strip */}
         <Card pad={14}>
           <Txt style={{ fontSize: 17, fontWeight: '600', color: colors.textPrimary, marginBottom: 12 }}>7 ngày tới</Txt>
           <ForecastStrip data={st.forecast} />
         </Card>
 
-        {/* Symptoms — quan trọng, ngay sau dự báo; badge xuống dòng */}
+        {/* Symptoms - quan trọng, ngay sau dự báo; badge xuống dòng */}
         {st.status !== 'after-all' && CURRENT_LEAP.symptoms.length > 0 ? (
           <View>
             <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 12, paddingHorizontal: 2 }}>
@@ -130,7 +130,7 @@ function LeapToday() {
           </View>
         ) : null}
 
-        {/* "ĐANG XẢY RA GÌ?" — tap to open detail */}
+        {/* "ĐANG XẢY RA GÌ?" - tap to open detail */}
         <Card onPress={() => ctx.go('leapdetail')}>
           <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.6, color: colors.textBrand }}>ĐANG XẢY RA GÌ?</Txt>
           <Txt serif style={{ fontSize: 22, marginTop: 8, lineHeight: 28, color: colors.textPrimary }}>{CURRENT_LEAP.fullName}</Txt>
@@ -269,24 +269,24 @@ function LeapJourney() {
   );
 }
 
-/* ---- 3C Lịch (calendar — tuần/ngày + chi tiết 7 ngày trong tuần) ---- */
+/* ---- 3C Lịch (calendar - tuần/ngày + chi tiết 7 ngày trong tuần) ---- */
 const DOW = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 type CalMode = 'week' | 'day';
 
 function LeapCalendar() {
   const { colors, radii } = useTheme();
   const { state: st } = useBaby();
-  /* Leap math anchors to the due date when set — the calendar shows leap weeks. */
+  /* Leap math anchors to the due date when set - the calendar shows leap weeks. */
   const curWeek = Math.min(77, Math.max(1, Math.floor(st.leapWeeksFrac)));
   const weeks = D.buildCalendar(curWeek);
   const [pick, setPick] = useState<D.CalendarWeek | null>(null);
   const [legend, setLegend] = useState(true);
   const [mode, setMode] = useState<CalMode>('week');
   const todayDow = (new Date().getDay() + 6) % 7; // 0 = T2
-  /* Intensity for day `di` (0=T2) of calendar week `w` — real engine curve. */
+  /* Intensity for day `di` (0=T2) of calendar week `w` - real engine curve. */
   const dayN = (w: number, di: number) =>
     clampLv(intensityAtWeek(st.leapWeeksFrac + ((w - curWeek) * 7 + (di - todayDow)) / 7));
-  /* Day mode: 14 ngày tới — real dates from today, engine intensity. */
+  /* Day mode: 14 ngày tới - real dates from today, engine intensity. */
   const days = Array.from({ length: 14 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
@@ -473,7 +473,7 @@ export function LeapScreen({ initialSub }: { initialSub?: Sub }) {
 }
 
 /* ============================================================
-   SCREEN 4 — Leap Detail
+   SCREEN 4 - Leap Detail
    ============================================================ */
 export function LeapDetailScreen() {
   const { colors } = useTheme();
@@ -552,7 +552,7 @@ export function LeapDetailScreen() {
                     Đọc đầy đủ dấu hiệu & cách đồng hành cùng bé qua Leap {CURRENT_LEAP.n}…
                   </Txt>
                   <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginBottom: 16 }}>
-                    Mở khóa trọn đời — 199.000đ 💛
+                    Mở khóa trọn đời - 199.000đ 💛
                   </Txt>
                   <ButtonPrimary onPress={() => ctx.openPaywall('Mở khóa Leap đầy đủ')}>Mở khóa với Premium</ButtonPrimary>
                 </Card>
@@ -569,8 +569,8 @@ export function LeapDetailScreen() {
                 ))
               ) : (
                 [
-                  'Giữ nhịp sinh hoạt đều đặn — bé cần dự đoán được điều gì xảy ra tiếp.',
-                  'Cho bé nhiều cơ hội được ôm — đây là nhu cầu thật, không phải thói quen.',
+                  'Giữ nhịp sinh hoạt đều đặn - bé cần dự đoán được điều gì xảy ra tiếp.',
+                  'Cho bé nhiều cơ hội được ôm - đây là nhu cầu thật, không phải thói quen.',
                   'Chơi trốn tìm để bé luyện khái niệm "biến mất rồi quay lại."',
                 ].map((t, i) => (
                   <Card key={i} pad={14}>

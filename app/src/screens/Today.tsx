@@ -1,5 +1,5 @@
 /* ============================================================
-   SCREEN 1 — TODAY (Home) — Muby UI v2.0 (Peachy)
+   SCREEN 1 - TODAY (Home) - Muby UI v2.0 (Peachy)
    Figma: B1 (đang Leap) · B2 (tuần nắng) · E4/E5 (trống / lỗi).
    Day header + white hero (leap progress + 7-day forecast),
    "Bống nhận thấy", today's stats, symptoms, actions, recent logs.
@@ -112,7 +112,7 @@ function LeapProgress({ day, total }: { day: number; total: number }) {
   );
 }
 
-/* ---- Sunny: "Hôm nay của bé" — rotating daily card (fact / game / photo) ---- */
+/* ---- Sunny: "Hôm nay của bé" - rotating daily card (fact / game / photo) ---- */
 function TodayOfBabyCard() {
   const { colors } = useTheme();
   const ctx = useApp();
@@ -134,7 +134,7 @@ function TodayOfBabyCard() {
   );
 }
 
-/* ---- Sunny: "Kỹ năng đang nở" — blossoming skills + milestone button ---- */
+/* ---- Sunny: "Kỹ năng đang nở" - blossoming skills + milestone button ---- */
 const BLOOM_CARD_W = 256;
 const CARD_GAP = 12;
 
@@ -184,7 +184,7 @@ function BloomSection() {
   );
 }
 
-/* ---- "Chuẩn bị cho Leap {n+1}" — pre-leap prep card ---- */
+/* ---- "Chuẩn bị cho Leap {n+1}" - pre-leap prep card ---- */
 function PrepCard() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
@@ -255,7 +255,7 @@ export function TodayScreen() {
   const [loading, setLoading] = useState(!_todayLoaded);
   const [symptomPick, setSymptomPick] = useState<string | null>(null);
   const [postLeapDismissed, setPostLeapDismissed] = useState(false);
-  // sunny mode: calm days — the home screen turns to celebration + prep
+  // sunny mode: calm days - the home screen turns to celebration + prep
   const sunny = intensity <= 2 && st.status !== 'after-all';
   const S = st.sunny;
   const C = D.INTENSITY_COPY[intensity];
@@ -281,7 +281,7 @@ export function TodayScreen() {
     );
   }
 
-  /* Stored profile could not be read — Figma E5 */
+  /* Stored profile could not be read - Figma E5 */
   if (babyError) {
     return (
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
@@ -300,7 +300,7 @@ export function TodayScreen() {
             <HeroCard>
               <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 1, color: colors.textSecondary }}>BẢN LƯU GẦN NHẤT</Txt>
               <Txt serif style={{ fontSize: 22, lineHeight: 28, marginTop: 8, color: colors.textPrimary }}>
-                {inLeap ? `Bé đang ở ${PHASE.name} của Leap ${CURRENT_LEAP.n}` : `Bé đang giữa hai leap — Leap ${CURRENT_LEAP.n} sắp tới`}
+                {inLeap ? `Bé đang ở ${PHASE.name} của Leap ${CURRENT_LEAP.n}` : `Bé đang giữa hai leap - Leap ${CURRENT_LEAP.n} sắp tới`}
               </Txt>
             </HeroCard>
           </View>
@@ -309,7 +309,7 @@ export function TodayScreen() {
     );
   }
 
-  /* First day, nothing logged — Figma E4 */
+  /* First day, nothing logged - Figma E4 */
   if (empty) {
     return (
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
@@ -331,7 +331,7 @@ export function TodayScreen() {
     : inLeap
       ? `Bống nhận thấy · ${PHASE.name}`
       : `Bống nhận thấy · Leap ${CURRENT_LEAP.n}`;
-  const insightBody = sunny ? C.copy : inLeap ? PHASE.desc : `Leap ${CURRENT_LEAP.n} · ${CURRENT_LEAP.world} sắp đến — tranh thủ nghỉ ngơi và chơi cùng con nhé.`;
+  const insightBody = sunny ? C.copy : inLeap ? PHASE.desc : `Leap ${CURRENT_LEAP.n} · ${CURRENT_LEAP.world} sắp đến - tranh thủ nghỉ ngơi và chơi cùng con nhé.`;
 
   return (
     <View style={{ flex: 1 }}>
@@ -339,7 +339,7 @@ export function TodayScreen() {
         <ScreenGlow />
         <TodayHeader />
         <View style={{ paddingTop: 20, paddingHorizontal: 20, gap: 28 }}>
-          {/* ===== HERO — white card: leap status + progress + 7 days ===== */}
+          {/* ===== HERO - white card: leap status + progress + 7 days ===== */}
           <HeroCard>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <View style={{ flex: 1, minWidth: 0, gap: 8 }}>
@@ -399,7 +399,7 @@ export function TodayScreen() {
               <View style={{ marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 12, borderRadius: radii.md, backgroundColor: colors.warningSoft }}>
                 <Ic name="sun" size={16} color={colors.warning} />
                 <Txt style={{ flex: 1, fontSize: 13, color: colors.textPrimary, lineHeight: 18 }}>
-                  Leap {S.nextLeap.n} dự kiến bắt đầu ngày {S.nextDate} — tranh thủ chơi cùng con nhé
+                  Leap {S.nextLeap.n} dự kiến bắt đầu ngày {S.nextDate} - tranh thủ chơi cùng con nhé
                 </Txt>
               </View>
             ) : null}
@@ -444,7 +444,7 @@ export function TodayScreen() {
 
           {sunny ? <TodayOfBabyCard /> : null}
 
-          {/* ===== HÔM NAY ĐẾN GIỜ — stat tiles ===== */}
+          {/* ===== HÔM NAY ĐẾN GIỜ - stat tiles ===== */}
           <View>
             <SectionHeader title="Hôm nay đến giờ" link="Xem tất cả" onLink={() => ctx.setTab('growth')} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20 }} contentContainerStyle={{ gap: 12, paddingHorizontal: 20, paddingBottom: 12, paddingTop: 2 }}>
@@ -471,7 +471,7 @@ export function TodayScreen() {
             </View>
           ) : null}
 
-          {/* ===== ACTIONS (stormy) — "Giúp bé ở Leap N" ===== */}
+          {/* ===== ACTIONS (stormy) - "Giúp bé ở Leap N" ===== */}
           {!sunny && st.status !== 'after-all' && CURRENT_LEAP.actions.length > 0 ? (
             <View>
               <SectionHeader title={inLeap ? `Giúp bé ở Leap ${CURRENT_LEAP.n}` : `Chuẩn bị cho Leap ${CURRENT_LEAP.n}`} link="Tất cả" onLink={() => ctx.go('leapdetail')} />
@@ -543,12 +543,12 @@ export function TodayScreen() {
 }
 
 /* ============================================================
-   EASY SCREEN — full explanation (stack) — Figma B6
+   EASY SCREEN - full explanation (stack) - Figma B6
    ============================================================ */
 const EASY_STEPS: { k: string; name: string; tone: TileTone; icon: IconName; desc: string }[] = [
   { k: 'E', name: 'Ăn', tone: 'feed', icon: 'bottle', desc: 'Bé thức dậy là được ăn ngay. Bú lúc tỉnh táo giúp bé ăn no hơn, không ngủ quên giữa cữ.' },
-  { k: 'A', name: 'Chơi', tone: 'growth', icon: 'sun', desc: 'Sau ăn là lúc bé tỉnh táo nhất: tummy time, nói chuyện, nhìn ngắm. Với bé 3–4 tháng, 60–90 phút thức là vừa đủ.' },
-  { k: 'S', name: 'Ngủ', tone: 'sleep', icon: 'moon', desc: 'Thấy bé dụi mắt, ngáp, quay mặt đi — đó là tín hiệu buồn ngủ. Đặt bé xuống khi lim dim, bé sẽ học tự vào giấc.' },
+  { k: 'A', name: 'Chơi', tone: 'growth', icon: 'sun', desc: 'Sau ăn là lúc bé tỉnh táo nhất: tummy time, nói chuyện, nhìn ngắm. Với bé 3-4 tháng, 60-90 phút thức là vừa đủ.' },
+  { k: 'S', name: 'Ngủ', tone: 'sleep', icon: 'moon', desc: 'Thấy bé dụi mắt, ngáp, quay mặt đi - đó là tín hiệu buồn ngủ. Đặt bé xuống khi lim dim, bé sẽ học tự vào giấc.' },
   { k: 'Y', name: 'Của mama', tone: 'brand', icon: 'heart', desc: 'Bé ngủ = giờ của bạn. Nghỉ ngơi, ăn uống, hay đơn giản là ngồi yên một chút. Chăm mình cũng là chăm con.' },
 ];
 
@@ -566,16 +566,16 @@ export function EasyScreen() {
             <BongFace emotion="snug" size={54} />
           </View>
           <Txt style={{ flex: 1, fontSize: 15, color: colors.textSecondary, lineHeight: 20 }}>
-            Trong Leap {st.leap.n}, thế giới của bé đang thay đổi — một nhịp <Txt style={{ color: colors.textPrimary, fontWeight: '600' }}>quen thuộc</Txt> giúp con đoán được điều gì đến tiếp theo, nên bớt bất an hơn.
+            Trong Leap {st.leap.n}, thế giới của bé đang thay đổi - một nhịp <Txt style={{ color: colors.textPrimary, fontWeight: '600' }}>quen thuộc</Txt> giúp con đoán được điều gì đến tiếp theo, nên bớt bất an hơn.
           </Txt>
         </View>
 
         <View style={{ padding: 20, gap: 10, borderRadius: radii.lg, backgroundColor: colors.bgAccentSoft }}>
           <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 1, color: colors.textBrand }}>EASY GIÚP GÌ TRONG LEAP {st.leap.n}?</Txt>
           {([
-            ['🍼', 'Bé có thể bú ít mỗi cữ nhưng đòi ăn nhiều lần — cứ theo nhịp E, không ép đủ lượng.'],
-            ['🌙', 'Trong leap bé dễ mệt sớm — đặt ngủ sớm hơn 30 phút so với lịch quen.'],
-            ['✨', 'Giữ nguyên trình tự Ăn → Chơi → Ngủ — sự quen thuộc chính là điểm tựa của con lúc này.'],
+            ['🍼', 'Bé có thể bú ít mỗi cữ nhưng đòi ăn nhiều lần - cứ theo nhịp E, không ép đủ lượng.'],
+            ['🌙', 'Trong leap bé dễ mệt sớm - đặt ngủ sớm hơn 30 phút so với lịch quen.'],
+            ['✨', 'Giữ nguyên trình tự Ăn → Chơi → Ngủ - sự quen thuộc chính là điểm tựa của con lúc này.'],
           ] as [string, string][]).map(([e, t], i) => (
             <View key={i} style={{ flexDirection: 'row', gap: 10 }}>
               <Txt style={{ fontSize: 13, lineHeight: 18 }}>{e}</Txt>

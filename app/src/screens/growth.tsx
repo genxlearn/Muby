@@ -108,10 +108,10 @@ const EMPTY_META: Record<Metric, { heading: string; helper: string; cta: string;
   height: { heading: 'Chưa có số đo nào', helper: 'Thêm số đo đầu tiên để bắt đầu vẽ đường lớn của bé nhé mama 💛', cta: '+ Thêm số đo đầu tiên', measure: true },
   feed: { heading: 'Chưa có cữ ăn nào', helper: 'Ghi cữ ăn đầu tiên để thấy nhịp bú của bé nhé mama 💛', cta: '+ Ghi cữ ăn' },
   sleep: { heading: 'Chưa có giấc ngủ nào', helper: 'Ghi giấc ngủ đầu tiên để thấy nhịp ngủ của bé 🌙', cta: '+ Ghi giấc ngủ' },
-  diaper: { heading: 'Chưa có lần thay tã nào', helper: 'Tã ướt đều đặn là dấu hiệu bé bú đủ — ghi lại để cùng theo dõi nhé 💛', cta: '+ Ghi tã' },
+  diaper: { heading: 'Chưa có lần thay tã nào', helper: 'Tã ướt đều đặn là dấu hiệu bé bú đủ - ghi lại để cùng theo dõi nhé 💛', cta: '+ Ghi tã' },
 };
 
-/** Metric chip strip — shared by the normal and empty growth screens. */
+/** Metric chip strip - shared by the normal and empty growth screens. */
 function MetricChips({ metric, onPick }: { metric: Metric; onPick: (m: Metric) => void }) {
   return (
     <ScrollView
@@ -159,12 +159,12 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
   const META: Record<Metric, { latest: string; sub: string; band: string }> = {
     weight: { latest: `${BABY.weight} kg`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
     height: { latest: `${BABY.height} cm`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
-    feed: { latest: '640 ml/ngày', sub: 'Bé đang bú đủ — yên tâm nhé mama 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
+    feed: { latest: '640 ml/ngày', sub: 'Bé đang bú đủ - yên tâm nhé mama 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
     sleep: { latest: '14 giờ/ngày', sub: 'Ngủ ít hơn chút trong leap là bình thường 💛', band: 'Khoảng thường gặp ở bé cùng tuổi' },
     diaper: { latest: '6 tã/ngày', sub: 'Tã ướt đều đặn = bé bú đủ 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
   };
   const m = META[metric];
-  // "today" stats and typical ranges come from the engine — age-appropriate for THIS baby
+  // "today" stats and typical ranges come from the engine - age-appropriate for THIS baby
   const stat = st.dailyStats.find((s) => s.id === metric);
   const inRange = stat ? stat.num >= stat.lo && stat.num <= stat.hi : false;
   const pos = stat ? Math.min(100, Math.max(0, ((stat.num - stat.lo) / (stat.hi - stat.lo)) * 60 + 20)) : 0;
@@ -195,7 +195,7 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
       <View style={{ paddingTop: 20, paddingHorizontal: 20 }}>
         <MetricChips metric={metric} onPick={setMetric} />
 
-        {/* HÔM NAY — chỉ số đối chiếu của tab đang chọn (cữ ăn / ngủ / tã) */}
+        {/* HÔM NAY - chỉ số đối chiếu của tab đang chọn (cữ ăn / ngủ / tã) */}
         {stat ? (
           <Card pad={16} style={{ marginBottom: 24 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -236,7 +236,7 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
             </Banner>
           </Card>
         ) : (
-          /* Số mới nhất — cho cân nặng / chiều cao */
+          /* Số mới nhất - cho cân nặng / chiều cao */
           <Card pad={20} style={{ marginBottom: 24, borderRadius: radii.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
               <BongFace emotion="blissful" size={64} ring />
@@ -560,15 +560,15 @@ export function LibraryScreen() {
         {art ? (
           <View style={{ gap: 14, paddingTop: 4 }}>
             <Txt style={{ fontSize: 14.5, lineHeight: 25, color: colors.textPrimary }}>
-              Tuần này, não bé đang mở ra một cách nhìn thế giới hoàn toàn mới. Những điều quen thuộc bỗng trở nên lạ lẫm — và người duy nhất con thấy an toàn lúc này chính là mẹ.
+              Tuần này, não bé đang mở ra một cách nhìn thế giới hoàn toàn mới. Những điều quen thuộc bỗng trở nên lạ lẫm - và người duy nhất con thấy an toàn lúc này chính là mẹ.
             </Txt>
             <Txt style={{ fontSize: 14.5, lineHeight: 25, color: colors.textPrimary }}>
-              Đó là lý do bé bám mẹ hơn, khóc khi mẹ rời phòng, và đòi bế nhiều hơn hẳn. Đây không phải thói quen xấu — đây là nhu cầu thật của một bộ não đang lớn rất nhanh.
+              Đó là lý do bé bám mẹ hơn, khóc khi mẹ rời phòng, và đòi bế nhiều hơn hẳn. Đây không phải thói quen xấu - đây là nhu cầu thật của một bộ não đang lớn rất nhanh.
             </Txt>
             {art.locked ? (
               <Card pad={20} style={{ backgroundColor: colors.aiSubtle, borderWidth: 1, borderColor: colors.aiTonal }}>
                 <Txt style={{ fontSize: 14, lineHeight: 22, color: colors.textPrimary, marginBottom: 12 }}>
-                  Đọc đầy đủ bài này và toàn bộ thư viện — Muby Premium 199.000đ trọn đời 💛
+                  Đọc đầy đủ bài này và toàn bộ thư viện - Muby Premium 199.000đ trọn đời 💛
                 </Txt>
                 <View style={{ flexDirection: 'row', gap: 10 }}>
                   <ButtonPrimary
@@ -589,10 +589,10 @@ export function LibraryScreen() {
             ) : (
               <>
                 <Txt style={{ fontSize: 14.5, lineHeight: 25, color: colors.textPrimary }}>
-                  Điều mẹ có thể làm: giữ nhịp sinh hoạt quen thuộc, ôm con nhiều hơn, và nhớ rằng giai đoạn này sẽ qua. Sau mỗi leap, bé lại biết thêm một kỹ năng mới — và nụ cười của con sẽ cho mẹ biết ngay.
+                  Điều mẹ có thể làm: giữ nhịp sinh hoạt quen thuộc, ôm con nhiều hơn, và nhớ rằng giai đoạn này sẽ qua. Sau mỗi leap, bé lại biết thêm một kỹ năng mới - và nụ cười của con sẽ cho mẹ biết ngay.
                 </Txt>
                 <Banner icon="💛" tone="soft">
-                  Mẹo nhỏ: đọc xong bài này, thử ôm con thêm 5 phút trước giờ ngủ — cả hai mẹ con đều sẽ dễ chịu hơn.
+                  Mẹo nhỏ: đọc xong bài này, thử ôm con thêm 5 phút trước giờ ngủ - cả hai mẹ con đều sẽ dễ chịu hơn.
                 </Banner>
               </>
             )}

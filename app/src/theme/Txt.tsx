@@ -4,9 +4,9 @@ import { fontFamily } from './tokens';
 import { useTheme } from './ThemeContext';
 
 export interface TxtProps extends TextProps {
-  /** Fraunces display serif — Peachy titles (always Regular weight). */
+  /** Fraunces display serif - Peachy titles (always Regular weight). */
   serif?: boolean;
-  /** Fraunces italic — Bống's voice in "Bống nhận thấy" cards. */
+  /** Fraunces italic - Bống's voice in "Bống nhận thấy" cards. */
   italic?: boolean;
   style?: TextStyle | TextStyle[];
 }
@@ -14,7 +14,7 @@ export interface TxtProps extends TextProps {
 /**
  * Text wrapper that resolves the correct custom font family from a numeric
  * `fontWeight` (+ `serif`/`italic` flags), because RN can't synthesize weights
- * on a custom font — each weight is a distinct loaded family. Defaults color to
+ * on a custom font - each weight is a distinct loaded family. Defaults color to
  * the themed primary text so nothing renders pure black.
  */
 export function Txt({ style, serif, italic, ...rest }: TxtProps) {

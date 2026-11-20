@@ -1,5 +1,5 @@
 /* ============================================================
-   SCREEN 0 — Design System Foundation (Muby v1.0)
+   SCREEN 0 - Design System Foundation (Muby v1.0)
    Reference page: tokens, hue-shift intensity palette, all 11 Bống
    emotions, IntensityBadge states, components, flower motifs.
    ============================================================ */
@@ -74,7 +74,7 @@ export function DesignSystemScreen() {
 
         {/* Intensity palette */}
         <View>
-          <SectionTitle>INTENSITY — HUE-SHIFT PALETTE</SectionTitle>
+          <SectionTitle>INTENSITY - HUE-SHIFT PALETTE</SectionTitle>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
             {([1, 2, 3, 4, 5] as const).map((n) => (
               <Swatch key={n} label={`intensity ${n}`} color={colors.intensity[n]} ink={colors.intensityInk[n]} />
@@ -89,7 +89,7 @@ export function DesignSystemScreen() {
 
         {/* Bống emotions */}
         <View>
-          <SectionTitle>BỐNG — 11 EMOTIONS</SectionTitle>
+          <SectionTitle>BỐNG - 11 EMOTIONS</SectionTitle>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
             {EMOTIONS.map((e) => (
               <View key={e} style={{ width: 78, alignItems: 'center' }}>
@@ -130,7 +130,7 @@ export function DesignSystemScreen() {
               <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>radius-lg · shadow-2 · no border</Txt>
               <View style={{ marginTop: 12 }}><MiniIntensityCurve w={280} h={40} /></View>
             </Card>
-            <Banner icon="💛" tone="soft">Banner — reassuring bestie voice, always warm.</Banner>
+            <Banner icon="💛" tone="soft">Banner - reassuring bestie voice, always warm.</Banner>
           </View>
         </View>
 

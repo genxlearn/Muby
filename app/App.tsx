@@ -32,7 +32,7 @@ function IntensitySync() {
   return null;
 }
 
-/** The device is the phone — no fake bezel. Safe areas frame the content;
+/** The device is the phone - no fake bezel. Safe areas frame the content;
  *  sheets, paywall and toast overlay the full screen (outside the safe area). */
 function Shell() {
   const { colors } = useTheme();
@@ -61,7 +61,7 @@ function Splash() {
   );
 }
 
-/** Face ID gate — shown when a session restored with biometric lock on. */
+/** Face ID gate - shown when a session restored with biometric lock on. */
 function LockScreen() {
   const auth = useAuth();
   const { colors } = useTheme();

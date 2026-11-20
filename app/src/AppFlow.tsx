@@ -1,5 +1,5 @@
 /* ============================================================
-   APP FLOW — router (Muby v3).
+   APP FLOW - router (Muby v3).
    Tabs: today · leap · growth · me, with the Ghi nhanh FAB in the
    middle of the floating nav (opens the quick-log sheet).
    ============================================================ */

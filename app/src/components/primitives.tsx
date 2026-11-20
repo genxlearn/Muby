@@ -95,7 +95,7 @@ export function ButtonSecondary({
   );
 }
 
-/** Tonal coral pill — small secondary actions ("Ghi", "Xem chi tiết →"). */
+/** Tonal coral pill - small secondary actions ("Ghi", "Xem chi tiết →"). */
 export function ButtonTonal({
   children,
   onPress,
@@ -179,7 +179,7 @@ export function Card({
   return <View style={base}>{children}</View>;
 }
 
-/** Hero card — the big white card at the top of a tab (Peachy "Next nap"). */
+/** Hero card - the big white card at the top of a tab (Peachy "Next nap"). */
 export function HeroCard({
   children,
   style,

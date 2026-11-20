@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, ViewStyle } from 'react-native';
 
-/** Gentle vertical bob — RN equivalent of the `@keyframes bongFloat` CSS loop. */
+/** Gentle vertical bob - RN equivalent of the `@keyframes bongFloat` CSS loop. */
 export function Floating({
   active = true,
   distance = 6,
@@ -34,7 +34,7 @@ export function Floating({
   return <Animated.View style={[style, { transform: [{ translateY }] }]}>{children}</Animated.View>;
 }
 
-/** One-shot hop — RN equivalent of `@keyframes hop`. */
+/** One-shot hop - RN equivalent of `@keyframes hop`. */
 export function Hop({ active = true, children, style }: { active?: boolean; children: React.ReactNode; style?: ViewStyle }) {
   const v = useRef(new Animated.Value(0)).current;
   useEffect(() => {

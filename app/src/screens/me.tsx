@@ -35,7 +35,7 @@ import { Txt } from '../theme/Txt';
 import { DueDateField, DUE_WINDOW_DAYS } from './auth';
 
 /* ============================================================
-   9A — NOTIFICATIONS
+   9A - NOTIFICATIONS
    ============================================================ */
 function NotifGroup({ title, items }: { title: string; items: D.Notif[] }) {
   const { colors } = useTheme();
@@ -164,7 +164,7 @@ function SettingRow({
 }
 
 /* ============================================================
-   9B — PROFILE / ME
+   9B - PROFILE / ME
    ============================================================ */
 export function MeScreen() {
   const { colors, radii } = useTheme();
@@ -185,9 +185,9 @@ export function MeScreen() {
     Math.abs(new Date(dueIso).getTime() - new Date(dobOk).getTime()) > DUE_WINDOW_DAYS * 86400000;
   const dueErr =
     babyDue.length >= 8 && !dueIso
-      ? 'Ngày dự sinh chưa đúng — nhập dạng DD/MM/YYYY nhé'
+      ? 'Ngày dự sinh chưa đúng - nhập dạng DD/MM/YYYY nhé'
       : dueFar
-        ? 'Ngày dự sinh thường chỉ cách ngày sinh vài tuần — mama kiểm tra lại nhé'
+        ? 'Ngày dự sinh thường chỉ cách ngày sinh vài tuần - mama kiểm tra lại nhé'
         : '';
 
   const openBabySheet = () => {
@@ -214,7 +214,7 @@ export function MeScreen() {
     const next = !auth.faceIdEnabled;
     const ok = await auth.setFaceIdEnabled(next);
     if (!ok) {
-      ctx.toast('Chưa bật được Face ID — thử lại nhé.');
+      ctx.toast('Chưa bật được Face ID - thử lại nhé.');
       return;
     }
     ctx.toast(next ? 'Đã bật Face ID 💚' : 'Đã tắt Face ID. Lần sau đăng nhập bằng mã SMS nhé.');
@@ -263,7 +263,7 @@ export function MeScreen() {
           {ctx.trial ? (
             <Banner icon="✨" tone="ai" style={{ marginBottom: 12 }}>
               <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20 }}>
-                7 ngày đầu: mọi thứ đang mở · còn <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>{ctx.trial.daysLeft} ngày</Txt> · sau đó về gói Miễn phí — không trừ tiền 💛
+                7 ngày đầu: mọi thứ đang mở · còn <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>{ctx.trial.daysLeft} ngày</Txt> · sau đó về gói Miễn phí - không trừ tiền 💛
               </Txt>
             </Banner>
           ) : null}
@@ -287,7 +287,7 @@ export function MeScreen() {
               onPress={() => ctx.openPaywall('Mở khóa Muby Premium')}
               style={{ alignSelf: 'flex-start', marginTop: 16, paddingVertical: 13, paddingHorizontal: 22, minHeight: 48, justifyContent: 'center', borderRadius: 999, backgroundColor: colors.accentPrimary }}
             >
-              <Txt style={{ fontWeight: '600', fontSize: 15, color: '#fff' }}>Mở khóa trọn đời — 199.000đ</Txt>
+              <Txt style={{ fontWeight: '600', fontSize: 15, color: '#fff' }}>Mở khóa trọn đời - 199.000đ</Txt>
             </Pressable>
             <Txt style={{ fontSize: 12, color: colors.textInverse, opacity: 0.55, marginTop: 12, maxWidth: 235 }}>
               Trả một lần. Không gia hạn. Không trừ tiền tự động.
@@ -314,8 +314,8 @@ export function MeScreen() {
         <SettingRow
           icon="users" tone="sleep"
           label="Mời bố vào cùng"
-          sub="Đồng bộ gia đình — sắp có"
-          onPress={() => ctx.toast('Sắp có rồi — mình sẽ báo mama ngay khi mở nhé 💛')}
+          sub="Đồng bộ gia đình - sắp có"
+          onPress={() => ctx.toast('Sắp có rồi, mình sẽ báo mama khi mở nhé 💛')}
           right={<Ic name="chevron" size={18} color={colors.textMuted} />}
         />
       </SettingsGroup>
@@ -378,7 +378,7 @@ export function MeScreen() {
           label="Ngày sinh"
           value={babyDob}
           onChange={setBabyDob}
-          error={babyDob.length >= 8 && !dobOk ? 'Ngày sinh chưa hợp lệ — bé cần đã chào đời và dưới 5 tuổi nhé' : ''}
+          error={babyDob.length >= 8 && !dobOk ? 'Ngày sinh chưa hợp lệ - bé cần đã chào đời và dưới 5 tuổi nhé' : ''}
           minDate={new Date(Date.now() - 5 * 365 * 86400000)}
           maxDate={new Date()}
         />
@@ -419,7 +419,7 @@ export function MeScreen() {
     <Sheet open={sheet === 'terms'} onClose={() => setSheet(null)} height="62%" title="Điều khoản & Quyền riêng tư">
       <View style={{ gap: 12, paddingTop: 4 }}>
         <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
-          <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Dữ liệu của bé là của bạn.</Txt> Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, khoảnh khắc, ảnh) thuộc về bạn mãi mãi — kể cả khi không dùng Premium.
+          <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Dữ liệu của bé là của bạn.</Txt> Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, khoảnh khắc, ảnh) thuộc về bạn mãi mãi - kể cả khi không dùng Premium.
         </Txt>
         <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
           <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Không bán dữ liệu.</Txt> Chúng mình không chia sẻ thông tin của bạn và bé cho bên thứ ba.
@@ -428,7 +428,7 @@ export function MeScreen() {
           <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Nội dung tham khảo.</Txt> Dự báo leap và gợi ý EASY mang tính tham khảo, không thay thế tư vấn y khoa. Khi lo lắng về sức khoẻ của bé, hãy hỏi bác sĩ nhi.
         </Txt>
         <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
-          <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Muby Premium.</Txt> 7 ngày đầu sau đăng ký, mọi tính năng đều mở — không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 199.000đ, trọn đời, không gia hạn.
+          <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Muby Premium.</Txt> 7 ngày đầu sau đăng ký, mọi tính năng đều mở - không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 199.000đ, trọn đời, không gia hạn.
         </Txt>
       </View>
     </Sheet>
@@ -443,7 +443,7 @@ const PAYWALL_BENEFITS: [IconName, TileTone, string, string][] = [
   ['book', 'brand', '10 leaps đầy đủ', 'Dấu hiệu, mẹo & cách đồng hành cho từng leap'],
   ['sun', 'growth', 'Sunny Play từng bước', 'Hướng dẫn chi tiết cho mỗi hoạt động'],
   ['music', 'sleep', '3 âm thanh dỗ bé', 'Mưa, suối & shh-shh, phát không cần mạng'],
-  ['users', 'diaper', 'Đồng bộ gia đình', 'Sắp có — cả nhà cùng chăm bé'],
+  ['users', 'diaper', 'Đồng bộ gia đình', 'Sắp có - cả nhà cùng chăm bé'],
 ];
 
 export function Paywall() {
@@ -484,7 +484,7 @@ export function Paywall() {
       </View>
 
       <View style={{ gap: 10, marginTop: 22 }}>
-        <ButtonPrimary onPress={buy}>Mở khóa trọn đời — 199.000đ</ButtonPrimary>
+        <ButtonPrimary onPress={buy}>Mở khóa trọn đời - 199.000đ</ButtonPrimary>
         <ButtonText onPress={ctx.closePaywall} style={{ alignSelf: 'center' }} textStyle={{ textAlign: 'center' }}>
           Để sau
         </ButtonText>

@@ -1,5 +1,5 @@
 /* ============================================================
-   BABY CONTEXT — the baby profile (per signed-in account, persisted)
+   BABY CONTEXT - the baby profile (per signed-in account, persisted)
    plus everything derived from the real date of birth via leapEngine.
    ============================================================ */
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,13 +28,13 @@ const SAMPLE_DOB = (() => {
 
 export interface BabyApi {
   ready: boolean;
-  /** True when the stored profile could not be read — Today shows the retry banner. */
+  /** True when the stored profile could not be read - Today shows the retry banner. */
   error: boolean;
   /** Re-attempt the load after an error. */
   reload(): void;
   /** Null until onboarding has saved a baby. */
   baby: BabyProfile | null;
-  /** Display name — baby's name or the affectionate default. */
+  /** Display name - baby's name or the affectionate default. */
   displayName: string;
   /** Derived, always available (uses a sample DOB before onboarding). */
   state: BabyState;

@@ -7,7 +7,7 @@ import { Txt } from '../theme/Txt';
 import { Ic, IconName } from './Icon';
 import type { Tab } from '../navigation/AppContext';
 
-/* ---------- Bottom Nav — Peachy: floating white pill with 4 tabs + coral FAB on the right ---------- */
+/* ---------- Bottom Nav - Peachy: floating white pill with 4 tabs + coral FAB on the right ---------- */
 const TABS: { id: Tab; icon: IconName; label: string }[] = [
   { id: 'today', icon: 'home', label: 'Hôm nay' },
   { id: 'leap', icon: 'leap', label: 'Leap' },
@@ -94,7 +94,7 @@ export function BottomNav({
             );
           })}
         </View>
-        {/* FAB — Ghi nhanh */}
+        {/* FAB - Ghi nhanh */}
         <Pressable
           onPress={onFab}
           accessibilityLabel="Ghi nhanh"
@@ -117,7 +117,7 @@ export function BottomNav({
   );
 }
 
-/* ---------- App bar (stack screens) — Peachy: chevron + headline title ---------- */
+/* ---------- App bar (stack screens) - Peachy: chevron + headline title ---------- */
 export function AppBar({ title, onBack, right }: { title?: string; onBack?: () => void; right?: React.ReactNode }) {
   const { colors } = useTheme();
   return (

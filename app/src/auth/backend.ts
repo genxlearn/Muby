@@ -1,8 +1,8 @@
 /* ============================================================
-   AUTH BACKEND — pluggable passwordless phone auth (OTP only).
+   AUTH BACKEND - pluggable passwordless phone auth (OTP only).
 
    - DemoAuthBackend (default): fully working offline auth. The OTP is
-     generated locally and RETURNED so the UI can display it — there is
+     generated locally and RETURNED so the UI can display it - there is
      no SMS provider in demo mode. Verifying the code signs you in
      (and creates the account on first use).
    - SupabaseAuthBackend: real SMS OTP via Supabase Auth REST (requires

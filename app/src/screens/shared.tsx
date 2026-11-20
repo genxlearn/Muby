@@ -38,7 +38,7 @@ export function BabyAvatar({ size = 36 }: { size?: number }) {
   );
 }
 
-/* 7-day forecast row — Peachy "Forecast Day" cells: day · Bống face · intensity bar */
+/* 7-day forecast row - Peachy "Forecast Day" cells: day · Bống face · intensity bar */
 export function ForecastStrip({ data, onPick }: { data: D.ForecastDay[]; onPick?: (d: D.ForecastDay) => void }) {
   const { colors, radii } = useTheme();
   return (
@@ -74,7 +74,7 @@ export function ForecastStrip({ data, onPick }: { data: D.ForecastDay[]; onPick?
   );
 }
 
-/* Action card — Icon3D badge + progressive disclosure (Muby App Final) */
+/* Action card - Icon3D badge + progressive disclosure (Muby App Final) */
 export function ActionCard({
   action,
   onSound,
@@ -166,7 +166,7 @@ export function EasyEducationCard() {
   );
 }
 
-/* Sunny Play section (intensity <= 2) — horizontal step-card carousel (v3) */
+/* Sunny Play section (intensity <= 2) - horizontal step-card carousel (v3) */
 const PLAY_CARD_W = 250;
 
 export function SunnyPlaySection({ leap }: { leap: Leap }) {

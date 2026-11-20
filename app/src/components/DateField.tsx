@@ -1,5 +1,5 @@
 /* ============================================================
-   DATE FIELD — masked DD/MM/YYYY input + inline calendar picker.
+   DATE FIELD - masked DD/MM/YYYY input + inline calendar picker.
    Used by onboarding (ngày sinh / ngày dự sinh) and the baby-edit
    sheet in Mama. The calendar expands below the input (no second
    modal, so it works inside bottom sheets too).
@@ -11,7 +11,7 @@ import { Txt } from '../theme/Txt';
 import { Ic } from './Icon';
 import { Input } from './primitives';
 
-/** Progressive DD/MM/YYYY mask — a slash appears only once the next group
+/** Progressive DD/MM/YYYY mask - a slash appears only once the next group
  *  has a digit, so deleting characters never gets stuck on a separator. */
 export function maskDateInput(raw: string): string {
   const d = raw.replace(/\D/g, '').slice(0, 8);
