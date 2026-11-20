@@ -7,6 +7,8 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import {
   AppBar,
+  AvatarButton,
+  InsightCard,
   Banner,
   ButtonPrimary,
   Card,
@@ -30,6 +32,8 @@ import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
 import { ActionCard, ForecastStrip, SunnyPlaySection } from './shared';
+import { PostLeapCard, PrepCard } from './Today';
+import { LEAP_SKILLS, skillKey } from '../data/milestones';
 
 const clampLv = (n: number) => (Math.min(5, Math.max(1, n)) as 1 | 2 | 3 | 4 | 5);
 
@@ -77,6 +81,7 @@ function LeapToday() {
   const PHASE = D.leapPhase(Math.max(1, st.leapDay), st.leapTotal);
   const sunny = intensity <= 2;
   const actions = CURRENT_LEAP.actions;
+  const [postDismissed, setPostDismissed] = useState(false);
 
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
@@ -113,6 +118,18 @@ function LeapToday() {
             </View>
           </View>
         </Card>
+
+        {/* BỐNG NHẬN THẤY (moved from Hôm nay, MVP v2.1) */}
+        {st.status !== 'after-all' ? (
+          <InsightCard
+            eyebrow={sunny ? 'Bống nhận thấy · tuần nắng' : inLeap ? `Bống nhận thấy · ${PHASE.name}` : `Bống nhận thấy · Leap ${CURRENT_LEAP.n}`}
+            meta="Theo nghiên cứu Wonder Weeks"
+          >
+            {sunny ? D.INTENSITY_COPY[intensity].copy : inLeap ? PHASE.desc : `Leap ${CURRENT_LEAP.n} · ${CURRENT_LEAP.world} sắp đến. Tranh thủ nghỉ ngơi và chơi cùng con nhé.`}
+          </InsightCard>
+        ) : null}
+        {sunny && !postDismissed ? <PostLeapCard onDismiss={() => setPostDismissed(true)} /> : null}
+        {sunny && st.sunny.prep && st.sunny.daysToNext != null && st.sunny.daysToNext <= 5 ? <PrepCard /> : null}
 
         {/* FORECAST - swipeable strip */}
         <Card pad={14}>
@@ -450,12 +467,13 @@ function LeapCalendar() {
 
 export function LeapScreen({ initialSub }: { initialSub?: Sub }) {
   const { colors } = useTheme();
+  const ctx = useApp();
   const [sub, setSub] = useState<Sub>(initialSub || 'today');
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <ScreenGlow height={260} />
       <View style={{ paddingTop: 6, paddingBottom: 12 }}>
-        <LargeTitle title="Leap" sub="Những tuần kỳ diệu của bé" />
+        <LargeTitle title="Leap" sub="Những tuần kỳ diệu của bé" right={<AvatarButton onPress={() => ctx.go('me')} />} />
         <SubTabs<Sub>
           value={sub}
           onChange={setSub}
@@ -468,6 +486,50 @@ export function LeapScreen({ initialSub }: { initialSub?: Sub }) {
         />
       </View>
       {sub === 'today' ? <LeapToday /> : sub === 'journey' ? <LeapJourney /> : <LeapCalendar />}
+    </View>
+  );
+}
+
+/* ---- "Bé đang học" - skills checklist for the current leap (MVP v2.1, Figma C4 v2) ---- */
+function SkillsChecklist({ leapN }: { leapN: number }) {
+  const { colors } = useTheme();
+  const ctx = useApp();
+  const skills = LEAP_SKILLS[leapN] ?? [];
+  if (!skills.length) return null;
+  const done = skills.filter((_, i) => ctx.milestones[skillKey(leapN, i)]).length;
+  const fmt = (ms: number) => { const d = new Date(ms); return `${d.getDate()}/${d.getMonth() + 1}`; };
+  return (
+    <View style={{ gap: 10, marginTop: 8 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Txt serif style={{ flex: 1, fontSize: 22, lineHeight: 28 }}>Bé đang học</Txt>
+        <Txt style={{ fontSize: 12, fontWeight: '600', color: colors.success }}>{done}/{skills.length} đã làm được</Txt>
+      </View>
+      <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>Leap này mở ra kỹ năng mới. Chạm khi bé làm được để lưu lại ngày đó.</Txt>
+      <Card pad={4} style={{ paddingHorizontal: 16 }}>
+        {skills.map((label, i) => {
+          const key = skillKey(leapN, i);
+          const at = ctx.milestones[key];
+          return (
+            <Pressable
+              key={key}
+              onPress={() => {
+                ctx.toggleMilestone(key);
+                if (!at) ctx.toast('Đã lưu khoảnh khắc của bé 💛');
+              }}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: !!at }}
+              accessibilityLabel={label}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderTopColor: colors.borderSubtle }}
+            >
+              <View style={{ width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: at ? colors.success : 'transparent', borderWidth: at ? 0 : 1.5, borderColor: colors.textMuted }}>
+                {at ? <Ic name="check" size={16} sw={2.4} color="#fff" /> : null}
+              </View>
+              <Txt style={{ flex: 1, fontSize: 15, lineHeight: 20, color: at ? colors.textSecondary : colors.textPrimary }}>{label}</Txt>
+              <Txt style={{ fontSize: 12, color: at ? colors.success : colors.textMuted }}>{at ? fmt(at) : 'Chưa'}</Txt>
+            </Pressable>
+          );
+        })}
+      </Card>
     </View>
   );
 }
@@ -542,6 +604,8 @@ export function LeapDetailScreen() {
                   <WrapPills symptoms={CURRENT_LEAP.symptoms} />
                 </View>
               ) : null}
+
+              <SkillsChecklist leapN={CURRENT_LEAP.n} />
 
               {locked ? (
                 <Card pad={20} style={{ backgroundColor: colors.aiSubtle, borderWidth: 1, borderColor: colors.aiTonal }}>

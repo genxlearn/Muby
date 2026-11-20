@@ -16,6 +16,7 @@ import {
   EmptyState,
   Flower,
   Ic,
+  AvatarButton,
   IconTile,
   Input,
   LargeTitle,
@@ -26,6 +27,8 @@ import {
   Sheet,
 } from '../components';
 import type { TileTone } from '../components';
+import { TodayOfBabyCard } from './Today';
+import { EasyEducationCard } from './shared';
 import * as D from '../data/sampleData';
 import { Bong, BongFace } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
@@ -178,7 +181,7 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
     return (
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
         <ScreenGlow height={260} />
-        <LargeTitle title="Lớn khôn" sub={`Đường lớn của bé · ${st.ageLabel}`} />
+        <LargeTitle title="Lớn khôn" sub={`Đường lớn của bé · ${st.ageLabel}`} right={<AvatarButton onPress={() => ctx.go('me')} />} />
         <View style={{ paddingTop: 20, paddingHorizontal: 20, paddingBottom: 16 }}>
           <MetricChips metric={metric} onPick={setMetric} />
           <EmptyState emotion="curious" onesie="sage" heading={em.heading} helper={em.helper} />
@@ -191,8 +194,13 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
       <ScreenGlow height={260} />
-      <LargeTitle title="Lớn khôn" sub={`Đường lớn của bé · ${st.ageLabel}`} />
+      <LargeTitle title="Lớn khôn" sub={`Đường lớn của bé · ${st.ageLabel}`} right={<AvatarButton onPress={() => ctx.go('me')} />} />
       <View style={{ paddingTop: 20, paddingHorizontal: 20 }}>
+        {/* Moved from Hôm nay (MVP v2.1): daily tip + EASY rhythm */}
+        <View style={{ gap: 16, marginBottom: 24 }}>
+          <TodayOfBabyCard />
+          <EasyEducationCard />
+        </View>
         <MetricChips metric={metric} onPick={setMetric} />
 
         {/* HÔM NAY - chỉ số đối chiếu của tab đang chọn (cữ ăn / ngủ / tã) */}

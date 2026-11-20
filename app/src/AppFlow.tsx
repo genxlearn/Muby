@@ -1,7 +1,7 @@
 /* ============================================================
    APP FLOW - router (Muby v3).
-   Tabs: today · leap · growth · me, with the Ghi nhanh FAB in the
-   middle of the floating nav (opens the quick-log sheet).
+   Tabs: today · leap · [Ghi nhanh] · growth · community (MVP v2.1).
+   Mama opens as a stack screen from the avatar on each tab.
    ============================================================ */
 import React from 'react';
 import { View } from 'react-native';
@@ -13,6 +13,8 @@ import { LeapDetailScreen, LeapScreen } from './screens/leap';
 import { MeScreen, NotificationsScreen } from './screens/me';
 import { EasyScreen, TodayScreen } from './screens/Today';
 import { DesignSystemScreen } from './screens/DesignSystem';
+import { FeedTimerScreen, SleepTimerScreen } from './screens/care';
+import { CommunityScreen } from './screens/community';
 
 export function AppFlow() {
   const ctx = useApp();
@@ -36,6 +38,8 @@ export function AppFlow() {
         </View>
       ),
       designsystem: <DesignSystemScreen />,
+      feedtimer: <FeedTimerScreen />,
+      sleeptimer: <SleepTimerScreen />,
     };
     return <View style={{ flex: 1 }}>{stacks[route.stack] ?? <TodayScreen />}</View>;
   }
@@ -44,7 +48,7 @@ export function AppFlow() {
     today: <TodayScreen />,
     leap: <LeapScreen />,
     growth: <GrowthScreen />,
-    me: <MeScreen />,
+    community: <CommunityScreen />,
   };
   return (
     <View style={{ flex: 1 }}>

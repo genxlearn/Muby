@@ -10,10 +10,10 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { ThemeMode } from '../theme/tokens';
 
 export type Flow = 'auth' | 'onboard' | 'app';
-export type Tab = 'today' | 'leap' | 'growth' | 'me';
+export type Tab = 'today' | 'leap' | 'growth' | 'community';
 export type Stack =
   | 'leapdetail' | 'measure' | 'history' | 'library' | 'notifications'
-  | 'easy' | 'me' | 'designsystem' | null;
+  | 'easy' | 'me' | 'designsystem' | 'feedtimer' | 'sleeptimer' | null;
 export type Sheet = 'quicklog' | 'soothing' | null;
 
 export interface Route {
@@ -25,6 +25,24 @@ export interface Route {
 }
 
 export interface Toast { text: string; id: number }
+
+/* ---- Logs, running timer, milestones (MVP v2.1) ---- */
+export type LogType = 'feed' | 'sleep' | 'diaper' | 'mood';
+export type Side = 'L' | 'R';
+export interface LogEntry {
+  id: string;
+  type: LogType;
+  label: string;   // "Cữ ăn"
+  detail: string;  // "120 ml", "Bú mẹ · trái 8p, phải 6p"
+  at: number;      // start time (ms)
+  endAt?: number;  // sleep end
+  side?: Side;     // last breast side used
+}
+export type Timer =
+  | { kind: 'breast'; startAt: number; side: Side | null; segStart: number | null; acc: { L: number; R: number } }
+  | { kind: 'sleep'; startAt: number }
+  | null;
+
 export interface Trial { daysLeft: number }
 export interface Paywall { title: string }
 
@@ -59,6 +77,14 @@ export interface AppCtx {
   openPaywall: (title: string) => void;
   closePaywall: () => void;
   toast: (text: string) => void;
+
+  logs: LogEntry[];
+  addLog: (e: Omit<LogEntry, 'id'>) => void;
+  timer: Timer;
+  setTimer: (t: Timer) => void;
+  /** key `${leapN}:${index}` → date checked (ms) */
+  milestones: Record<string, number>;
+  toggleMilestone: (key: string) => void;
 }
 
 const Ctx = createContext<AppCtx | null>(null);
@@ -72,6 +98,8 @@ export function useApp(): AppCtx {
 /* ---- persisted premium record (per account) ---- */
 const TRIAL_DAYS = 7;
 const premiumKey = (account: string) => `bww.premium.v2.${account}`;
+const careKey = (account: string) => `bww.care.v1.${account}`;
+interface CareRecord { logs: LogEntry[]; timer: Timer; milestones: Record<string, number> }
 interface PremiumRecord { purchased: boolean; trialStart: number | null }
 
 function daysLeftOf(rec: PremiumRecord): number {
@@ -103,6 +131,8 @@ export function AppProvider({
   const [empty, setEmpty] = useState(false);
   const [rec, setRec] = useState<PremiumRecord>({ purchased: false, trialStart: null });
   const [paywall, setPaywall] = useState<Paywall | null>(null);
+  const [care, setCare] = useState<CareRecord>({ logs: [], timer: null, milestones: {} });
+  const careLoaded = useRef(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastSeq = useRef(0);
 
@@ -125,6 +155,27 @@ export function AppProvider({
       alive = false;
     };
   }, [accountKey]);
+
+  // Logs, running timer and milestones persist per account.
+  useEffect(() => {
+    let alive = true;
+    careLoaded.current = false;
+    AsyncStorage.getItem(careKey(accountKey))
+      .then((raw) => {
+        if (!alive) return;
+        if (raw) setCare({ logs: [], timer: null, milestones: {}, ...(JSON.parse(raw) as Partial<CareRecord>) });
+        careLoaded.current = true;
+      })
+      .catch(() => { careLoaded.current = true; });
+    return () => { alive = false; };
+  }, [accountKey]);
+  const updateCare = (fn: (c: CareRecord) => CareRecord) => {
+    setCare((c) => {
+      const next = fn(c);
+      AsyncStorage.setItem(careKey(accountKey), JSON.stringify(next)).catch(() => {});
+      return next;
+    });
+  };
 
   const saveRec = (next: PremiumRecord) => {
     setRec(next);
@@ -161,6 +212,24 @@ export function AppProvider({
     setPremium: (b) => saveRec({ ...rec, purchased: b }),
     openPaywall: (title) => setPaywall({ title }),
     closePaywall: () => setPaywall(null),
+    logs: care.logs,
+    addLog: (e) =>
+      updateCare((c) => ({
+        ...c,
+        logs: [{ ...e, id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}` }, ...c.logs]
+          .sort((a, b) => b.at - a.at)
+          .slice(0, 300),
+      })),
+    timer: care.timer,
+    setTimer: (t) => updateCare((c) => ({ ...c, timer: t })),
+    milestones: care.milestones,
+    toggleMilestone: (key) =>
+      updateCare((c) => {
+        const m = { ...c.milestones };
+        if (m[key]) delete m[key];
+        else m[key] = Date.now();
+        return { ...c, milestones: m };
+      }),
     toast: (text) => {
       toastSeq.current += 1;
       setToastVal({ text, id: toastSeq.current });

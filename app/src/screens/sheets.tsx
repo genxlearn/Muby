@@ -1,5 +1,5 @@
 /* ============================================================
-   SCREEN 2 - Quick Log Sheet · 2B - Soothing Sheet - Muby UI v2.0
+   SCREEN 2 - Quick Log Sheet · 2B - Soothing Sheet - Muby UI v2.1
    Figma: B3 (Ghi nhanh) · B4 (chọn chi tiết) · B5 (Hộp dỗ bé).
    Two taps: pick a category tile → pick a detail. No forms.
    ============================================================ */
@@ -16,16 +16,17 @@ import { Txt } from '../theme/Txt';
 type TileId = 'feed' | 'sleep' | 'diaper' | 'more';
 const TILES: { id: TileId; tone: TileTone; icon: IconName; label: string; sub: string }[] = [
   { id: 'feed', tone: 'feed', icon: 'bottle', label: 'Cữ ăn', sub: 'Bú mẹ, bình sữa' },
-  { id: 'sleep', tone: 'sleep', icon: 'moon', label: 'Giấc ngủ', sub: 'Ngủ trưa, ngủ đêm' },
+  { id: 'sleep', tone: 'sleep', icon: 'moon', label: 'Giấc ngủ', sub: 'Đếm giờ hoặc ghi lại' },
   { id: 'diaper', tone: 'diaper', icon: 'diaper', label: 'Tã', sub: 'Ướt hay bẩn' },
   { id: 'more', tone: 'neutral', icon: 'more', label: 'Khác', sub: 'Cảm xúc, dỗ bé' },
 ];
 
-/* second-tap detail options per category */
-const LOG_OPTS: Record<'feed' | 'sleep' | 'diaper', { title: string; q: string; opts: string[] }> = {
-  feed: { title: 'Cữ ăn', q: 'Bé ăn bao nhiêu?', opts: ['60 ml', '80 ml', '100 ml', '120 ml', 'Bú mẹ'] },
-  sleep: { title: 'Giấc ngủ', q: 'Bé ngủ từ khi nào?', opts: ['Bắt đầu bây giờ', '15 phút trước', '30 phút trước', '1 giờ trước', 'Vừa thức dậy'] },
-  diaper: { title: 'Tã', q: 'Tã của bé thế nào?', opts: ['Ướt', 'Bẩn', 'Cả hai'] },
+/* Second-tap options. `timer` options open a timer screen instead of saving. */
+type Opt = { label: string; timer?: 'feedtimer' | 'sleeptimer'; mins?: number };
+const LOG_OPTS: Record<'feed' | 'sleep' | 'diaper', { title: string; q: string; opts: Opt[] }> = {
+  feed: { title: 'Cữ ăn', q: 'Cữ ăn', opts: [{ label: '60 ml' }, { label: '80 ml' }, { label: '100 ml' }, { label: '120 ml' }, { label: 'Bú mẹ · đếm giờ ›', timer: 'feedtimer' }, { label: 'Ăn dặm' }] },
+  sleep: { title: 'Giấc ngủ', q: 'Giấc ngủ', opts: [{ label: 'Đếm giờ từ bây giờ ›', timer: 'sleeptimer' }, { label: 'Ngủ 30 phút', mins: 30 }, { label: 'Ngủ 1 giờ', mins: 60 }, { label: 'Ngủ 1 giờ 30', mins: 90 }, { label: 'Ngủ 2 giờ', mins: 120 }] },
+  diaper: { title: 'Tã', q: 'Tã', opts: [{ label: 'Ướt' }, { label: 'Bẩn' }, { label: 'Cả hai' }, { label: 'Khô' }] },
 };
 const MOODS: [Emotion, string][] = [
   ['blissful', 'Vui lắm'],
@@ -34,22 +35,72 @@ const MOODS: [Emotion, string][] = [
   ['fussy', 'Cáu kỉnh'],
   ['crying', 'Khóc nhiều'],
 ];
-const REPEAT: { tone: TileTone; icon: IconName; title: string; sub: string; label: string; val: string }[] = [
-  { tone: 'feed', icon: 'bottle', title: 'Bình sữa · 120 ml', sub: 'Lần trước 08:15', label: 'cữ ăn', val: '120 ml' },
-  { tone: 'diaper', icon: 'diaper', title: 'Tã · Ướt', sub: 'Lần trước 06:10', label: 'tã', val: 'ướt' },
+const REPEAT: { tone: TileTone; icon: IconName; title: string; type: 'feed' | 'diaper'; label: string; val: string }[] = [
+  { tone: 'feed', icon: 'bottle', title: 'Bình sữa · 120 ml', type: 'feed', label: 'Cữ ăn', val: '120 ml' },
+  { tone: 'diaper', icon: 'diaper', title: 'Tã · Ướt', type: 'diaper', label: 'Tã', val: 'Ướt' },
 ];
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const hhmm = (ms: number) => { const d = new Date(ms); return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+
+/** "Lúc nào?" - when it happened. Offset in minutes before now. */
+function WhenPicker({ offset, onChange }: { offset: number; onChange: (m: number) => void }) {
+  const { colors, radii } = useTheme();
+  const [custom, setCustom] = useState(false);
+  const presets: [number, string][] = [[0, 'Vừa xong'], [15, '15 phút trước'], [30, '30 phút trước']];
+  return (
+    <View style={{ gap: 8 }}>
+      <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>Lúc nào?</Txt>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        {presets.map(([m, l]) => (
+          <Chip key={m} active={!custom && offset === m} onPress={() => { setCustom(false); onChange(m); }}>{l}</Chip>
+        ))}
+        <Chip active={custom} onPress={() => { setCustom(true); if (offset < 45) onChange(45); }}>Chọn giờ…</Chip>
+      </View>
+      {custom ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16, paddingVertical: 8, borderRadius: radii.md, backgroundColor: colors.bgSunken }}>
+          <Pressable onPress={() => onChange(offset + 5)} accessibilityLabel="Sớm hơn 5 phút" hitSlop={8} style={{ paddingHorizontal: 12, paddingVertical: 6 }}>
+            <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.textBrand }}>- 5 phút</Txt>
+          </Pressable>
+          <Txt style={{ fontSize: 22, fontWeight: '600', fontVariant: ['tabular-nums'] }}>{hhmm(Date.now() - offset * 60000)}</Txt>
+          <Pressable onPress={() => onChange(Math.max(0, offset - 5))} accessibilityLabel="Muộn hơn 5 phút" hitSlop={8} style={{ paddingHorizontal: 12, paddingVertical: 6 }}>
+            <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.textBrand }}>+ 5 phút</Txt>
+          </Pressable>
+        </View>
+      ) : null}
+    </View>
+  );
+}
 
 export function QuickLogSheet({ open }: { open: boolean }) {
   const { colors, radii } = useTheme();
   const ctx = useApp();
   const [detail, setDetail] = useState<TileId | null>(null);
+  const [offset, setOffset] = useState(0);
   useEffect(() => {
-    if (!open) setDetail(null);
+    if (!open) { setDetail(null); setOffset(0); }
   }, [open]);
 
-  const save = (label: string, val: string) => {
+  const at = () => Date.now() - offset * 60000;
+  const done = (text: string) => {
     ctx.closeSheet();
-    ctx.toast(`Đã ghi ${label} · ${val}. Bạn đang làm rất tốt ❤️`);
+    ctx.toast(`Đã ghi ${text}. Bạn đang làm rất tốt ❤️`);
+  };
+  const pick = (kind: 'feed' | 'sleep' | 'diaper', o: Opt) => {
+    if (o.timer) {
+      ctx.closeSheet();
+      if (o.timer === 'sleeptimer' && !ctx.timer) ctx.setTimer({ kind: 'sleep', startAt: Date.now() });
+      ctx.go(o.timer);
+      return;
+    }
+    if (kind === 'sleep' && o.mins) {
+      const end = at();
+      ctx.addLog({ type: 'sleep', label: 'Giấc ngủ', detail: o.label.replace('Ngủ ', ''), at: end - o.mins * 60000, endAt: end });
+      done(`giấc ngủ ${o.label.replace('Ngủ ', '').toLowerCase()}`);
+      return;
+    }
+    const label = LOG_OPTS[kind].title;
+    ctx.addLog({ type: kind, label, detail: o.label, at: at() });
+    done(`${label.toLowerCase()} · ${o.label.toLowerCase()}`);
   };
   const OD = detail && detail !== 'more' ? LOG_OPTS[detail] : undefined;
 
@@ -57,9 +108,9 @@ export function QuickLogSheet({ open }: { open: boolean }) {
     <Sheet
       open={open}
       onClose={ctx.closeSheet}
-      height="74%"
+      height="78%"
       title={detail ? (OD ? OD.q : 'Ghi thêm') : 'Ghi cho bé'}
-      sub={detail ? 'Chọn một ô là xong.' : 'Chọn một mục, rồi chọn chi tiết. Hai chạm là xong.'}
+      sub={detail ? 'Chọn lúc nào và chọn một ô là xong.' : 'Chọn một mục, rồi chọn chi tiết. Hai chạm là xong.'}
     >
       {!detail ? (
         <View style={{ gap: 16 }}>
@@ -97,37 +148,42 @@ export function QuickLogSheet({ open }: { open: boolean }) {
               <IconTile tone={r.tone} icon={r.icon} />
               <View style={{ flex: 1 }}>
                 <Txt style={{ fontSize: 15, fontWeight: '600' }}>{r.title}</Txt>
-                <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>{r.sub}</Txt>
+                <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>Ghi lại đúng như vậy, lúc này</Txt>
               </View>
-              <ButtonTonal onPress={() => save(r.label, r.val)}>Ghi</ButtonTonal>
+              <ButtonTonal onPress={() => { ctx.addLog({ type: r.type, label: r.label, detail: r.val, at: Date.now() }); done(`${r.label.toLowerCase()} · ${r.val.toLowerCase()}`); }}>Ghi</ButtonTonal>
             </View>
           ))}
         </View>
       ) : null}
 
-      {OD ? (
-        <View style={{ gap: 12 }}>
+      {OD && detail ? (
+        <View style={{ gap: 14 }}>
+          <WhenPicker offset={offset} onChange={setOffset} />
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
             {OD.opts.map((o) => (
               <Pressable
-                key={o}
-                onPress={() => save(OD.title.toLowerCase(), o)}
+                key={o.label}
+                onPress={() => pick(detail as 'feed' | 'sleep' | 'diaper', o)}
                 style={({ pressed }) => ({
                   flexBasis: '46%',
                   flexGrow: 1,
                   minHeight: 60,
                   alignItems: 'center',
                   justifyContent: 'center',
+                  paddingHorizontal: 8,
                   borderRadius: radii.lg,
-                  backgroundColor: pressed ? colors.accentSoftBg : colors.bgSunken,
+                  backgroundColor: pressed ? colors.accentSoftBg : o.timer ? colors.bgAccentSoft : colors.bgSunken,
                   borderWidth: pressed ? 1.5 : 0,
                   borderColor: colors.accentPrimary,
                 })}
               >
-                <Txt style={{ fontSize: 17, fontWeight: '600', color: colors.textPrimary }}>{o}</Txt>
+                <Txt style={{ fontSize: 16, fontWeight: '600', color: o.timer ? colors.textBrand : colors.textPrimary, textAlign: 'center' }}>{o.label}</Txt>
               </Pressable>
             ))}
           </View>
+          {detail === 'sleep' ? (
+            <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>"Lúc nào" là giờ bé thức dậy. Muby tự tính giờ bắt đầu.</Txt>
+          ) : null}
           <ButtonText onPress={() => setDetail(null)} style={{ alignSelf: 'center', marginTop: 4 }}>← Quay lại</ButtonText>
         </View>
       ) : null}
@@ -139,7 +195,7 @@ export function QuickLogSheet({ open }: { open: boolean }) {
             {MOODS.map(([emo, label]) => (
               <Pressable
                 key={emo}
-                onPress={() => save('cảm xúc', label.toLowerCase())}
+                onPress={() => { ctx.addLog({ type: 'mood', label: 'Cảm xúc', detail: label, at: Date.now() }); done(`cảm xúc · ${label.toLowerCase()}`); }}
                 style={({ pressed }) => ({
                   flex: 1,
                   alignItems: 'center',

@@ -30,4 +30,4 @@ export { DateField, maskDateInput } from './DateField';
 export { EmptyState } from './EmptyState';
 export { Toast } from './Toast';
 export { Sheet } from './Sheet';
-export { BottomNav, AppBar, LargeTitle, SubTabs, NAV_CLEARANCE } from './nav';
+export { BottomNav, AppBar, AvatarButton, LargeTitle, SubTabs, NAV_CLEARANCE } from './nav';

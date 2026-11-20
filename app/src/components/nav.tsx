@@ -6,13 +6,15 @@ import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
 import { Ic, IconName } from './Icon';
 import type { Tab } from '../navigation/AppContext';
+import { BongFace } from '../mascot/Bong';
 
-/* ---------- Bottom Nav - Peachy: floating white pill with 4 tabs + coral FAB on the right ---------- */
+/* ---------- Bottom Nav v2 (MVP v2.1) - white pill: Hôm nay · Leap · [+] · Lớn khôn · Cộng đồng ----------
+   Mama is no longer a tab: it opens from the avatar at the top of each tab. */
 const TABS: { id: Tab; icon: IconName; label: string }[] = [
   { id: 'today', icon: 'home', label: 'Hôm nay' },
   { id: 'leap', icon: 'leap', label: 'Leap' },
   { id: 'growth', icon: 'growth', label: 'Lớn khôn' },
-  { id: 'me', icon: 'me', label: 'Mama' },
+  { id: 'community', icon: 'users', label: 'Cộng đồng' },
 ];
 
 /** Height the floating nav needs at the bottom of scrollable tab content. */
@@ -32,6 +34,34 @@ export function BottomNav({
   const fadeTop = colors.bgCanvas + '00';
   const fadeBottom = colors.bgCanvas + 'E6';
 
+  const tab = (it: (typeof TABS)[number]) => {
+    const on = active === it.id;
+    return (
+      <Pressable
+        key={it.id}
+        onPress={() => onNav(it.id)}
+        accessibilityRole="tab"
+        accessibilityLabel={it.label}
+        accessibilityState={{ selected: on }}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          height: 52,
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 2,
+          borderRadius: 999,
+          backgroundColor: on ? colors.bgSunken : 'transparent',
+        }}
+      >
+        <Ic name={it.icon} size={24} sw={on ? 2 : 1.6} color={on ? colors.accentPrimary : colors.textPrimary} />
+        <Txt numberOfLines={1} style={{ fontSize: 11, fontWeight: on ? '600' : '500', color: on ? colors.textBrand : colors.textPrimary }}>
+          {it.label}
+        </Txt>
+      </Pressable>
+    );
+  };
+
   return (
     <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
       <LinearGradient
@@ -39,81 +69,53 @@ export function BottomNav({
         colors={[fadeTop, fadeBottom]}
         style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
       />
-      <View
-        pointerEvents="box-none"
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 12,
-          paddingTop: 24,
-          paddingHorizontal: 20,
-          paddingBottom: Math.max(insets.bottom, 12) + 6,
-        }}
-      >
+      <View pointerEvents="box-none" style={{ paddingTop: 24, paddingHorizontal: 16, paddingBottom: Math.max(insets.bottom, 12) + 6 }}>
         <View
           style={[
-            {
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 2,
-              padding: 6,
-              backgroundColor: colors.bgElevated,
-              borderRadius: 999,
-            },
+            { flexDirection: 'row', alignItems: 'center', gap: 2, padding: 6, backgroundColor: colors.bgElevated, borderRadius: 999 },
             shadows[3],
           ]}
         >
-          {TABS.map((it) => {
-            const on = active === it.id;
-            return (
-              <Pressable
-                key={it.id}
-                onPress={() => onNav(it.id)}
-                accessibilityLabel={it.label}
-                accessibilityState={{ selected: on }}
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  height: 52,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 2,
-                  borderRadius: 999,
-                  backgroundColor: on ? colors.bgSunken : 'transparent',
-                }}
-              >
-                <Ic name={it.icon} size={24} sw={on ? 2 : 1.6} color={on ? colors.accentPrimary : colors.textPrimary} />
-                <Txt
-                  numberOfLines={1}
-                  style={{ fontSize: 11, fontWeight: on ? '600' : '500', color: on ? colors.textBrand : colors.textPrimary }}
-                >
-                  {it.label}
-                </Txt>
-              </Pressable>
-            );
-          })}
+          {tab(TABS[0])}
+          {tab(TABS[1])}
+          <Pressable
+            onPress={onFab}
+            accessibilityLabel="Ghi nhanh"
+            style={({ pressed }) => [
+              {
+                width: 52,
+                height: 52,
+                marginHorizontal: 4,
+                borderRadius: 26,
+                backgroundColor: pressed ? colors.accentHover : colors.accentPrimary,
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+              shadows.fab,
+            ]}
+          >
+            <Ic name="plus" size={26} sw={2.2} color="#fff" />
+          </Pressable>
+          {tab(TABS[2])}
+          {tab(TABS[3])}
         </View>
-        {/* FAB - Ghi nhanh */}
-        <Pressable
-          onPress={onFab}
-          accessibilityLabel="Ghi nhanh"
-          style={({ pressed }) => [
-            {
-              width: 56,
-              height: 56,
-              borderRadius: 28,
-              backgroundColor: pressed ? colors.accentHover : colors.accentPrimary,
-              alignItems: 'center',
-              justifyContent: 'center',
-            },
-            shadows.fab,
-          ]}
-        >
-          <Ic name="plus" size={26} sw={2.2} color="#fff" />
-        </Pressable>
       </View>
     </View>
+  );
+}
+
+/** Avatar at the top-right of each tab; opens the Mama page. */
+export function AvatarButton({ onPress }: { onPress: () => void }) {
+  const { colors, shadows } = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityLabel="Trang của mama"
+      hitSlop={6}
+      style={[{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.bgElevated, alignItems: 'center', justifyContent: 'center' }, shadows[2]]}
+    >
+      <BongFace emotion="happy" size={32} />
+    </Pressable>
   );
 }
 

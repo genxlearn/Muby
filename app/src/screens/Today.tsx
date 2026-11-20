@@ -33,7 +33,9 @@ import { useApp } from '../navigation/AppContext';
 import { useBaby } from '../state/BabyContext';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
-import { BabyAvatar, EasyEducationCard, ForecastStrip, SymptomSheet } from './shared';
+import { BabyAvatar, ForecastStrip } from './shared';
+import { ActiveTimerPill, StatusStrip } from './care';
+import { ago, clock } from '../state/care';
 
 let _todayLoaded = false;
 
@@ -60,7 +62,7 @@ function TodayHeader() {
   return (
     <View style={{ paddingHorizontal: 20, paddingTop: 8, gap: 8 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Pressable onPress={() => ctx.setTab('me')} accessibilityLabel="Trang của mama">
+        <Pressable onPress={() => ctx.go('me')} accessibilityLabel="Trang của mama">
           <BabyAvatar size={44} />
         </Pressable>
         <Txt style={{ flex: 1, fontSize: 13, fontWeight: '500', color: colors.textSecondary }}>{greeting()}</Txt>
@@ -113,7 +115,7 @@ function LeapProgress({ day, total }: { day: number; total: number }) {
 }
 
 /* ---- Sunny: "Hôm nay của bé" - rotating daily card (fact / game / photo) ---- */
-function TodayOfBabyCard() {
+export function TodayOfBabyCard() {
   const { colors } = useTheme();
   const ctx = useApp();
   const { state } = useBaby();
@@ -138,7 +140,7 @@ function TodayOfBabyCard() {
 const BLOOM_CARD_W = 256;
 const CARD_GAP = 12;
 
-function BloomSection() {
+export function BloomSection() {
   const { colors, radii, shadows } = useTheme();
   const ctx = useApp();
   const { state } = useBaby();
@@ -185,7 +187,7 @@ function BloomSection() {
 }
 
 /* ---- "Chuẩn bị cho Leap {n+1}" - pre-leap prep card ---- */
-function PrepCard() {
+export function PrepCard() {
   const { colors, radii } = useTheme();
   const ctx = useApp();
   const { state } = useBaby();
@@ -212,7 +214,7 @@ function PrepCard() {
 }
 
 /* ---- Post-leap premium moment (one-time, dismissible, never at intensity ≥ 4) ---- */
-function PostLeapCard({ onDismiss }: { onDismiss: () => void }) {
+export function PostLeapCard({ onDismiss }: { onDismiss: () => void }) {
   const { colors } = useTheme();
   const ctx = useApp();
   const { state, displayName } = useBaby();
@@ -326,6 +328,13 @@ export function TodayScreen() {
     );
   }
 
+  const sp = CURRENT_LEAP.sunnyPlay[0];
+  const todoItem: { emoji: string; title: string; why?: string; what: string; hasSound?: boolean } | null = sunny
+    ? sp ? { emoji: '🌼', title: sp.title, what: sp.desc } : null
+    : CURRENT_LEAP.actions[0] ?? null;
+  const recent = ctx.logs.length
+    ? ctx.logs.slice(0, 2).map((l) => ({ type: l.type, label: l.label, detail: l.detail, time: clock(l.at), ago: ago(l.endAt ?? l.at) }))
+    : D.RECENT_LOGS.slice(0, 2);
   const insightEyebrow = sunny
     ? 'Bống nhận thấy · tuần nắng'
     : inLeap
@@ -339,6 +348,12 @@ export function TodayScreen() {
         <ScreenGlow />
         <TodayHeader />
         <View style={{ paddingTop: 20, paddingHorizontal: 20, gap: 28 }}>
+          {/* ===== LIVE STATUS + RUNNING TIMER (MVP v2.1) ===== */}
+          <View style={{ gap: 10 }}>
+            <StatusStrip />
+            <ActiveTimerPill />
+          </View>
+
           {/* ===== HERO - white card: leap status + progress + 7 days ===== */}
           <HeroCard>
             <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -431,19 +446,6 @@ export function TodayScreen() {
             </Card>
           ) : null}
 
-          {sunny && !postLeapDismissed ? <PostLeapCard onDismiss={() => setPostLeapDismissed(true)} /> : null}
-          {sunny && S.prep && S.daysToNext != null && S.daysToNext <= 5 ? <PrepCard /> : null}
-
-          {/* ===== BỐNG NHẬN THẤY ===== */}
-          {st.status !== 'after-all' ? (
-            <View>
-              <SectionHeader title="Bống nhận thấy" link="Chi tiết" onLink={() => ctx.go('leapdetail')} />
-              <InsightCard eyebrow={insightEyebrow} meta="Theo nghiên cứu Wonder Weeks">{insightBody}</InsightCard>
-            </View>
-          ) : null}
-
-          {sunny ? <TodayOfBabyCard /> : null}
-
           {/* ===== HÔM NAY ĐẾN GIỜ - stat tiles ===== */}
           <View>
             <SectionHeader title="Hôm nay đến giờ" link="Xem tất cả" onLink={() => ctx.setTab('growth')} />
@@ -455,64 +457,32 @@ export function TodayScreen() {
             </ScrollView>
           </View>
 
-          {/* ===== SYMPTOMS (stormy) ===== */}
-          {!sunny && st.status !== 'after-all' && CURRENT_LEAP.symptoms.length > 0 ? (
+          {/* ===== VIỆC NÊN LÀM HÔM NAY - one card, the rest lives in Leap ===== */}
+          {st.status !== 'after-all' && todoItem ? (
             <View>
-              <SectionHeader
-                title={inLeap ? 'Biểu hiện thường thấy' : `Có thể gặp ở Leap ${CURRENT_LEAP.n}`}
-                link="Cách giúp bé"
-                onLink={() => ctx.go('leapdetail')}
-              />
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                {CURRENT_LEAP.symptoms.map((sym, i) => (
-                  <Chip key={i} onPress={() => setSymptomPick(sym)}>{sym}</Chip>
-                ))}
+              <SectionHeader title="Việc nên làm hôm nay" link="Thêm ở Leap" onLink={() => ctx.setTab('leap')} />
+              <View style={[{ padding: 20, gap: 12, borderRadius: radii.lg, backgroundColor: colors.bgElevated }, shadows[2]]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                  <IconTile tone={sunny ? 'growth' : 'brand'} emoji={todoItem.emoji} />
+                  <Txt style={{ flex: 1, fontSize: 17, fontWeight: '600', lineHeight: 22 }}>{todoItem.title}</Txt>
+                </View>
+                {todoItem.why ? <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 20 }}>Vì sao? {todoItem.why}</Txt> : null}
+                <View style={{ paddingVertical: 12, paddingHorizontal: 14, borderRadius: radii.md, backgroundColor: colors.bgAccentSoft }}>
+                  <Txt style={{ fontSize: 13, color: colors.textPrimary, lineHeight: 18 }}>
+                    <Txt style={{ fontWeight: '600' }}>Nên làm: </Txt>
+                    {todoItem.what}
+                  </Txt>
+                </View>
+                {todoItem.hasSound ? <ButtonTonal onPress={() => ctx.openSheet('soothing')}>🎵  Bật tiếng ồn trắng</ButtonTonal> : null}
               </View>
             </View>
           ) : null}
-
-          {/* ===== ACTIONS (stormy) - "Giúp bé ở Leap N" ===== */}
-          {!sunny && st.status !== 'after-all' && CURRENT_LEAP.actions.length > 0 ? (
-            <View>
-              <SectionHeader title={inLeap ? `Giúp bé ở Leap ${CURRENT_LEAP.n}` : `Chuẩn bị cho Leap ${CURRENT_LEAP.n}`} link="Tất cả" onLink={() => ctx.go('leapdetail')} />
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                snapToInterval={300 + CARD_GAP}
-                snapToAlignment="start"
-                decelerationRate="fast"
-                style={{ marginHorizontal: -20 }}
-                contentContainerStyle={{ gap: CARD_GAP, paddingHorizontal: 20, paddingBottom: 12, paddingTop: 2 }}
-              >
-                {CURRENT_LEAP.actions.slice(0, 3).map((a, i) => (
-                  <View key={i} style={[{ width: 300, padding: 20, gap: 12, borderRadius: radii.lg, backgroundColor: colors.bgElevated }, shadows[2]]}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                      <IconTile tone="brand" emoji={a.emoji} />
-                      <Txt style={{ flex: 1, fontSize: 17, fontWeight: '600', lineHeight: 22 }}>{a.title}</Txt>
-                    </View>
-                    <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 20 }}>Vì sao? {a.why}</Txt>
-                    <View style={{ marginTop: 'auto', paddingVertical: 12, paddingHorizontal: 14, borderRadius: radii.md, backgroundColor: colors.bgAccentSoft }}>
-                      <Txt style={{ fontSize: 13, color: colors.textPrimary, lineHeight: 18 }}>
-                        <Txt style={{ fontWeight: '600' }}>Nên làm: </Txt>
-                        {a.what}
-                      </Txt>
-                    </View>
-                    {a.hasSound ? <ButtonTonal onPress={() => ctx.openSheet('soothing')}>🎵  Bật tiếng ồn trắng</ButtonTonal> : null}
-                  </View>
-                ))}
-              </ScrollView>
-            </View>
-          ) : null}
-
-          {sunny ? <BloomSection /> : null}
-
-          <EasyEducationCard />
 
           {/* ===== VỪA GHI ===== */}
           <View>
             <SectionHeader title="Vừa ghi" link="Xem tất cả" onLink={() => ctx.go('history')} />
             <View style={{ gap: 12 }}>
-              {D.RECENT_LOGS.slice(0, 3).map((l, i) => {
+              {recent.map((l, i) => {
                 const [tone, icon] = LOG_TONE[l.type] || ['neutral', 'more'];
                 return (
                   <Card key={i} pad={16}>
@@ -530,14 +500,8 @@ export function TodayScreen() {
             </View>
           </View>
 
-          <Banner icon="🍼" tone="sunken">
-            <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>
-              Khoảng <Txt style={{ color: colors.textPrimary, fontWeight: '600' }}>11:30</Txt> bé có thể đói. Mình sẽ nhắc nhẹ nhé.
-            </Txt>
-          </Banner>
         </View>
       </ScrollView>
-      <SymptomSheet symptom={symptomPick} leap={CURRENT_LEAP} open={!!symptomPick} onClose={() => setSymptomPick(null)} />
     </View>
   );
 }
