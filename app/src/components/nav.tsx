@@ -8,7 +8,7 @@ import { Ic, IconName } from './Icon';
 import type { Tab } from '../navigation/AppContext';
 import { BongFace } from '../mascot/Bong';
 
-/* ---------- Bottom Nav v2 (MVP v2.1) - white pill: Hôm nay · Leap · [+] · Lớn khôn · Cộng đồng ----------
+/* ---------- Bottom Nav v2 (MVP v2.1) - white pill with 4 tabs + coral FAB outside on the right ----------
    Mama is no longer a tab: it opens from the avatar at the top of each tab. */
 const TABS: { id: Tab; icon: IconName; label: string }[] = [
   { id: 'today', icon: 'home', label: 'Hôm nay' },
@@ -69,36 +69,36 @@ export function BottomNav({
         colors={[fadeTop, fadeBottom]}
         style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
       />
-      <View pointerEvents="box-none" style={{ paddingTop: 24, paddingHorizontal: 16, paddingBottom: Math.max(insets.bottom, 12) + 6 }}>
+      <View
+        pointerEvents="box-none"
+        style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 24, paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 12) + 6 }}
+      >
         <View
           style={[
-            { flexDirection: 'row', alignItems: 'center', gap: 2, padding: 6, backgroundColor: colors.bgElevated, borderRadius: 999 },
+            { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2, padding: 6, backgroundColor: colors.bgElevated, borderRadius: 999 },
             shadows[3],
           ]}
         >
-          {tab(TABS[0])}
-          {tab(TABS[1])}
-          <Pressable
-            onPress={onFab}
-            accessibilityLabel="Ghi nhanh"
-            style={({ pressed }) => [
-              {
-                width: 52,
-                height: 52,
-                marginHorizontal: 4,
-                borderRadius: 26,
-                backgroundColor: pressed ? colors.accentHover : colors.accentPrimary,
-                alignItems: 'center',
-                justifyContent: 'center',
-              },
-              shadows.fab,
-            ]}
-          >
-            <Ic name="plus" size={26} sw={2.2} color="#fff" />
-          </Pressable>
-          {tab(TABS[2])}
-          {tab(TABS[3])}
+          {TABS.map(tab)}
         </View>
+        {/* FAB - Ghi nhanh, outside the pill on the right */}
+        <Pressable
+          onPress={onFab}
+          accessibilityLabel="Ghi nhanh"
+          style={({ pressed }) => [
+            {
+              width: 56,
+              height: 56,
+              borderRadius: 28,
+              backgroundColor: pressed ? colors.accentHover : colors.accentPrimary,
+              alignItems: 'center',
+              justifyContent: 'center',
+            },
+            shadows.fab,
+          ]}
+        >
+          <Ic name="plus" size={26} sw={2.2} color="#fff" />
+        </Pressable>
       </View>
     </View>
   );

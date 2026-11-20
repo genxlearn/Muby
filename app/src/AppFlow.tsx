@@ -1,6 +1,6 @@
 /* ============================================================
    APP FLOW - router (Muby v3).
-   Tabs: today · leap · [Ghi nhanh] · growth · community (MVP v2.1).
+   Tabs: today · leap · growth · community, Ghi nhanh FAB on the right (MVP v2.1).
    Mama opens as a stack screen from the avatar on each tab.
    ============================================================ */
 import React from 'react';
