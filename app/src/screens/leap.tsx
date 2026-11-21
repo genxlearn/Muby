@@ -514,7 +514,7 @@ function SkillsChecklist({ leapN }: { leapN: number }) {
               key={key}
               onPress={() => {
                 ctx.toggleMilestone(key);
-                if (!at) ctx.toast('Đã lưu khoảnh khắc của bé 💛');
+                if (!at) ctx.toast('Đã ghi nhận kỹ năng mới của bé 💛');
               }}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: !!at }}

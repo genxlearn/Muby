@@ -168,7 +168,7 @@ export function BloomSection() {
                 disabled={!!saved[i]}
                 onPress={() => {
                   setSaved((x) => ({ ...x, [i]: true }));
-                  ctx.toast(`Đã lưu khoảnh khắc đầu tiên con ${b.skill} 🎉`);
+                  ctx.toast(`Đã ghi nhận: con ${b.skill} 🎉`);
                 }}
               >
                 {saved[i] ? '✓ Đã lưu vào Nhật ký' : '🎉 Con làm được rồi!'}

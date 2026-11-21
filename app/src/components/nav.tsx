@@ -8,7 +8,8 @@ import { Ic, IconName } from './Icon';
 import type { Tab } from '../navigation/AppContext';
 import { BongFace } from '../mascot/Bong';
 
-/* ---------- Bottom Nav v2 (MVP v2.1) - white pill with 4 tabs + coral FAB outside on the right ----------
+/* ---------- Bottom Nav v2 (MVP v2.1) - white pill with 4 tabs + coral FAB outside on the right.
+   Inactive tabs show the icon only; the active tab adds its label. ----------
    Mama is no longer a tab: it opens from the avatar at the top of each tab. */
 const TABS: { id: Tab; icon: IconName; label: string }[] = [
   { id: 'today', icon: 'home', label: 'Hôm nay' },
@@ -55,9 +56,11 @@ export function BottomNav({
         }}
       >
         <Ic name={it.icon} size={24} sw={on ? 2 : 1.6} color={on ? colors.accentPrimary : colors.textPrimary} />
-        <Txt numberOfLines={1} style={{ fontSize: 11, fontWeight: on ? '600' : '500', color: on ? colors.textBrand : colors.textPrimary }}>
-          {it.label}
-        </Txt>
+        {on ? (
+          <Txt numberOfLines={1} style={{ fontSize: 11, fontWeight: '600', color: colors.textBrand }}>
+            {it.label}
+          </Txt>
+        ) : null}
       </Pressable>
     );
   };

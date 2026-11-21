@@ -419,7 +419,7 @@ export function MeScreen() {
     <Sheet open={sheet === 'terms'} onClose={() => setSheet(null)} height="62%" title="Điều khoản & Quyền riêng tư">
       <View style={{ gap: 12, paddingTop: 4 }}>
         <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
-          <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Dữ liệu của bé là của bạn.</Txt> Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, khoảnh khắc, ảnh) thuộc về bạn mãi mãi - kể cả khi không dùng Premium.
+          <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Dữ liệu của bé là của bạn.</Txt> Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, kỹ năng của bé) thuộc về bạn mãi mãi - kể cả khi không dùng Premium.
         </Txt>
         <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
           <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Không bán dữ liệu.</Txt> Chúng mình không chia sẻ thông tin của bạn và bé cho bên thứ ba.

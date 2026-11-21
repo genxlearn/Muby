@@ -408,10 +408,6 @@ export function MeasureScreen() {
           <Input label="Vòng đầu (cm) · không bắt buộc" type="tel" value={hd} onChange={setHd} placeholder="40.2" />
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <Pressable style={dashedBtn}>
-              <Ic name="camera" size={22} color={colors.textMuted} />
-              <Txt style={{ fontSize: 12.5, fontWeight: '600', color: colors.textMuted }}>Thêm ảnh</Txt>
-            </Pressable>
-            <Pressable style={dashedBtn}>
               <Txt style={{ fontSize: 18, color: colors.textMuted }}>✎</Txt>
               <Txt style={{ fontSize: 12.5, fontWeight: '600', color: colors.textMuted }}>Ghi chú</Txt>
             </Pressable>

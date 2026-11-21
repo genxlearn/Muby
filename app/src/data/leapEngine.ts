@@ -248,7 +248,7 @@ export function computeBabyState(dobIso: string, dueDateIso?: string | null, now
   const dw = now.getDay(); // 0 = CN
   const daily: DailyCard =
     dw === 0
-      ? { kind: 'photo', label: '📸 Khoảnh khắc tuần này', text: 'Tuần này nhiều bé bắt đầu cười thành tiếng. Nếu bé cười, quay lại 10 giây thôi - sau này xem lại sẽ tan chảy đó.', action: 'Lưu khoảnh khắc' }
+      ? { kind: 'photo', label: '📸 Khoảnh khắc tuần này', text: 'Tuần này nhiều bé bắt đầu cười thành tiếng. Nếu bé cười, mama quay lại 10 giây bằng camera điện thoại nhé.', action: null }
       : dw % 2 === 1
         ? { kind: 'fact', label: '✨ Điều kỳ diệu hôm nay', text: magicText, action: null }
         : { kind: 'game', label: '🎲 Trò 5 phút', text: game ? `Bé vừa học ${game.skill}. Thử: ${game.game}` : `Chơi ú òa với khăn - con đang luyện kỹ năng ${refLeap.skill}.`, action: null };

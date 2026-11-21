@@ -202,7 +202,7 @@ const VN_DOW = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 export const LOG_HISTORY: LogGroup[] = [
   {
     date: 'Hôm nay · ' + VN_DOW[new Date().getDay()], items: [
-      { type: 'milestone', icon: '🎉', label: 'Khoảnh khắc · Lần đầu với tay chính xác', time: '09:05' },
+      { type: 'milestone', icon: '🎉', label: 'Kỹ năng mới · Lần đầu với tay chính xác', time: '09:05' },
       { type: 'feed', icon: '🍼', label: 'Cữ ăn · 80ml', time: '08:15' },
       { type: 'sleep', icon: '🌙', label: 'Giấc ngủ · 1g 40p', time: '06:20' },
       { type: 'diaper', icon: '💧', label: 'Tã · Ướt', time: '06:10' },
