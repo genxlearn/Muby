@@ -45,8 +45,10 @@ export function BottomNav({
         accessibilityLabel={it.label}
         accessibilityState={{ selected: on }}
         style={{
-          flex: 1,
+          // Active tab is wider so its label fits ("Lớn khôn", "Cộng đồng").
+          flex: on ? 2 : 1,
           minWidth: 0,
+          paddingHorizontal: on ? 10 : 0,
           height: 52,
           alignItems: 'center',
           justifyContent: 'center',
