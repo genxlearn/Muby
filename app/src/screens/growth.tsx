@@ -572,7 +572,7 @@ export function LibraryScreen() {
             {art.locked ? (
               <Card pad={20} style={{ backgroundColor: colors.aiSubtle, borderWidth: 1, borderColor: colors.aiTonal }}>
                 <Txt style={{ fontSize: 14, lineHeight: 22, color: colors.textPrimary, marginBottom: 12 }}>
-                  Đọc đầy đủ bài này và toàn bộ thư viện - Muby Premium 199.000đ trọn đời 💛
+                  Đọc đầy đủ bài này và toàn bộ thư viện - Muby Premium 79.000đ trọn đời 💛
                 </Txt>
                 <View style={{ flexDirection: 'row', gap: 10 }}>
                   <ButtonPrimary

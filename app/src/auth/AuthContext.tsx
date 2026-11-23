@@ -10,6 +10,21 @@ import React, { createContext, useContext, useEffect, useMemo, useRef, useState 
 import { AuthBackend, createAuthBackend, normalizePhone, Session } from './backend';
 
 const faceIdKey = (phone: string) => `bww.faceid.v1.${phone}`;
+export const GUEST = 'guest';
+
+/** Copy everything saved while trying the app (keys ending in ".guest") to the new account. */
+async function migrateGuestData(phone: string) {
+  try {
+    const keys = (await AsyncStorage.getAllKeys()).filter((k) => k.endsWith(`.${GUEST}`));
+    for (const k of keys) {
+      const target = k.slice(0, -GUEST.length) + phone;
+      if (await AsyncStorage.getItem(target)) continue;
+      const v = await AsyncStorage.getItem(k);
+      if (v != null) await AsyncStorage.setItem(target, v);
+    }
+    if (keys.length) await AsyncStorage.multiRemove(keys);
+  } catch {}
+}
 
 export interface AuthApi {
   ready: boolean;
@@ -19,6 +34,11 @@ export interface AuthApi {
   /** Verify the code - on success the session is set (account created if new). */
   verifyOtp(rawPhone: string, code: string): Promise<boolean>;
   signOut(): Promise<void>;
+  /** Use the app without an account (data stays on this phone). */
+  continueAsGuest(): Promise<void>;
+  /** Delete the account (server + every key stored for it on this phone). */
+  deleteAccount(): Promise<void>;
+  isGuest: boolean;
 
   /** Device has Face ID / Touch ID hardware with biometrics enrolled. */
   faceIdSupported: boolean;
@@ -95,8 +115,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       session,
       sendOtp: (raw) => backend.sendOtp(normalizePhone(raw)),
       verifyOtp: async (raw, code) => {
+        const fromGuest = session?.phone === GUEST;
         const s = await backend.verifyOtp(normalizePhone(raw), code);
         if (!s) return false;
+        if (fromGuest) await migrateGuestData(s.phone);
         let enabled = false;
         try {
           enabled = (await AsyncStorage.getItem(faceIdKey(s.phone))) === '1';
@@ -112,6 +134,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setFaceIdEnabledState(false);
         setLocked(false);
       },
+      continueAsGuest: async () => {
+        const s: Session = { phone: GUEST };
+        await backend.persist(s);
+        setLocked(false);
+        setSession(s);
+      },
+      deleteAccount: async () => {
+        if (!session) return;
+        if (session.phone !== GUEST) await backend.deleteAccount(session);
+        const keys = await AsyncStorage.getAllKeys();
+        const mine = keys.filter((k) => k.endsWith(`.${session.phone}`));
+        if (mine.length) await AsyncStorage.multiRemove(mine);
+        await backend.persist(null);
+        setSession(null);
+        setFaceIdEnabledState(false);
+        setLocked(false);
+      },
+      isGuest: session?.phone === GUEST,
       faceIdSupported,
       faceIdEnabled,
       setFaceIdEnabled: async (on) => {

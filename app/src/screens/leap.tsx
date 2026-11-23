@@ -619,7 +619,7 @@ export function LeapDetailScreen() {
                     Đọc đầy đủ dấu hiệu & cách đồng hành cùng bé qua Leap {CURRENT_LEAP.n}…
                   </Txt>
                   <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginBottom: 16 }}>
-                    Mở khóa trọn đời - 199.000đ 💛
+                    Mở khóa trọn đời - 79.000đ 💛
                   </Txt>
                   <ButtonPrimary onPress={() => ctx.openPaywall('Mở khóa Leap đầy đủ')}>Mở khóa với Premium</ButtonPrimary>
                 </Card>

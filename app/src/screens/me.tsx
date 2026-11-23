@@ -3,7 +3,7 @@
    Ported from project/screens/me.jsx (Muby v3).
    Premium is a reverse trial: 7 days open automatically at signup
    (no card, no auto-charge), then Free; unlock is a one-time
-   199.000đ purchase via ctx.buyPremium().
+   79.000đ store purchase via ctx.purchase() (restore via ctx.restorePurchase()).
    ============================================================ */
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
@@ -172,7 +172,8 @@ export function MeScreen() {
   const auth = useAuth();
   const { baby, displayName, state: st, saveBaby } = useBaby();
   const [reminders, setReminders] = useState(true);
-  const [sheet, setSheet] = useState<null | 'baby' | 'units' | 'terms'>(null);
+  const [sheet, setSheet] = useState<null | 'baby' | 'units' | 'terms' | 'delete'>(null);
+  const [deleting, setDeleting] = useState(false);
   const [units, setUnits] = useState('kg · cm');
   const [babyName, setBabyName] = useState(displayName);
   const [babyDob, setBabyDob] = useState(baby ? formatDobDisplay(baby.dob) : '');
@@ -223,6 +224,27 @@ export function MeScreen() {
   const logout = async () => {
     await auth.signOut();
     ctx.goFlow('auth', { authStep: 'A1' });
+  };
+  const signInFromGuest = () => {
+    // Keep the guest session: verifying the OTP copies the trial data to the new account.
+    ctx.goFlow('auth', { authStep: 'A2' });
+  };
+  const restore = async () => {
+    const r = await ctx.restorePurchase();
+    ctx.toast(r === 'ok' ? 'Đã khôi phục Muby Premium 💛' : r === 'none' ? 'Chưa tìm thấy giao dịch mua Premium trên tài khoản này.' : 'Cửa hàng chưa sẵn sàng. Thử lại sau ít phút nhé.');
+  };
+  const deleteAll = async () => {
+    setDeleting(true);
+    try {
+      await auth.deleteAccount();
+      setSheet(null);
+      ctx.goFlow('auth', { authStep: 'A1' });
+      ctx.toast('Đã xoá tài khoản và toàn bộ dữ liệu.');
+    } catch (e: any) {
+      ctx.toast(e?.message || 'Chưa xoá được. Thử lại nhé.');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -275,7 +297,7 @@ export function MeScreen() {
               <Ic name="crown" size={20} color={colors.leap[3]} />
               <Txt serif style={{ fontSize: 24, color: colors.textInverse }}>Muby Premium</Txt>
             </View>
-            <Txt style={{ fontSize: 13.5, color: colors.textInverse, opacity: 0.7, marginTop: 4 }}>199.000đ · Một lần · Trọn đời</Txt>
+            <Txt style={{ fontSize: 13.5, color: colors.textInverse, opacity: 0.7, marginTop: 4 }}>{ctx.priceLabel} · Một lần · Trọn đời</Txt>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
               {['10 leaps đầy đủ', 'Sunny Play từng bước', '3 âm thanh dỗ bé', 'Đồng bộ gia đình (sắp có)'].map((p) => (
                 <View key={p} style={{ backgroundColor: 'rgba(255,255,255,0.12)', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8 }}>
@@ -287,7 +309,7 @@ export function MeScreen() {
               onPress={() => ctx.openPaywall('Mở khóa Muby Premium')}
               style={{ alignSelf: 'flex-start', marginTop: 16, paddingVertical: 13, paddingHorizontal: 22, minHeight: 48, justifyContent: 'center', borderRadius: 999, backgroundColor: colors.accentPrimary }}
             >
-              <Txt style={{ fontWeight: '600', fontSize: 15, color: '#fff' }}>Mở khóa trọn đời - 199.000đ</Txt>
+              <Txt style={{ fontWeight: '600', fontSize: 15, color: '#fff' }}>{`Mở khóa trọn đời - ${ctx.priceLabel}`}</Txt>
             </Pressable>
             <Txt style={{ fontSize: 12, color: colors.textInverse, opacity: 0.55, marginTop: 12, maxWidth: 235 }}>
               Trả một lần. Không gia hạn. Không trừ tiền tự động.
@@ -351,6 +373,15 @@ export function MeScreen() {
         <SettingRow icon="ruler" tone="growth" label="Đơn vị đo" sub={units} onPress={() => setSheet('units')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
       </SettingsGroup>
 
+      {/* Account */}
+      <SettingsGroup title="Tài khoản">
+        {auth.isGuest ? (
+          <SettingRow first icon="users" tone="brand" label="Đăng nhập bằng số điện thoại" sub="Giữ nhật ký khi đổi máy · dữ liệu dùng thử được chuyển sang" onPress={signInFromGuest} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
+        ) : null}
+        <SettingRow first={!auth.isGuest} icon="crown" tone="growth" label="Khôi phục giao dịch" sub="Đã mua Premium trên máy khác" onPress={restore} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
+        <SettingRow icon="logout" tone="neutral" label="Xoá tài khoản" sub="Xoá vĩnh viễn tài khoản và mọi ghi chép" onPress={() => setSheet('delete')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
+      </SettingsGroup>
+
       {/* About */}
       <SettingsGroup title="Về Muby">
         <SettingRow first icon="heart" tone="brand" label="Đánh giá ứng dụng" onPress={() => ctx.toast('Cảm ơn mama! Chờ chút để mở App Store nhé 💛')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
@@ -359,7 +390,7 @@ export function MeScreen() {
 
       <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
         <Pressable onPress={logout} style={{ padding: 10 }}>
-          <Txt style={{ color: colors.danger, fontWeight: '600', fontSize: 14.5 }}>Đăng xuất</Txt>
+          <Txt style={{ color: colors.danger, fontWeight: '600', fontSize: 14.5 }}>{auth.isGuest ? 'Thoát chế độ dùng thử' : 'Đăng xuất'}</Txt>
         </Pressable>
       </View>
       <Pressable onPress={() => ctx.go('designsystem')} style={{ alignSelf: 'center', padding: 6 }}>
@@ -384,6 +415,19 @@ export function MeScreen() {
         />
         <DueDateField value={babyDue} onChange={setBabyDue} error={dueErr} anchorDob={dobOk} />
         <ButtonPrimary disabled={!dobOk || (babyDue.trim().length > 0 && !dueIso) || dueFar} onPress={saveBabySheet}>Lưu thay đổi</ButtonPrimary>
+      </View>
+    </Sheet>
+
+    <Sheet open={sheet === 'delete'} onClose={() => setSheet(null)} height="52%" title="Xoá tài khoản?">
+      <View style={{ gap: 14, paddingTop: 4 }}>
+        <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22 }}>
+          Muby sẽ xoá vĩnh viễn tài khoản, hồ sơ bé và mọi ghi chép (cữ ăn, giấc ngủ, đo lường, kỹ năng). Không khôi phục lại được.
+        </Txt>
+        <Txt style={{ fontSize: 13, color: colors.textMuted, lineHeight: 19 }}>
+          Giao dịch Premium thuộc tài khoản App Store / Google Play của bạn, có thể khôi phục lại sau.
+        </Txt>
+        <ButtonPrimary disabled={deleting} onPress={deleteAll}>{deleting ? 'Đang xoá…' : 'Xoá vĩnh viễn'}</ButtonPrimary>
+        <ButtonText onPress={() => setSheet(null)} style={{ alignSelf: 'center' }}>Giữ lại</ButtonText>
       </View>
     </Sheet>
 
@@ -428,7 +472,7 @@ export function MeScreen() {
           <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Nội dung tham khảo.</Txt> Dự báo leap và gợi ý EASY mang tính tham khảo, không thay thế tư vấn y khoa. Khi lo lắng về sức khoẻ của bé, hãy hỏi bác sĩ nhi.
         </Txt>
         <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
-          <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Muby Premium.</Txt> 7 ngày đầu sau đăng ký, mọi tính năng đều mở - không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 199.000đ, trọn đời, không gia hạn.
+          <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Muby Premium.</Txt> 7 ngày đầu sau đăng ký, mọi tính năng đều mở - không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 79.000đ, trọn đời, không gia hạn.
         </Txt>
       </View>
     </Sheet>
@@ -437,7 +481,7 @@ export function MeScreen() {
 }
 
 /* ============================================================
-   MUBY PREMIUM PAYWALL (one-time 199k)
+   MUBY PREMIUM PAYWALL (one-time 79.000đ, store in-app purchase)
    ============================================================ */
 const PAYWALL_BENEFITS: [IconName, TileTone, string, string][] = [
   ['book', 'brand', '10 leaps đầy đủ', 'Dấu hiệu, mẹo & cách đồng hành cho từng leap'],
@@ -457,14 +501,27 @@ export function Paywall() {
   }, [ctx.paywall, ctx.intensity]);
   const open = !!ctx.paywall && ctx.intensity < 4;
 
-  const buy = () => {
-    ctx.buyPremium();
-    ctx.closePaywall();
-    ctx.toast('Muby Premium là của bạn mãi mãi 💛');
+  const [busy, setBusy] = useState<null | 'buy' | 'restore'>(null);
+  const buy = async () => {
+    setBusy('buy');
+    const r = await ctx.purchase();
+    setBusy(null);
+    if (r === 'ok') { ctx.closePaywall(); ctx.toast('Muby Premium là của bạn mãi mãi 💛'); }
+    else if (r === 'pending') ctx.toast('Giao dịch đang chờ xác nhận. Premium sẽ mở khi thanh toán xong.');
+    else if (r === 'unavailable') ctx.toast('Cửa hàng chưa sẵn sàng. Thử lại sau ít phút nhé.');
+    else if (r === 'error') ctx.toast('Chưa mua được. Mama thử lại nhé, chưa bị trừ tiền.');
+  };
+  const restore = async () => {
+    setBusy('restore');
+    const r = await ctx.restorePurchase();
+    setBusy(null);
+    if (r === 'ok') { ctx.closePaywall(); ctx.toast('Đã khôi phục Muby Premium 💛'); }
+    else if (r === 'none') ctx.toast('Chưa tìm thấy giao dịch mua Premium trên tài khoản này.');
+    else ctx.toast('Cửa hàng chưa sẵn sàng. Thử lại sau ít phút nhé.');
   };
 
   return (
-    <Sheet open={open} onClose={ctx.closePaywall} height="76%" title="Muby Premium" sub="199.000đ · Một lần · Trọn đời">
+    <Sheet open={open} onClose={ctx.closePaywall} height="80%" title="Muby Premium" sub={`${ctx.priceLabel} · Một lần · Trọn đời`}>
       <View style={{ alignItems: 'center', paddingTop: 4 }}>
         <Bong emotion="excited" onesie="orange" size={124} float />
         <Tag tone="brand" style={{ marginTop: 10 }}>Ưu đãi trọn đời</Tag>
@@ -484,14 +541,15 @@ export function Paywall() {
       </View>
 
       <View style={{ gap: 10, marginTop: 22 }}>
-        <ButtonPrimary onPress={buy}>Mở khóa trọn đời - 199.000đ</ButtonPrimary>
-        <ButtonText onPress={ctx.closePaywall} style={{ alignSelf: 'center' }} textStyle={{ textAlign: 'center' }}>
-          Để sau
-        </ButtonText>
+        <ButtonPrimary disabled={!!busy} onPress={buy}>{busy === 'buy' ? 'Đang mở cửa hàng…' : `Mở khóa trọn đời - ${ctx.priceLabel}`}</ButtonPrimary>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
+          <ButtonText onPress={ctx.closePaywall}>Để sau</ButtonText>
+          <ButtonText onPress={restore}>{busy === 'restore' ? 'Đang khôi phục…' : 'Khôi phục giao dịch'}</ButtonText>
+        </View>
       </View>
 
       <Txt style={{ textAlign: 'center', fontSize: 11.5, color: colors.textMuted, marginTop: 8, paddingBottom: 8, lineHeight: 17 }}>
-        Trả một lần. Không gia hạn. Không trừ tiền tự động. Kỷ niệm của bé luôn miễn phí.
+        Trả một lần qua App Store hoặc Google Play. Không gia hạn, không trừ tiền tự động. Nhật ký của bé luôn miễn phí.
       </Txt>
     </Sheet>
   );

@@ -7,21 +7,40 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.genxlearn.muby",
       "infoPlist": {
-        "NSFaceIDUsageDescription": "Cho phép Muby dùng Face ID để mở khóa ứng dụng."
+        "NSFaceIDUsageDescription": "Cho phép Muby dùng Face ID để mở khóa ứng dụng.",
+        "CFBundleDevelopmentRegion": "vi",
+        "CFBundleLocalizations": [
+          "vi"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "config": {
+        "usesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.genxlearn.muby",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FBC1B8",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "com.android.vending.BILLING"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,7 +51,31 @@
         {
           "faceIDPermission": "Cho phép Muby dùng Face ID để mở khóa ứng dụng."
         }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#FAFAFA",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#141212"
+          }
+        }
+      ],
+      [
+        "expo-iap",
+        {
+          "android": {
+            "store": "play"
+          }
+        }
       ]
-    ]
+    ],
+    "description": "Muby hiểu bé theo từng leap: dự báo những tuần khó chịu theo ngày dự sinh, việc nên làm mỗi ngày, ghi cữ ăn, giấc ngủ, tã chỉ hai chạm.",
+    "primaryColor": "#F2646C",
+    "backgroundColor": "#FAFAFA"
   }
 }

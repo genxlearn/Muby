@@ -6,8 +6,8 @@
      no SMS provider in demo mode. Verifying the code signs you in
      (and creates the account on first use).
    - SupabaseAuthBackend: real SMS OTP via Supabase Auth REST (requires
-     a Supabase project with a phone provider such as Twilio). Fill in
-     src/auth/config.ts and switch mode to 'supabase'.
+     a Supabase project with a phone provider such as Twilio). Turns on
+     when EXPO_PUBLIC_SUPABASE_URL / _ANON_KEY are set (see config.ts).
    ============================================================ */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AUTH_CONFIG } from './config';
@@ -25,6 +25,18 @@ export interface AuthBackend {
   verifyOtp(phone: string, code: string): Promise<Session | null>;
   restore(): Promise<Session | null>;
   persist(session: Session | null): Promise<void>;
+  /** Delete the account on the server (no-op in demo mode). */
+  deleteAccount(session: Session): Promise<void>;
+}
+
+/** Turn Supabase / SMS provider errors into short Vietnamese messages. */
+function friendly(msg: string): string {
+  const m = msg.toLowerCase();
+  if (m.includes('security purposes') || m.includes('rate limit') || m.includes('too many')) return 'Mình vừa gửi mã rồi. Đợi khoảng 1 phút rồi thử lại nhé.';
+  if (m.includes('invalid phone') || m.includes('phone number')) return 'Số điện thoại chưa đúng. Kiểm tra lại giúp mình nhé.';
+  if (m.includes('expired')) return 'Mã đã hết hạn. Bấm "Gửi lại mã" nhé.';
+  if (m.includes('sms') || m.includes('provider')) return 'Chưa gửi được SMS. Thử lại sau ít phút nhé.';
+  return 'Có lỗi xảy ra. Thử lại nhé.';
 }
 
 /** '+84' + digits, from local input like '912 345 678'. */
@@ -81,6 +93,13 @@ class DemoAuthBackend implements AuthBackend {
     if (session) await AsyncStorage.setItem(K_SESSION, JSON.stringify(session));
     else await AsyncStorage.removeItem(K_SESSION);
   }
+
+  async deleteAccount(session: Session): Promise<void> {
+    const raw = await AsyncStorage.getItem(K_USERS);
+    const users: StoredUsers = raw ? JSON.parse(raw) : {};
+    delete users[session.phone];
+    await AsyncStorage.setItem(K_USERS, JSON.stringify(users));
+  }
 }
 
 /* ============================================================
@@ -102,8 +121,8 @@ class SupabaseAuthBackend implements AuthBackend {
     }
     const json = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const msg = (json as any).msg || (json as any).error_description || 'Có lỗi xảy ra. Thử lại nhé.';
-      throw new AuthError('unknown', msg);
+      const msg = (json as any).msg || (json as any).error_description || (json as any).message || '';
+      throw new AuthError('unknown', friendly(String(msg)));
     }
     return json;
   }
@@ -133,6 +152,19 @@ class SupabaseAuthBackend implements AuthBackend {
   async persist(session: Session | null): Promise<void> {
     if (session) await AsyncStorage.setItem(K_SESSION, JSON.stringify(session));
     else await AsyncStorage.removeItem(K_SESSION);
+  }
+
+  /** Calls the `delete-account` Edge Function (see supabase/functions/delete-account). */
+  async deleteAccount(session: Session): Promise<void> {
+    if (!session.accessToken) return;
+    try {
+      await fetch(`${this.base}/functions/v1/delete-account`, {
+        method: 'POST',
+        headers: { apikey: AUTH_CONFIG.supabaseAnonKey, Authorization: `Bearer ${session.accessToken}` },
+      });
+    } catch {
+      throw new AuthError('network', 'Mạng lag chút xíu. Mình thử lại nhé.');
+    }
   }
 }
 

@@ -3,11 +3,12 @@
    Pure immersive flow (no external controls): Auth → Onboarding → App.
    Premium is a reverse trial: 7 days start automatically at signup
    (no card), then the app falls back to Free until the one-time
-   199k unlock. Both are persisted per account.
+   79.000đ unlock (store in-app purchase). Both are persisted per account.
    ============================================================ */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { ThemeMode } from '../theme/tokens';
+import * as IAP from '../purchases/iap';
 
 export type Flow = 'auth' | 'onboard' | 'app';
 export type Tab = 'today' | 'leap' | 'growth' | 'community';
@@ -58,8 +59,14 @@ export interface AppCtx {
   purchased: boolean;
   trial: Trial | null;
 
-  /** One-time 199k unlock - persists for this account. */
+  /** Grant the unlock locally (after a verified store purchase / restore). */
   buyPremium: () => void;
+  /** Store purchase flow; resolves with the outcome. Grants Premium on success. */
+  purchase: () => Promise<IAP.BuyResult>;
+  /** Restore a previous store purchase. */
+  restorePurchase: () => Promise<'ok' | 'none' | 'unavailable'>;
+  /** Localized price from the store, falls back to 79.000đ. */
+  priceLabel: string;
   /** (Re)start the 7-day reverse trial - normally only fired at signup. */
   startTrial: () => void;
   cancelTrial: () => void;
@@ -133,6 +140,7 @@ export function AppProvider({
   const [paywall, setPaywall] = useState<Paywall | null>(null);
   const [care, setCare] = useState<CareRecord>({ logs: [], timer: null, milestones: {} });
   const careLoaded = useRef(false);
+  const [priceLabel, setPriceLabel] = useState(IAP.FALLBACK_PRICE);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastSeq = useRef(0);
 
@@ -177,6 +185,21 @@ export function AppProvider({
     });
   };
 
+  // Store price + silent ownership check (re-grants Premium after reinstall).
+  useEffect(() => {
+    let alive = true;
+    IAP.loadPrice().then((p) => { if (alive && p) setPriceLabel(p); });
+    IAP.ownsPremium().then((owned) => {
+      if (alive && owned) setRec((r) => {
+        if (r.purchased) return r;
+        const next = { ...r, purchased: true };
+        AsyncStorage.setItem(premiumKey(accountKey), JSON.stringify(next)).catch(() => {});
+        return next;
+      });
+    });
+    return () => { alive = false; };
+  }, [accountKey]);
+
   const saveRec = (next: PremiumRecord) => {
     setRec(next);
     AsyncStorage.setItem(premiumKey(accountKey), JSON.stringify(next)).catch(() => {});
@@ -197,6 +220,19 @@ export function AppProvider({
     purchased: rec.purchased,
     trial,
     buyPremium: () => saveRec({ ...rec, purchased: true }),
+    purchase: async () => {
+      const r = await IAP.buyPremium();
+      // Expo Go has no store module: allow a simulated unlock only in development.
+      if (r === 'unavailable' && __DEV__) { saveRec({ ...rec, purchased: true }); return 'ok'; }
+      if (r === 'ok') saveRec({ ...rec, purchased: true });
+      return r;
+    },
+    restorePurchase: async () => {
+      const r = await IAP.restorePremium();
+      if (r === 'ok') saveRec({ ...rec, purchased: true });
+      return r;
+    },
+    priceLabel,
     startTrial: () => saveRec({ ...rec, trialStart: Date.now() }),
     cancelTrial: () => saveRec({ ...rec, trialStart: null }),
     setTheme: setThemeMode,

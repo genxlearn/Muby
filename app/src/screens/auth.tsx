@@ -77,8 +77,14 @@ function AuthScaffold({
 const phoneOkRe = /^\d{9,10}$/;
 
 /* ---- A1 Welcome ---- */
-function A1({ go }: StepProps) {
+function A1({ go, ctx, auth }: StepProps) {
   const { colors } = useTheme();
+  const tryFirst = async () => {
+    await auth.continueAsGuest();
+    const has = await hasBabyFor('guest');
+    if (has) { ctx.goFlow('app'); ctx.setTab('today'); }
+    else ctx.goFlow('onboard', { obStep: 'ob1' });
+  };
   return (
     <AuthScaffold>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, paddingVertical: 20 }}>
@@ -95,7 +101,8 @@ function A1({ go }: StepProps) {
       </View>
       <View style={{ paddingHorizontal: 24, paddingBottom: 48 }}>
         <ButtonPrimary onPress={() => go('A2')}>Bắt đầu với số điện thoại</ButtonPrimary>
-        <Txt style={{ fontSize: 13, color: colors.textSecondary, textAlign: 'center', marginTop: 14 }}>Không cần mật khẩu · Dữ liệu của bé là của bạn</Txt>
+        <ButtonText onPress={tryFirst} style={{ alignSelf: 'center', marginTop: 6 }}>Dùng thử, đăng nhập sau</ButtonText>
+        <Txt style={{ fontSize: 13, color: colors.textSecondary, textAlign: 'center', marginTop: 6 }}>Không cần mật khẩu · Dữ liệu của bé là của bạn</Txt>
       </View>
     </AuthScaffold>
   );
@@ -115,7 +122,7 @@ function TermsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
         <P b="Dữ liệu của bé là của bạn." t="Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, kỹ năng của bé) thuộc về bạn mãi mãi - kể cả khi không dùng Premium." />
         <P b="Không bán dữ liệu." t="Chúng mình không chia sẻ thông tin của bạn và bé cho bên thứ ba." />
         <P b="Nội dung tham khảo." t="Dự báo leap và gợi ý EASY mang tính tham khảo, không thay thế tư vấn y khoa. Khi lo lắng về sức khoẻ của bé, hãy hỏi bác sĩ nhi." />
-        <P b="Muby Premium." t="7 ngày đầu sau đăng ký, mọi tính năng đều mở - không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 199.000đ, trọn đời, không gia hạn." />
+        <P b="Muby Premium." t="7 ngày đầu sau đăng ký, mọi tính năng đều mở - không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 79.000đ, trọn đời, không gia hạn." />
       </View>
     </Sheet>
   );
