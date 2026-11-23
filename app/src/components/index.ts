@@ -31,3 +31,5 @@ export { EmptyState } from './EmptyState';
 export { Toast } from './Toast';
 export { Sheet } from './Sheet';
 export { BottomNav, AppBar, AvatarButton, LargeTitle, SubTabs, NAV_CLEARANCE } from './nav';
+
+export { MOTION, FadeInUp, PressScale, Pulse, PopIn, Rotate, useReducedMotion } from './anim/motion';

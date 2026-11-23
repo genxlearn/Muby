@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { LayoutAnimation, Pressable, View } from 'react-native';
+import { PressScale, useReducedMotion } from './anim/motion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
@@ -35,12 +36,17 @@ export function BottomNav({
   const fadeTop = colors.bgCanvas + '00';
   const fadeBottom = colors.bgCanvas + 'E6';
 
+  const reduce = useReducedMotion();
   const tab = (it: (typeof TABS)[number]) => {
     const on = active === it.id;
     return (
       <Pressable
         key={it.id}
-        onPress={() => onNav(it.id)}
+        onPress={() => {
+          // The active pill widens and its label fades in; others shrink to icons.
+          if (!on && !reduce) LayoutAnimation.configureNext(LayoutAnimation.create(220, 'easeInEaseOut', 'opacity'));
+          onNav(it.id);
+        }}
         accessibilityRole="tab"
         accessibilityLabel={it.label}
         accessibilityState={{ selected: on }}
@@ -87,23 +93,17 @@ export function BottomNav({
           {TABS.map(tab)}
         </View>
         {/* FAB - Ghi nhanh, outside the pill on the right */}
-        <Pressable
+        <PressScale
           onPress={onFab}
           accessibilityLabel="Ghi nhanh"
-          style={({ pressed }) => [
-            {
-              width: 56,
-              height: 56,
-              borderRadius: 28,
-              backgroundColor: pressed ? colors.accentHover : colors.accentPrimary,
-              alignItems: 'center',
-              justifyContent: 'center',
-            },
+          scaleTo={0.9}
+          style={[
+            { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.accentPrimary, alignItems: 'center', justifyContent: 'center' },
             shadows.fab,
           ]}
         >
           <Ic name="plus" size={26} sw={2.2} color="#fff" />
-        </Pressable>
+        </PressScale>
       </View>
     </View>
   );

@@ -5,7 +5,7 @@
    ============================================================ */
 import React from 'react';
 import { View } from 'react-native';
-import { AppBar, BottomNav } from './components';
+import { AppBar, BottomNav, FadeInUp } from './components';
 import { useApp } from './navigation/AppContext';
 import { AuthFlow, OnboardFlow } from './screens/auth';
 import { GrowthScreen, HistoryScreen, LibraryScreen, MeasureScreen } from './screens/growth';
@@ -41,7 +41,11 @@ export function AppFlow() {
       feedtimer: <FeedTimerScreen />,
       sleeptimer: <SleepTimerScreen />,
     };
-    return <View style={{ flex: 1 }}>{stacks[route.stack] ?? <TodayScreen />}</View>;
+    return (
+      <FadeInUp key={route.stack} distance={8} duration={220} style={{ flex: 1 }}>
+        {stacks[route.stack] ?? <TodayScreen />}
+      </FadeInUp>
+    );
   }
 
   const tabs: Record<string, React.ReactNode> = {
@@ -52,7 +56,9 @@ export function AppFlow() {
   };
   return (
     <View style={{ flex: 1 }}>
-      {tabs[route.tab] ?? <TodayScreen />}
+      <FadeInUp key={route.tab} distance={6} duration={200} style={{ flex: 1 }}>
+        {tabs[route.tab] ?? <TodayScreen />}
+      </FadeInUp>
       <BottomNav active={route.tab} onNav={(t) => ctx.setTab(t)} onFab={() => ctx.openSheet('quicklog')} />
     </View>
   );

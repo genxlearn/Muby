@@ -5,7 +5,7 @@
    ============================================================ */
 import React, { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
-import { AppBar, ButtonPrimary, ButtonText, Chip, Ic } from '../components';
+import { AppBar, ButtonPrimary, ButtonText, Chip, FadeInUp, Ic, PressScale, Pulse } from '../components';
 import { BongFace } from '../mascot/Bong';
 import { Side, useApp } from '../navigation/AppContext';
 import { useBaby } from '../state/BabyContext';
@@ -26,12 +26,13 @@ export function StatusStrip() {
     else ctx.openSheet('quicklog');
   };
   return (
-    <Pressable
+    <PressScale
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${s.status}. ${s.detail}`}
-      style={({ pressed }) => [
-        { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radii.lg, backgroundColor: colors.bgElevated, opacity: pressed ? 0.85 : 1 },
+      scaleTo={0.98}
+      style={[
+        { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radii.lg, backgroundColor: colors.bgElevated },
         shadows[2],
       ]}
     >
@@ -43,7 +44,7 @@ export function StatusStrip() {
         <Txt numberOfLines={2} style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2, lineHeight: 18 }}>{s.detail}</Txt>
       </View>
       <Ic name="chevron" size={18} color={colors.textSecondary} />
-    </Pressable>
+    </PressScale>
   );
 }
 
@@ -59,20 +60,23 @@ export function ActiveTimerPill() {
   const time = sleep ? stopwatch(now - t.startAt) : stopwatch(breastTotals(t, now).total);
   const bg = sleep ? colors.activity.sleep.bg : colors.activity.feed.bg;
   const fg = sleep ? colors.activity.sleep.fg : colors.activity.feed.fg;
+  const live = sleep || !!(t.kind === 'breast' && t.segStart);
   return (
+    <FadeInUp distance={6} duration={220}>
     <Pressable
       onPress={() => ctx.go(sleep ? 'sleeptimer' : 'feedtimer')}
       accessibilityRole="button"
       accessibilityLabel={`${label}, ${time}. Mở đồng hồ`}
       style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, paddingLeft: 14, paddingRight: 10, borderRadius: 999, backgroundColor: bg }}
     >
-      <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: fg }} />
+      <Pulse active={live} from={1} to={1.35} fade style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: fg }} />
       <Txt numberOfLines={1} style={{ flex: 1, fontSize: 15, fontWeight: '600' }}>{label}</Txt>
       <Txt style={{ fontSize: 17, fontWeight: '600', color: fg, fontVariant: ['tabular-nums'] }}>{time}</Txt>
       <View style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, backgroundColor: colors.bgElevated }}>
         <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textBrand }}>Mở</Txt>
       </View>
     </Pressable>
+    </FadeInUp>
   );
 }
 
@@ -83,6 +87,11 @@ function SideButton({ side, state, ms, onPress }: { side: Side; state: 'idle' | 
   const last = state === 'last';
   const fg = running ? colors.textOnAccent : last ? colors.textBrand : colors.textPrimary;
   return (
+    <View style={{ width: 132, height: 132, alignItems: 'center', justifyContent: 'center' }}>
+    {/* breathing ring while this side is counting */}
+    {running ? (
+      <Pulse active from={1} to={1.14} fade style={{ position: 'absolute', width: 132, height: 132, borderRadius: 66, backgroundColor: colors.accentSoftBg }} />
+    ) : null}
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
@@ -109,6 +118,7 @@ function SideButton({ side, state, ms, onPress }: { side: Side; state: 'idle' | 
         {last && ms === 0 ? 'Lần trước' : stopwatch(ms)}
       </Txt>
     </Pressable>
+    </View>
   );
 }
 
@@ -250,9 +260,10 @@ export function SleepTimerScreen() {
     <View style={{ flex: 1 }}>
       <AppBar title="Giấc ngủ" onBack={ctx.back} />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, alignItems: 'center', gap: 18 }}>
-        <View style={{ width: 200, height: 200, borderRadius: 100, backgroundColor: colors.activity.sleep.bg, alignItems: 'center', justifyContent: 'center' }}>
+        {/* slow 4s breathing while the baby sleeps - calming, not attention-grabbing */}
+        <Pulse active={!!t} from={1} to={1.04} duration={4000} style={{ width: 200, height: 200, borderRadius: 100, backgroundColor: colors.activity.sleep.bg, alignItems: 'center', justifyContent: 'center' }}>
           <BongFace emotion="sleeping" size={130} />
-        </View>
+        </Pulse>
         <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.activity.sleep.fg }}>{t ? `${displayName} đang ngủ` : `${displayName} chuẩn bị ngủ`}</Txt>
         <Txt style={{ fontSize: 56, lineHeight: 62, fontWeight: '600', letterSpacing: -1, fontVariant: ['tabular-nums'] }}>
           {t ? stopwatch(now - t.startAt) : '00:00'}

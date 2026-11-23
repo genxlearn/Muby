@@ -9,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { PressScale } from './anim/motion';
 import { useTheme } from '../theme/ThemeContext';
 import { fontFamily } from '../theme/tokens';
 import { Txt } from '../theme/Txt';
@@ -171,9 +172,9 @@ export function Card({
   ];
   if (onPress) {
     return (
-      <Pressable onPress={onPress} style={({ pressed }) => [base, { opacity: pressed ? 0.94 : 1 }]}>
+      <PressScale onPress={onPress} scaleTo={0.98} style={base}>
         {children}
-      </Pressable>
+      </PressScale>
     );
   }
   return <View style={base}>{children}</View>;

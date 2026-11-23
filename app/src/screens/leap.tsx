@@ -9,6 +9,7 @@ import {
   AppBar,
   AvatarButton,
   InsightCard,
+  PopIn,
   Banner,
   ButtonPrimary,
   Card,
@@ -522,7 +523,9 @@ function SkillsChecklist({ leapN }: { leapN: number }) {
               style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderTopColor: colors.borderSubtle }}
             >
               <View style={{ width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: at ? colors.success : 'transparent', borderWidth: at ? 0 : 1.5, borderColor: colors.textMuted }}>
-                {at ? <Ic name="check" size={16} sw={2.4} color="#fff" /> : null}
+                <PopIn show={!!at}>
+                  <Ic name="check" size={16} sw={2.4} color="#fff" />
+                </PopIn>
               </View>
               <Txt style={{ flex: 1, fontSize: 15, lineHeight: 20, color: at ? colors.textSecondary : colors.textPrimary }}>{label}</Txt>
               <Txt style={{ fontSize: 12, color: at ? colors.success : colors.textMuted }}>{at ? fmt(at) : 'Chưa'}</Txt>

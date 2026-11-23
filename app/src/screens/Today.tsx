@@ -15,6 +15,7 @@ import {
   Card,
   Chip,
   EmptyState,
+  FadeInUp,
   HeroCard,
   Ic,
   IconTile,
@@ -349,12 +350,13 @@ export function TodayScreen() {
         <TodayHeader />
         <View style={{ paddingTop: 20, paddingHorizontal: 20, gap: 28 }}>
           {/* ===== LIVE STATUS + RUNNING TIMER (MVP v2.1) ===== */}
-          <View style={{ gap: 10 }}>
+          <FadeInUp index={0} onceKey="today-0" style={{ gap: 10 }}>
             <StatusStrip />
             <ActiveTimerPill />
-          </View>
+          </FadeInUp>
 
           {/* ===== HERO - white card: leap status + progress + 7 days ===== */}
+          <FadeInUp index={1} onceKey="today-1">
           <HeroCard>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <View style={{ flex: 1, minWidth: 0, gap: 8 }}>
@@ -431,6 +433,7 @@ export function TodayScreen() {
             </View>
             <ForecastStrip data={st.forecast} onPick={() => ctx.setTab('leap')} />
           </HeroCard>
+          </FadeInUp>
 
           {/* ===== ALL-LEAPS-DONE celebration ===== */}
           {st.status === 'after-all' ? (
@@ -447,7 +450,7 @@ export function TodayScreen() {
           ) : null}
 
           {/* ===== HÔM NAY ĐẾN GIỜ - stat tiles ===== */}
-          <View>
+          <FadeInUp index={3} onceKey="today-3">
             <SectionHeader title="Hôm nay đến giờ" link="Xem tất cả" onLink={() => ctx.setTab('growth')} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20 }} contentContainerStyle={{ gap: 12, paddingHorizontal: 20, paddingBottom: 12, paddingTop: 2 }}>
               {st.dailyStats.map((d) => {
@@ -455,11 +458,11 @@ export function TodayScreen() {
                 return <StatTile key={d.id} tone={tone} icon={icon} label={d.label} value={d.value} sub={d.range} />;
               })}
             </ScrollView>
-          </View>
+          </FadeInUp>
 
           {/* ===== VIỆC NÊN LÀM HÔM NAY - one card, the rest lives in Leap ===== */}
           {st.status !== 'after-all' && todoItem ? (
-            <View>
+            <FadeInUp index={2} onceKey="today-2">
               <SectionHeader title="Việc nên làm hôm nay" link="Thêm ở Leap" onLink={() => ctx.setTab('leap')} />
               <View style={[{ padding: 20, gap: 12, borderRadius: radii.lg, backgroundColor: colors.bgElevated }, shadows[2]]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -475,11 +478,11 @@ export function TodayScreen() {
                 </View>
                 {todoItem.hasSound ? <ButtonTonal onPress={() => ctx.openSheet('soothing')}>🎵  Bật tiếng ồn trắng</ButtonTonal> : null}
               </View>
-            </View>
+            </FadeInUp>
           ) : null}
 
           {/* ===== VỪA GHI ===== */}
-          <View>
+          <FadeInUp index={4} onceKey="today-4">
             <SectionHeader title="Vừa ghi" link="Xem tất cả" onLink={() => ctx.go('history')} />
             <View style={{ gap: 12 }}>
               {recent.map((l, i) => {
@@ -498,7 +501,7 @@ export function TodayScreen() {
                 );
               })}
             </View>
-          </View>
+          </FadeInUp>
 
         </View>
       </ScrollView>
