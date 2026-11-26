@@ -76,7 +76,7 @@ export function Sheet({
           shadows[4],
         ]}
       >
-        <View style={{ paddingTop: 8, paddingBottom: 6, alignItems: 'center' }}>
+        <View style={{ paddingTop: 8, paddingBottom: 8, alignItems: 'center' }}>
           <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: colors.borderDefault }} />
         </View>
         {title ? (

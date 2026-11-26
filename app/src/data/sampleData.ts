@@ -40,7 +40,7 @@ export const LEAPS: Leap[] = [
     actions: [
       { emoji: '🤱', title: 'Bé bú liên tục, không chịu rời mẹ', why: 'Cảm giác mới khiến bé cần sự an toàn. Da kề da là liều thuốc tốt nhất.', what: 'Bế sát ngực, cho bú theo nhu cầu. Không cần lịch cố định ở tuần này.' },
       { emoji: '😴', title: 'Giật mình, khó ngủ sâu', why: 'Não bộ "bật" cảm giác mới → dễ bị kích thích. Giấc ngủ bị chia nhỏ là bình thường.', what: 'Quấn chặt, tiếng ồn trắng, phòng tối. Cho bé nằm nghiêng khi dỗ.' },
-      { emoji: '👀', title: 'Bé nhìn chăm chăm một chỗ', why: 'Mắt bé đang nhìn rõ dần. Con tập lấy nét và theo dõi vật di chuyển.', what: 'Để đồ vật cách 20-30cm, di chuyển chậm. Không cần can thiệp - bé đang học!' },
+      { emoji: '👀', title: 'Bé nhìn chăm chăm một chỗ', why: 'Mắt bé đang nhìn rõ dần. Con tập lấy nét và theo dõi vật di chuyển.', what: 'Để đồ vật cách 20-30cm, di chuyển chậm. Không cần can thiệp - bé đang học' },
     ],
     sunnyPlay: [
       { title: 'Nhìn theo đồ chơi', desc: 'Đưa đồ chơi màu sáng qua lại chậm, cách mặt 20-30cm - bé tập theo dõi.' },
@@ -59,7 +59,7 @@ export const LEAPS: Leap[] = [
       { emoji: '🌙', title: 'Giấc ngủ thất thường', why: 'Não hoạt động mạnh hơn bình thường để xử lý hoa văn mới. Giấc ngủ bị phá vỡ.', what: 'Routine trước ngủ ổn định: tắm → massage → bú → hát → tắt đèn. Lặp lại mỗi tối.' },
     ],
     sunnyPlay: [
-      { title: 'Gương thần kỳ', desc: 'Đặt gương an toàn trước mặt - bé mê mẩn khuôn mặt mình!' },
+      { title: 'Gương thần kỳ', desc: 'Đặt gương an toàn trước mặt - bé mê mẩn khuôn mặt mình' },
       { title: 'Đen trắng tương phản', desc: 'Dùng thẻ đen-trắng hoặc sách tương phản. Bé đang yêu patterns.' },
       { title: 'Nhạc có nhịp', desc: 'Hát hoặc bật nhạc có nhịp rõ. Bé bắt đầu nhận ra sự lặp lại.' },
     ],
@@ -70,9 +70,9 @@ export const LEAPS: Leap[] = [
     desc: 'Cử động từ giật cục → mượt mà. Con với lấy đồ vật, đưa tay vào miệng có chủ đích. Giọng nói bắt đầu thay đổi âm lượng, cao thấp.',
     symptoms: ['Với lấy đồ vật', 'Cho tay vào miệng', 'Bi bô nhiều hơn'],
     actions: [
-      { emoji: '🤚', title: 'Bé liên tục cho tay vào miệng', why: 'Con đang luyện kỹ năng phối hợp tay-miệng - không phải đói hay mọc răng!', what: 'Để bé tự khám phá. Giữ tay sạch. Đưa đồ chơi an toàn thay thế nếu muốn.' },
+      { emoji: '🤚', title: 'Bé liên tục cho tay vào miệng', why: 'Con đang luyện kỹ năng phối hợp tay-miệng - không phải đói hay mọc răng', what: 'Để bé tự khám phá. Giữ tay sạch. Đưa đồ chơi an toàn thay thế nếu muốn.' },
       { emoji: '😤', title: 'Bé cáu khi không với được đồ', why: 'Con muốn chạm nhưng tay chưa đủ khéo. Bé bực vì đang cố gắng, đó là dấu hiệu tốt.', what: 'Đặt đồ vật gần hơn một chút (không quá dễ). Cổ vũ khi bé chạm được.' },
-      { emoji: '🗣️', title: 'Giọng bé thay đổi bất thường', why: 'Bé đang thử nghiệm thanh quản - cao, thấp, to, nhỏ. Đây là tiền ngôn ngữ.', what: 'Trả lời bé! Lặp lại âm thanh bé tạo ra. "Hội thoại" này cực kỳ quan trọng.' },
+      { emoji: '🗣️', title: 'Giọng bé thay đổi bất thường', why: 'Bé đang thử nghiệm thanh quản - cao, thấp, to, nhỏ. Đây là tiền ngôn ngữ.', what: 'Trả lời bé. Lặp lại âm thanh bé tạo ra. "Hội thoại" này cực kỳ quan trọng.' },
     ],
     sunnyPlay: [
       { title: 'Nằm sấp nâng cao', desc: 'Nằm sấp với đồ chơi phía trước - bé luyện với tay và nâng đầu.' },
@@ -87,8 +87,8 @@ export const LEAPS: Leap[] = [
     symptoms: ['Khóc nhiều hơn bình thường', 'Bám mẹ không rời', 'Ngủ ngắn, hay tỉnh giấc', 'Bú thất thường'],
     actions: [
       { emoji: '🍼', title: 'Bé bú ít, hay nhả ti', why: 'Không phải bé chán sữa đâu. Thế giới đang quá thú vị - con mải "hóng chuyện" nên xao nhãng cả ăn.', what: 'Cho bú ở phòng yên tĩnh, ánh sáng dịu. Bú ít một nhưng nhiều lần trong ngày là được.', hasSound: false },
-      { emoji: '🌙', title: 'Bé ngủ ngắn, hay tỉnh dậy khóc', why: 'Não con đang "học bài mới" cả trong lúc ngủ - nhiều mẹ thấy đây là đoạn ngủ vất vả nhất năm đầu. Rồi sẽ qua!', what: 'Phòng tối, tiếng ồn trắng, đặt bé xuống khi mắt lim dim. Đừng ngại dỗ thêm - bé đang cần thật.', hasSound: true },
-      { emoji: '🤱', title: 'Bé khóc ngay khi mẹ đi khỏi', why: 'Bé vừa hiểu "mẹ mặc áo = mẹ sắp đi" - nhưng chưa hiểu mẹ sẽ quay lại. Con không nhõng nhẽo đâu.', what: 'Chơi ú òa mỗi ngày để con học "mất rồi lại có". Luôn chào bé khi đi, đừng lẻn - dù rất muốn!', hasSound: false },
+      { emoji: '🌙', title: 'Bé ngủ ngắn, hay tỉnh dậy khóc', why: 'Não con đang "học bài mới" cả trong lúc ngủ - nhiều mẹ thấy đây là đoạn ngủ vất vả nhất năm đầu. Rồi sẽ qua', what: 'Phòng tối, tiếng ồn trắng, đặt bé xuống khi mắt lim dim. Đừng ngại dỗ thêm - bé đang cần thật.', hasSound: true },
+      { emoji: '🤱', title: 'Bé khóc ngay khi mẹ đi khỏi', why: 'Bé vừa hiểu "mẹ mặc áo = mẹ sắp đi" - nhưng chưa hiểu mẹ sẽ quay lại. Con không nhõng nhẽo đâu.', what: 'Chơi ú òa mỗi ngày để con học "mất rồi lại có". Luôn chào bé khi đi, đừng lẻn - dù rất muốn', hasSound: false },
     ],
     sunnyPlay: [
       { title: 'Ú òa với khăn', desc: 'Che mặt rồi ló ra - con học được điều kỳ diệu: mất rồi sẽ lại có.' },
@@ -114,9 +114,9 @@ export const LEAPS: Leap[] = [
       { emoji: '🛏️', title: 'Thức đêm, đòi mẹ', why: 'Nửa đêm tỉnh dậy + không thấy mẹ = hoảng. Bé cần xác nhận mẹ vẫn ở đây.', what: 'Vỗ nhẹ, không bật đèn sáng. Giọng mẹ trầm, đều. Đặt áo mẹ cạnh bé.' },
     ],
     sunnyPlay: [
-      { title: 'Ú òa sau cánh cửa', desc: 'Trốn sau cửa, gọi tên bé rồi ló ra - con học được rằng mẹ luôn quay lại!' },
+      { title: 'Ú òa sau cánh cửa', desc: 'Trốn sau cửa, gọi tên bé rồi ló ra - con học được rằng mẹ luôn quay lại' },
       { title: 'Đặt tên mọi thứ', desc: 'Chỉ vào đồ vật và nói tên. Bé đang gắn "từ" vào "vật" rất nhanh.' },
-      { title: 'Bò tìm kho báu', desc: 'Giấu đồ chơi dưới chăn. Bé tập bò tới và lật tìm - phần thưởng!' },
+      { title: 'Bò tìm kho báu', desc: 'Giấu đồ chơi dưới chăn. Bé tập bò tới và lật tìm - phần thưởng' },
     ],
   },
   {
@@ -125,9 +125,9 @@ export const LEAPS: Leap[] = [
     desc: 'Bé bắt đầu phân loại: đây là chó, đây cũng là chó dù khác màu. Thức ăn vs đồ chơi. Mọi thứ có "loại."',
     symptoms: ['So sánh hai đồ vật', 'Thử sờ mọi bề mặt', 'Bỏ đồ vào hộp'],
     actions: [
-      { emoji: '🐕', title: 'Bé chỉ vào mọi thứ, phản ứng lạ', why: 'Con đang "dán nhãn" mọi thứ. Mèo nhà vs mèo ảnh → cùng loại! Bé đang vui mừng.', what: 'Trả lời khi bé chỉ: "Đúng rồi, đó là con mèo!" Mỗi câu trả lời giúp bé phân loại.' },
+      { emoji: '🐕', title: 'Bé chỉ vào mọi thứ, phản ứng lạ', why: 'Con đang "dán nhãn" mọi thứ. Mèo nhà vs mèo ảnh → cùng loại. Bé đang vui mừng.', what: 'Trả lời khi bé chỉ: "Đúng rồi, đó là con mèo." Mỗi câu trả lời giúp bé phân loại.' },
       { emoji: '🍽️', title: 'Bé chọn lọc thức ăn kỹ hơn', why: 'Bé phân biệt loại thức ăn rồi! "Cái này thuộc nhóm ngon, cái kia không."', what: 'Cho thử nhiều kết cấu. Trộn mới + quen. Không ép - bé đang phân loại.' },
-      { emoji: '🧸', title: 'Ném đồ xuống đất liên tục', why: 'Bé không nghịch đâu. Con đang thử xem thứ gì rơi, thứ gì dính.', what: 'Cho đồ an toàn. Nói "rơi rồi!" khi bé thả. Bé sẽ mê phản ứng nhất quán của mẹ.' },
+      { emoji: '🧸', title: 'Ném đồ xuống đất liên tục', why: 'Bé không nghịch đâu. Con đang thử xem thứ gì rơi, thứ gì dính.', what: 'Cho đồ an toàn. Nói "rơi rồi" khi bé thả. Bé sẽ mê phản ứng nhất quán của mẹ.' },
     ],
     sunnyPlay: [
       { title: 'Phân loại đồ chơi', desc: 'Bỏ bóng vào rổ, khối vuông vào hộp - bé luyện nhóm theo hình dạng.' },
@@ -270,7 +270,7 @@ export const INTENSITY_COPY: Record<number, IntensityCopy> = {
   1: { label: 'Tuần nắng đẹp', emoji: '🌼', copy: 'Bé có thể sẵn sàng học kỹ năng mới - quan sát tín hiệu của con nhé.' },
   2: { label: 'Thường dễ chịu', emoji: '💛', copy: 'Nhiều bé thoải mái ở giai đoạn này - nhưng mỗi bé một nhịp riêng.' },
   3: { label: 'Có thể cần thêm hơi ấm', emoji: '🤍', copy: 'Bé có thể cần được ôm nhiều hơn chút hôm nay.' },
-  4: { label: 'Có thể khá khó', emoji: '☁️', copy: 'Hôm nay có thể vất vả. Mama không một mình đâu ❤️' },
+  4: { label: 'Có thể khá khó', emoji: '☁️', copy: 'Hôm nay có thể vất vả. Mama không một mình đâu' },
   5: { label: 'Bé có thể cần mama nhất', emoji: '🌧️', copy: 'Nếu bé khóc nhiều hơn, đó là leap, không phải lỗi của mama. Cứ ôm con thật chặt.' },
 };
 
@@ -280,7 +280,7 @@ export function leapPhase(day: number, total: number): LeapPhase {
   const r = day / total;
   if (r < 0.3) return { key: 'start', name: 'những ngày đầu', desc: 'Bé có thể khóc nhiều hơn, bám mẹ hơn, cáu kỉnh hơn - 3 dấu hiệu quen thuộc báo leap bắt đầu. Không phải do bạn làm gì cả.' };
   if (r < 0.65) return { key: 'peak', name: 'đoạn giữa', desc: 'Đoạn "lên dốc" nhất - bé thường cần mẹ nhiều nhất lúc này. Ôm con nhiều không bao giờ là hư đâu.' };
-  return { key: 'end', name: 'đoạn cuối', desc: 'Sắp đến phần vui nhất: bé bắt đầu khoe kỹ năng mới. Để ý nhé - con sắp làm bạn bất ngờ đấy!' };
+  return { key: 'end', name: 'đoạn cuối', desc: 'Sắp đến phần vui nhất: bé bắt đầu khoe kỹ năng mới. Để ý nhé - con sắp làm bạn bất ngờ đấy' };
 }
 
 /* Chỉ số hôm nay - đối chiếu khoảng thường gặp ở bé 3-4 tháng */

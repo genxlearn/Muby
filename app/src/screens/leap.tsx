@@ -20,7 +20,7 @@ import {
   ListRow,
   MiniIntensityCurve,
   NAV_CLEARANCE,
-  ScreenGlow,
+  
   Sheet,
   SubTabs,
 } from '../components';
@@ -89,7 +89,7 @@ function LeapToday() {
       <View style={{ paddingTop: 4, paddingHorizontal: 20, gap: 24 }}>
         {/* HERO - phase-based framing (Muby App Final) */}
         <Card pad={0} style={{ overflow: 'hidden', borderRadius: 24 }}>
-          <View style={{ flexDirection: 'row', gap: 6, paddingVertical: 20, paddingHorizontal: 20 }}>
+          <View style={{ flexDirection: 'row', gap: 4, paddingVertical: 20, paddingHorizontal: 20 }}>
             <View style={{ flex: 1, minWidth: 0 }}>
               <IntensityBadge level={intensity} size="md" />
               <Txt serif style={{ fontSize: 22, lineHeight: 28, marginTop: 12, color: colors.textPrimary }}>
@@ -99,14 +99,14 @@ function LeapToday() {
                     ? 'Bé đã đi qua 10 leaps kỳ diệu'
                     : `Leap ${CURRENT_LEAP.n} · ${CURRENT_LEAP.world} sắp tới`}
               </Txt>
-              <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20, marginTop: 6 }}>
+              <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 20, marginTop: 4 }}>
                 {inLeap
                   ? PHASE.desc
                   : st.status === 'after-all'
                     ? 'Hành trình Wonder Weeks đã trọn vẹn. Tận hưởng từng khoảnh khắc lớn khôn của con nhé.'
                     : 'Bé đang ở tuần nắng giữa hai leap. Lúc này hợp để chơi và nghỉ ngơi cùng con.'}
               </Txt>
-              <Txt style={{ fontSize: 12, color: colors.textMuted, fontWeight: '600', marginTop: 8 }}>
+              <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginTop: 8 }}>
                 {inLeap
                   ? `Ngày ${st.leapDay}/${st.leapTotal} · còn khoảng ${st.leapTotal - st.leapDay} ngày`
                   : st.status === 'after-all'
@@ -115,7 +115,7 @@ function LeapToday() {
               </Txt>
             </View>
             <View style={{ alignSelf: 'flex-end' }}>
-              <BongIntensity level={intensity} size={128} float />
+              <BongIntensity level={intensity} size={128} />
             </View>
           </View>
         </Card>
@@ -142,17 +142,17 @@ function LeapToday() {
         {st.status !== 'after-all' && CURRENT_LEAP.symptoms.length > 0 ? (
           <View>
             <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 12, paddingHorizontal: 2 }}>
-              {inLeap ? '📌 Biểu hiện thường thấy:' : `📌 Biểu hiện có thể gặp ở Leap ${CURRENT_LEAP.n}:`}
+              {inLeap ? 'Biểu hiện thường thấy:' : `Biểu hiện có thể gặp ở Leap ${CURRENT_LEAP.n}:`}
             </Txt>
             <WrapPills symptoms={CURRENT_LEAP.symptoms} />
           </View>
         ) : null}
 
-        {/* "ĐANG XẢY RA GÌ?" - tap to open detail */}
+        {/* "Đang xảy ra gì" - tap to open detail */}
         <Card onPress={() => ctx.go('leapdetail')}>
-          <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.6, color: colors.textBrand }}>ĐANG XẢY RA GÌ?</Txt>
+          <Txt style={{ fontSize: 13, fontWeight: '600', letterSpacing: 0.2, color: colors.textBrand }}>Đang xảy ra gì</Txt>
           <Txt serif style={{ fontSize: 22, marginTop: 8, lineHeight: 28, color: colors.textPrimary }}>{CURRENT_LEAP.fullName}</Txt>
-          <Txt style={{ fontSize: 14, color: colors.textSecondary, marginTop: 6, lineHeight: 22 }}>
+          <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 4, lineHeight: 22 }}>
             {CURRENT_LEAP.desc.split('\n')[0]}
           </Txt>
           <Pressable
@@ -164,7 +164,7 @@ function LeapToday() {
               gap: 4,
               marginTop: 12,
               minHeight: 44,
-              paddingVertical: 10,
+              paddingVertical: 12,
               paddingHorizontal: 16,
               borderRadius: 999,
               backgroundColor: colors.accentSoftBg,
@@ -182,7 +182,7 @@ function LeapToday() {
               size="sm"
               emotion="blissful"
               onesie="sage"
-              heading="10 leaps đã trọn vẹn 🎉"
+              heading="10 leaps đã trọn vẹn"
               helper="Bé đã đi qua mọi tuần kỳ diệu. Xem lại hành trình ở tab Hành trình nhé."
             />
           </Card>
@@ -193,7 +193,7 @@ function LeapToday() {
             <Txt serif style={{ fontSize: 22, lineHeight: 28, color: colors.textPrimary, marginBottom: 12, paddingHorizontal: 2 }}>
               {inLeap ? `Giúp bé hợp tác ở Leap ${CURRENT_LEAP.n}` : `Chuẩn bị cho Leap ${CURRENT_LEAP.n}`}
             </Txt>
-            <View style={{ gap: 10 }}>
+            <View style={{ gap: 8 }}>
               {actions.map((a, i) => (
                 <ActionCard key={i} action={a} intensity={intensity} onSound={a.hasSound ? () => ctx.openSheet('soothing') : null} />
               ))}
@@ -201,8 +201,8 @@ function LeapToday() {
           </View>
         ) : (
           <View>
-            <Txt serif style={{ fontSize: 22, lineHeight: 28, color: colors.textPrimary, marginBottom: 12, paddingHorizontal: 2 }}>Cách dỗ bé hôm nay 🤍</Txt>
-            <View style={{ gap: 10 }}>
+            <Txt serif style={{ fontSize: 22, lineHeight: 28, color: colors.textPrimary, marginBottom: 12, paddingHorizontal: 2 }}>Cách dỗ bé hôm nay</Txt>
+            <View style={{ gap: 8 }}>
               {FALLBACK_SOOTHE.map((a, i) => (
                 <ActionCard key={i} action={a} intensity={intensity} onSound={a.hasSound ? () => ctx.openSheet('soothing') : null} />
               ))}
@@ -211,7 +211,7 @@ function LeapToday() {
         )}
 
         <Banner icon="💛" tone="soft">
-          <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20 }}>
+          <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 20 }}>
             Bé hôm nay thế nào rồi mama?{' '}
             <Txt onPress={() => ctx.openSheet('quicklog')} style={{ color: colors.textBrand, fontWeight: '600' }}>Ghi lại cảm xúc</Txt>
           </Txt>
@@ -252,31 +252,31 @@ function LeapJourney() {
                 {past ? (
                   <Ic name="check" size={22} sw={2.6} color="#fff" />
                 ) : (
-                  <Txt style={{ fontSize: 16, fontWeight: '600', color: current ? '#fff' : colors.textMuted }}>{lp.n}</Txt>
+                  <Txt style={{ fontSize: 17, fontWeight: '600', color: current ? '#fff' : colors.textMuted }}>{lp.n}</Txt>
                 )}
               </View>
               {current ? (
                 <Card pad={16} style={{ flex: 1, borderWidth: 1.5, borderColor: colors.accentPrimary }} onPress={() => ctx.go('leapdetail')}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <View style={{ flex: 1, minWidth: 0 }}>
-                      <Txt style={{ fontSize: 11.5, fontWeight: '600', letterSpacing: 0.5, color: colors.textBrand }}>ĐANG DIỄN RA</Txt>
-                      <Txt serif style={{ fontSize: 20, marginTop: 3, color: colors.textPrimary }}>Leap {lp.n} · {lp.world}</Txt>
-                      <Txt style={{ fontSize: 12.5, color: colors.textSecondary, marginTop: 4, lineHeight: 18 }}>Bé đang học: {lp.skill}</Txt>
+                      <Txt style={{ fontSize: 11, fontWeight: '600', letterSpacing: 0.2, color: colors.textBrand }}>Đang diễn ra</Txt>
+                      <Txt serif style={{ fontSize: 22, marginTop: 4, color: colors.textPrimary }}>Leap {lp.n} · {lp.world}</Txt>
+                      <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4, lineHeight: 18 }}>Bé đang học: {lp.skill}</Txt>
                     </View>
                     <BongIntensity level={ctx.intensity} size={56} />
                   </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 }}>
                     <IntensityBadge level={ctx.intensity} size="sm" />
                     <View style={{ marginLeft: 'auto', alignItems: 'flex-end' }}>
                       <MiniIntensityCurve w={92} h={28} />
-                      <Txt style={{ fontSize: 10.5, color: colors.textBrand, fontWeight: '600' }}>▼ Hôm nay</Txt>
+                      <Txt style={{ fontSize: 11, color: colors.textBrand, fontWeight: '600' }}>▼ Hôm nay</Txt>
                     </View>
                   </View>
                 </Card>
               ) : (
                 <View style={{ flex: 1, paddingTop: 4 }}>
-                  <Txt style={{ fontSize: 15.5, fontWeight: '600', color: past ? colors.textSecondary : colors.textPrimary }}>Leap {lp.n} · {lp.world}</Txt>
-                  <Txt style={{ fontSize: 12.5, color: colors.textMuted, marginTop: 2 }}>Khoảng tuần {lp.wk} · {past ? 'Đã qua' : 'Sắp tới'}</Txt>
+                  <Txt style={{ fontSize: 15, fontWeight: '600', color: past ? colors.textSecondary : colors.textPrimary }}>Leap {lp.n} · {lp.world}</Txt>
+                  <Txt style={{ fontSize: 13, color: colors.textMuted, marginTop: 2 }}>Khoảng tuần {lp.wk} · {past ? 'Đã qua' : 'Sắp tới'}</Txt>
                 </View>
               )}
             </View>
@@ -320,10 +320,10 @@ function LeapCalendar() {
     <View style={{ flex: 1 }}>
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
       <View style={{ paddingTop: 16, paddingHorizontal: 20 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <Txt serif style={{ fontSize: 22, color: colors.textPrimary }}>77 tuần kỳ diệu</Txt>
-          <Pressable onPress={() => setLegend((l) => !l)} hitSlop={8} style={{ paddingVertical: 6 }}>
-            <Txt style={{ fontSize: 12.5, color: colors.textBrand, fontWeight: '600' }}>{legend ? 'Ẩn chú thích' : 'Chú thích'}</Txt>
+          <Pressable onPress={() => setLegend((l) => !l)} hitSlop={8} style={{ paddingVertical: 8 }}>
+            <Txt style={{ fontSize: 13, color: colors.textBrand, fontWeight: '600' }}>{legend ? 'Ẩn chú thích' : 'Chú thích'}</Txt>
           </Pressable>
         </View>
 
@@ -338,22 +338,22 @@ function LeapCalendar() {
         />
 
         {legend ? (
-          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
             {([[1, 'Nắng'], [3, 'Hơi ấm'], [5, 'Cần mama']] as [number, string][]).map(([l, t]) => (
-              <View key={l} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <View key={l} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: colors.intensity[clampLv(l)] }} />
-                <Txt style={{ fontSize: 12, color: colors.textSecondary }}>{t}</Txt>
+                <Txt style={{ fontSize: 13, color: colors.textSecondary }}>{t}</Txt>
               </View>
             ))}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: colors.bgElevated, borderWidth: 2.5, borderColor: colors.accentPrimary }} />
-              <Txt style={{ fontSize: 12, color: colors.textSecondary }}>Hôm nay (bé đang ở đây)</Txt>
+              <Txt style={{ fontSize: 13, color: colors.textSecondary }}>Hôm nay (bé đang ở đây)</Txt>
             </View>
           </View>
         ) : null}
 
         {mode === 'week' ? (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             {weeks.map((w) => (
               <Pressable
                 key={w.w}
@@ -370,7 +370,7 @@ function LeapCalendar() {
                   borderColor: w.current ? colors.accentPrimary : 'transparent',
                 }}
               >
-                <Txt style={{ fontSize: 12, fontWeight: '600', color: colors.intensityInk[clampLv(w.n)] }}>{w.w}</Txt>
+                <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.intensityInk[clampLv(w.n)] }}>{w.w}</Txt>
               </Pressable>
             ))}
           </View>
@@ -383,7 +383,7 @@ function LeapCalendar() {
                   flexDirection: 'row',
                   alignItems: 'center',
                   gap: 12,
-                  paddingVertical: 10,
+                  paddingVertical: 12,
                   paddingHorizontal: 12,
                   minHeight: 52,
                   borderRadius: radii.md,
@@ -396,10 +396,10 @@ function LeapCalendar() {
                   <BongFace emotion={D.FORECAST_EMO[d.n]} size={28} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Txt style={{ fontSize: 13.5, fontWeight: '600', color: colors.textPrimary }}>
+                  <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textPrimary }}>
                     {d.today ? 'Hôm nay' : `${DOW[(d.d.getDay() + 6) % 7]} · ${d.d.getDate()}/${d.d.getMonth() + 1}`}
                   </Txt>
-                  <Txt style={{ fontSize: 11.5, color: colors.textMuted }}>Tuần {d.w} · {D.INTENSITY_COPY[d.n].label}</Txt>
+                  <Txt style={{ fontSize: 11, color: colors.textMuted }}>Tuần {d.w} · {D.INTENSITY_COPY[d.n].label}</Txt>
                 </View>
                 {d.today ? (
                   <Txt style={{ fontSize: 11, fontWeight: '600', color: colors.textBrand }}>Bé đang ở đây</Txt>
@@ -420,7 +420,7 @@ function LeapCalendar() {
       >
         {pick ? (
           <View style={{ gap: 16, paddingTop: 8 }}>
-            <View style={{ flexDirection: 'row', gap: 6 }}>
+            <View style={{ flexDirection: 'row', gap: 4 }}>
               {DOW.map((lbl, di) => {
                 const n = dayN(pick.w, di);
                 const isToday = pick.current && di === todayDow;
@@ -430,7 +430,7 @@ function LeapCalendar() {
                     style={{
                       flex: 1,
                       alignItems: 'center',
-                      gap: 5,
+                      gap: 4,
                       paddingVertical: 8,
                       paddingHorizontal: 2,
                       borderRadius: radii.md,
@@ -439,7 +439,7 @@ function LeapCalendar() {
                       borderColor: isToday ? colors.accentPrimary : 'transparent',
                     }}
                   >
-                    <Txt style={{ fontSize: 10.5, fontWeight: '600', color: isToday ? colors.accentPrimary : colors.textMuted }}>{lbl}</Txt>
+                    <Txt style={{ fontSize: 11, fontWeight: '600', color: isToday ? colors.accentPrimary : colors.textMuted }}>{lbl}</Txt>
                     <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.intensity[n], alignItems: 'center', justifyContent: 'center' }}>
                       <BongFace emotion={D.FORECAST_EMO[n]} size={21} />
                     </View>
@@ -448,13 +448,13 @@ function LeapCalendar() {
               })}
             </View>
             {pick.current ? (
-              <Txt style={{ fontSize: 12.5, fontWeight: '600', color: colors.textBrand, textAlign: 'center' }}>▼ Bé đang ở {DOW[todayDow]} tuần này</Txt>
+              <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textBrand, textAlign: 'center' }}>▼ Bé đang ở {DOW[todayDow]} tuần này</Txt>
             ) : null}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, justifyContent: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
               <BongIntensity level={pick.n} size={84} />
               <View>
                 <IntensityBadge level={pick.n} size="md" />
-                <Txt style={{ fontSize: 13.5, color: colors.textSecondary, maxWidth: 190, lineHeight: 20, marginTop: 8 }}>
+                <Txt style={{ fontSize: 13, color: colors.textSecondary, maxWidth: 190, lineHeight: 20, marginTop: 8 }}>
                   {D.INTENSITY_COPY[pick.n].copy}
                 </Txt>
               </View>
@@ -472,8 +472,7 @@ export function LeapScreen({ initialSub }: { initialSub?: Sub }) {
   const [sub, setSub] = useState<Sub>(initialSub || 'today');
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
-      <ScreenGlow height={260} />
-      <View style={{ paddingTop: 6, paddingBottom: 12 }}>
+      <View style={{ paddingTop: 8, paddingBottom: 12 }}>
         <LargeTitle title="Leap" sub="Những tuần kỳ diệu của bé" right={<AvatarButton onPress={() => ctx.go('me')} />} />
         <SubTabs<Sub>
           value={sub}
@@ -500,10 +499,10 @@ function SkillsChecklist({ leapN }: { leapN: number }) {
   const done = skills.filter((_, i) => ctx.milestones[skillKey(leapN, i)]).length;
   const fmt = (ms: number) => { const d = new Date(ms); return `${d.getDate()}/${d.getMonth() + 1}`; };
   return (
-    <View style={{ gap: 10, marginTop: 8 }}>
+    <View style={{ gap: 8, marginTop: 8 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Txt serif style={{ flex: 1, fontSize: 22, lineHeight: 28 }}>Bé đang học</Txt>
-        <Txt style={{ fontSize: 12, fontWeight: '600', color: colors.success }}>{done}/{skills.length} đã làm được</Txt>
+        <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.success }}>{done}/{skills.length} đã làm được</Txt>
       </View>
       <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>Leap này mở ra kỹ năng mới. Chạm khi bé làm được để lưu lại ngày đó.</Txt>
       <Card pad={4} style={{ paddingHorizontal: 16 }}>
@@ -515,7 +514,7 @@ function SkillsChecklist({ leapN }: { leapN: number }) {
               key={key}
               onPress={() => {
                 ctx.toggleMilestone(key);
-                if (!at) ctx.toast('Đã ghi nhận kỹ năng mới của bé 💛');
+                if (!at) ctx.toast('Đã ghi nhận kỹ năng mới của bé');
               }}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: !!at }}
@@ -528,7 +527,7 @@ function SkillsChecklist({ leapN }: { leapN: number }) {
                 </PopIn>
               </View>
               <Txt style={{ flex: 1, fontSize: 15, lineHeight: 20, color: at ? colors.textSecondary : colors.textPrimary }}>{label}</Txt>
-              <Txt style={{ fontSize: 12, color: at ? colors.success : colors.textMuted }}>{at ? fmt(at) : 'Chưa'}</Txt>
+              <Txt style={{ fontSize: 13, color: at ? colors.success : colors.textMuted }}>{at ? fmt(at) : 'Chưa'}</Txt>
             </Pressable>
           );
         })}
@@ -563,11 +562,11 @@ export function LeapDetailScreen() {
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={{ paddingHorizontal: 20 }}>
           {/* HERO */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 12 }}>
-            <BongIntensity level={ctx.intensity} size={120} float />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <BongIntensity level={ctx.intensity} size={120} />
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.6, color: colors.textBrand }}>LEAP {CURRENT_LEAP.n}</Txt>
-              <Txt serif style={{ fontSize: 28, lineHeight: 34, marginTop: 4, marginBottom: 6, color: colors.textPrimary }}>{CURRENT_LEAP.fullName}</Txt>
+              <Txt style={{ fontSize: 13, fontWeight: '600', letterSpacing: 0.2, color: colors.textBrand }}>Leap {CURRENT_LEAP.n}</Txt>
+              <Txt serif style={{ fontSize: 28, lineHeight: 34, marginTop: 4, marginBottom: 4, color: colors.textPrimary }}>{CURRENT_LEAP.fullName}</Txt>
               <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18, marginBottom: 8 }}>Bé đang học: {CURRENT_LEAP.skill}</Txt>
               <IntensityBadge level={ctx.intensity} size="sm" />
             </View>
@@ -577,7 +576,7 @@ export function LeapDetailScreen() {
           <Card pad={14} style={{ marginBottom: 24 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.textPrimary }}>Bạn đang ở đây</Txt>
-              <Txt style={{ fontSize: 12, color: colors.textMuted }}>
+              <Txt style={{ fontSize: 13, color: colors.textMuted }}>
                 {st.status === 'in-leap' ? `Ngày ${st.leapDay}/${st.leapTotal}` : `Sau ~${st.daysUntilLeap} ngày`}
               </Txt>
             </View>
@@ -603,7 +602,7 @@ export function LeapDetailScreen() {
 
               {CURRENT_LEAP.symptoms.length > 0 ? (
                 <View>
-                  <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 12 }}>📌 Biểu hiện thường thấy:</Txt>
+                  <Txt style={{ fontSize: 13, color: colors.textMuted, fontWeight: '600', marginBottom: 12 }}>Biểu hiện thường thấy:</Txt>
                   <WrapPills symptoms={CURRENT_LEAP.symptoms} />
                 </View>
               ) : null}
@@ -615,11 +614,11 @@ export function LeapDetailScreen() {
                   <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.aiTonal, alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
                     <Ic name="lock" size={20} color={colors.aiText} />
                   </View>
-                  <Txt serif style={{ fontSize: 20, color: colors.textPrimary, lineHeight: 26, marginBottom: 8 }}>
+                  <Txt serif style={{ fontSize: 22, color: colors.textPrimary, lineHeight: 26, marginBottom: 8 }}>
                     Đọc đầy đủ dấu hiệu & cách đồng hành cùng bé qua Leap {CURRENT_LEAP.n}…
                   </Txt>
                   <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginBottom: 16 }}>
-                    Mở khóa trọn đời - 79.000đ 💛
+                    Mở khóa trọn đời - 79.000đ
                   </Txt>
                   <ButtonPrimary onPress={() => ctx.openPaywall('Mở khóa Leap đầy đủ')}>Mở khóa với Premium</ButtonPrimary>
                 </Card>
@@ -629,7 +628,7 @@ export function LeapDetailScreen() {
 
           {/* TAB: Giúp bé */}
           {tab === 'actions' ? (
-            <View style={{ gap: 10 }}>
+            <View style={{ gap: 8 }}>
               {CURRENT_LEAP.actions.length > 0 ? (
                 CURRENT_LEAP.actions.map((a, i) => (
                   <ActionCard key={i} action={a} intensity={ctx.intensity} onSound={a.hasSound ? () => ctx.openSheet('soothing') : null} />
@@ -641,9 +640,9 @@ export function LeapDetailScreen() {
                   'Chơi trốn tìm để bé luyện khái niệm "biến mất rồi quay lại."',
                 ].map((t, i) => (
                   <Card key={i} pad={14}>
-                    <View style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
+                    <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
                       <Ic name="check" size={20} sw={2.4} color={colors.success} />
-                      <Txt style={{ flex: 1, fontSize: 14.5, lineHeight: 22, color: colors.textPrimary }}>{t}</Txt>
+                      <Txt style={{ flex: 1, fontSize: 15, lineHeight: 22, color: colors.textPrimary }}>{t}</Txt>
                     </View>
                   </Card>
                 ))
@@ -665,12 +664,12 @@ export function LeapDetailScreen() {
                   />
                 ))
               ) : (
-                <EmptyState emotion="curious" onesie="sage" heading="Đây là leap đầu tiên!" helper="Bé đang bắt đầu hành trình kỳ diệu." />
+                <EmptyState emotion="curious" onesie="sage" heading="Đây là leap đầu tiên" helper="Bé đang bắt đầu hành trình kỳ diệu." />
               )}
             </View>
           ) : null}
 
-          <Banner icon="💛" tone="soft" style={{ marginTop: 18 }}>Mỗi leap rồi sẽ qua. Bé đang lớn lên ngay trong vòng tay mama.</Banner>
+          <Banner icon="💛" tone="soft" style={{ marginTop: 16 }}>Mỗi leap rồi sẽ qua. Bé đang lớn lên ngay trong vòng tay mama.</Banner>
         </View>
       </ScrollView>
     </View>

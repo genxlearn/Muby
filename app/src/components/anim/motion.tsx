@@ -16,7 +16,6 @@ export const MOTION = {
   /** live indicators (running timer dot, breathing ring) */
   pulse: { duration: 1600 },
   /** a check / state change that deserves a small celebration */
-  pop: { friction: 5, tension: 160 },
   easeOut: Easing.bezier(0.2, 0.8, 0.2, 1),
 } as const;
 
@@ -140,12 +139,12 @@ export function PopIn({ show, style, children }: { show: boolean; style?: StyleP
     if (reduce) { v.setValue(show ? 1 : 0); return; }
     if (show) {
       v.setValue(0);
-      Animated.spring(v, { toValue: 1, friction: MOTION.pop.friction, tension: MOTION.pop.tension, useNativeDriver: true }).start();
+      Animated.timing(v, { toValue: 1, duration: MOTION.enter.duration, easing: MOTION.easeOut, useNativeDriver: true }).start();
     } else {
       Animated.timing(v, { toValue: 0, duration: 120, useNativeDriver: true }).start();
     }
   }, [show, reduce, v]);
-  const scale = v.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] });
+  const scale = v.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] });
   return <Animated.View style={[style, { opacity: v, transform: [{ scale }] }]}>{children}</Animated.View>;
 }
 
@@ -155,7 +154,7 @@ export function Rotate({ on, deg = 45, style, children }: { on: boolean; deg?: n
   const v = useRef(new Animated.Value(on ? 1 : 0)).current;
   useEffect(() => {
     if (reduce) { v.setValue(on ? 1 : 0); return; }
-    Animated.spring(v, { toValue: on ? 1 : 0, friction: 7, tension: 140, useNativeDriver: true }).start();
+    Animated.timing(v, { toValue: on ? 1 : 0, duration: MOTION.press.out, easing: MOTION.easeOut, useNativeDriver: true }).start();
   }, [on, reduce, v]);
   const rotate = v.interpolate({ inputRange: [0, 1], outputRange: ['0deg', `${deg}deg`] });
   return <Animated.View style={[style, { transform: [{ rotate }] }]}>{children}</Animated.View>;

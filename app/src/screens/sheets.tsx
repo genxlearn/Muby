@@ -58,11 +58,11 @@ function WhenPicker({ offset, onChange }: { offset: number; onChange: (m: number
       </View>
       {custom ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16, paddingVertical: 8, borderRadius: radii.md, backgroundColor: colors.bgSunken }}>
-          <Pressable onPress={() => onChange(offset + 5)} accessibilityLabel="Sớm hơn 5 phút" hitSlop={8} style={{ paddingHorizontal: 12, paddingVertical: 6 }}>
+          <Pressable onPress={() => onChange(offset + 5)} accessibilityLabel="Sớm hơn 5 phút" hitSlop={8} style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
             <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.textBrand }}>- 5 phút</Txt>
           </Pressable>
           <Txt style={{ fontSize: 22, fontWeight: '600', fontVariant: ['tabular-nums'] }}>{hhmm(Date.now() - offset * 60000)}</Txt>
-          <Pressable onPress={() => onChange(Math.max(0, offset - 5))} accessibilityLabel="Muộn hơn 5 phút" hitSlop={8} style={{ paddingHorizontal: 12, paddingVertical: 6 }}>
+          <Pressable onPress={() => onChange(Math.max(0, offset - 5))} accessibilityLabel="Muộn hơn 5 phút" hitSlop={8} style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
             <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.textBrand }}>+ 5 phút</Txt>
           </Pressable>
         </View>
@@ -83,7 +83,7 @@ export function QuickLogSheet({ open }: { open: boolean }) {
   const at = () => Date.now() - offset * 60000;
   const done = (text: string) => {
     ctx.closeSheet();
-    ctx.toast(`Đã ghi ${text}. Bạn đang làm rất tốt ❤️`);
+    ctx.toast(`Đã ghi ${text}. Bạn đang làm rất tốt`);
   };
   const pick = (kind: 'feed' | 'sleep' | 'diaper', o: Opt) => {
     if (o.timer) {
@@ -157,7 +157,7 @@ export function QuickLogSheet({ open }: { open: boolean }) {
       ) : null}
 
       {OD && detail ? (
-        <View style={{ gap: 14 }}>
+        <View style={{ gap: 12 }}>
           <WhenPicker offset={offset} onChange={setOffset} />
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
             {OD.opts.map((o) => (
@@ -177,7 +177,7 @@ export function QuickLogSheet({ open }: { open: boolean }) {
                   borderColor: colors.accentPrimary,
                 })}
               >
-                <Txt style={{ fontSize: 16, fontWeight: '600', color: o.timer ? colors.textBrand : colors.textPrimary, textAlign: 'center' }}>{o.label}</Txt>
+                <Txt style={{ fontSize: 17, fontWeight: '600', color: o.timer ? colors.textBrand : colors.textPrimary, textAlign: 'center' }}>{o.label}</Txt>
               </Pressable>
             ))}
           </View>
@@ -199,7 +199,7 @@ export function QuickLogSheet({ open }: { open: boolean }) {
                 style={({ pressed }) => ({
                   flex: 1,
                   alignItems: 'center',
-                  gap: 6,
+                  gap: 4,
                   paddingVertical: 12,
                   paddingHorizontal: 2,
                   minHeight: 88,
@@ -254,26 +254,26 @@ export function SoothingSheet({ open }: { open: boolean }) {
     stream: [colors.bgAccentSoft, 'heart'],
   };
   return (
-    <Sheet open={open} onClose={ctx.closeSheet} height="78%" title="Hộp công cụ dỗ bé" sub="Không cần mạng 💤">
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20 }} contentContainerStyle={{ gap: 12, paddingHorizontal: 20, paddingBottom: 6 }}>
+    <Sheet open={open} onClose={ctx.closeSheet} height="78%" title="Hộp công cụ dỗ bé" sub="Không cần mạng">
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20 }} contentContainerStyle={{ gap: 12, paddingHorizontal: 20, paddingBottom: 8 }}>
         {D.SOOTHING.map((s) => {
           const locked = s.premium && !ctx.premium && ctx.intensity < 4;
           const isOn = playing === s.id;
           const [tint, icon] = TINT[s.id] || [colors.bgSunken, 'music'];
           return (
-            <View key={s.id} style={{ width: 156, padding: 14, gap: 12, borderRadius: radii.xl - 4, backgroundColor: tint }}>
+            <View key={s.id} style={{ width: 156, padding: 16, gap: 12, borderRadius: radii.xl - 4, backgroundColor: tint }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.bgElevated, alignItems: 'center', justifyContent: 'center' }}>
                   <Ic name={icon} size={20} color={colors.textPrimary} />
                 </View>
                 {locked ? (
-                  <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: radii.sm, backgroundColor: colors.aiTonal }}>
-                    <Txt style={{ fontSize: 12, fontWeight: '500', color: colors.aiText }}>Premium</Txt>
+                  <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: radii.sm, backgroundColor: colors.aiTonal }}>
+                    <Txt style={{ fontSize: 13, fontWeight: '500', color: colors.aiText }}>Premium</Txt>
                   </View>
                 ) : null}
               </View>
               <Txt style={{ fontSize: 17, fontWeight: '600' }}>{s.name}</Txt>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Pressable
                   onPress={() => (locked ? ctx.openPaywall('Mở khóa âm thanh dỗ bé') : setPlaying(isOn ? null : s.id))}
                   accessibilityLabel={locked ? 'Mở khóa' : isOn ? 'Tạm dừng' : 'Phát'}
@@ -288,7 +288,7 @@ export function SoothingSheet({ open }: { open: boolean }) {
         })}
       </ScrollView>
 
-      <Txt style={{ marginTop: 22, fontSize: 17, fontWeight: '600', color: colors.textPrimary, marginBottom: 10 }}>Hẹn giờ tắt</Txt>
+      <Txt style={{ marginTop: 20, fontSize: 17, fontWeight: '600', color: colors.textPrimary, marginBottom: 8 }}>Hẹn giờ tắt</Txt>
       <View style={{ flexDirection: 'row', gap: 8 }}>
         {[15, 30, 45, 60].map((t) => (
           <Chip key={t} active={timer === t} onPress={() => setTimer(t)} style={{ flex: 1 }}>{`${t} phút`}</Chip>

@@ -79,7 +79,7 @@ function CalendarPanel({
   return (
     <View
       style={[
-        { marginTop: 10, backgroundColor: colors.bgElevated, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.borderSubtle, padding: 12 },
+        { marginTop: 8, backgroundColor: colors.bgElevated, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.borderSubtle, padding: 12 },
         shadows[2],
       ]}
     >
@@ -139,7 +139,7 @@ function CalendarPanel({
               >
                 <Txt
                   style={{
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: isSel || isToday ? '700' : '500',
                     color: off ? colors.borderDefault : isSel ? '#fff' : colors.textPrimary,
                   }}

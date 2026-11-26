@@ -22,7 +22,7 @@ import {
   LargeTitle,
   ListRow,
   NAV_CLEARANCE,
-  ScreenGlow,
+  
   SectionHeader,
   Sheet,
 } from '../components';
@@ -107,11 +107,11 @@ const METRIC_TABS: { id: Metric; label: string }[] = [
 
 /** Per-metric empty-state copy (v3). */
 const EMPTY_META: Record<Metric, { heading: string; helper: string; cta: string; measure?: boolean }> = {
-  weight: { heading: 'Chưa có số đo nào', helper: 'Thêm số đo đầu tiên để bắt đầu vẽ đường lớn của bé nhé mama 💛', cta: '+ Thêm số đo đầu tiên', measure: true },
-  height: { heading: 'Chưa có số đo nào', helper: 'Thêm số đo đầu tiên để bắt đầu vẽ đường lớn của bé nhé mama 💛', cta: '+ Thêm số đo đầu tiên', measure: true },
-  feed: { heading: 'Chưa có cữ ăn nào', helper: 'Ghi cữ ăn đầu tiên để thấy nhịp bú của bé nhé mama 💛', cta: '+ Ghi cữ ăn' },
-  sleep: { heading: 'Chưa có giấc ngủ nào', helper: 'Ghi giấc ngủ đầu tiên để thấy nhịp ngủ của bé 🌙', cta: '+ Ghi giấc ngủ' },
-  diaper: { heading: 'Chưa có lần thay tã nào', helper: 'Tã ướt đều đặn là dấu hiệu bé bú đủ - ghi lại để cùng theo dõi nhé 💛', cta: '+ Ghi tã' },
+  weight: { heading: 'Chưa có số đo nào', helper: 'Thêm số đo đầu tiên để bắt đầu vẽ đường lớn của bé nhé mama', cta: '+ Thêm số đo đầu tiên', measure: true },
+  height: { heading: 'Chưa có số đo nào', helper: 'Thêm số đo đầu tiên để bắt đầu vẽ đường lớn của bé nhé mama', cta: '+ Thêm số đo đầu tiên', measure: true },
+  feed: { heading: 'Chưa có cữ ăn nào', helper: 'Ghi cữ ăn đầu tiên để thấy nhịp bú của bé nhé mama', cta: '+ Ghi cữ ăn' },
+  sleep: { heading: 'Chưa có giấc ngủ nào', helper: 'Ghi giấc ngủ đầu tiên để thấy nhịp ngủ của bé', cta: '+ Ghi giấc ngủ' },
+  diaper: { heading: 'Chưa có lần thay tã nào', helper: 'Tã ướt đều đặn là dấu hiệu bé bú đủ - ghi lại để cùng theo dõi nhé', cta: '+ Ghi tã' },
 };
 
 /** Metric chip strip - shared by the normal and empty growth screens. */
@@ -120,8 +120,8 @@ function MetricChips({ metric, onPick }: { metric: Metric; onPick: (m: Metric) =
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={{ marginHorizontal: -20, marginTop: -8, marginBottom: 14, flexGrow: 0 }}
-      contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingTop: 8, paddingBottom: 14 }}
+      style={{ marginHorizontal: -20, marginTop: -8, marginBottom: 12, flexGrow: 0 }}
+      contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16 }}
     >
       {METRIC_TABS.map((t) => (
         <Chip key={t.id} active={metric === t.id} onPress={() => onPick(t.id)}>{t.label}</Chip>
@@ -160,11 +160,11 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
     { date: '05/06', label: '5.8 kg · 59 cm' },
   ];
   const META: Record<Metric, { latest: string; sub: string; band: string }> = {
-    weight: { latest: `${BABY.weight} kg`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
-    height: { latest: `${BABY.height} cm`, sub: 'Bé đang phát triển khoẻ mạnh 💚', band: 'Vùng khoẻ mạnh theo WHO' },
-    feed: { latest: '640 ml/ngày', sub: 'Bé đang bú đủ - yên tâm nhé mama 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
-    sleep: { latest: '14 giờ/ngày', sub: 'Ngủ ít hơn chút trong leap là bình thường 💛', band: 'Khoảng thường gặp ở bé cùng tuổi' },
-    diaper: { latest: '6 tã/ngày', sub: 'Tã ướt đều đặn = bé bú đủ 💚', band: 'Khoảng thường gặp ở bé cùng tuổi' },
+    weight: { latest: `${BABY.weight} kg`, sub: 'Bé đang phát triển khoẻ mạnh', band: 'Vùng khoẻ mạnh theo WHO' },
+    height: { latest: `${BABY.height} cm`, sub: 'Bé đang phát triển khoẻ mạnh', band: 'Vùng khoẻ mạnh theo WHO' },
+    feed: { latest: '640 ml/ngày', sub: 'Bé đang bú đủ - yên tâm nhé mama', band: 'Khoảng thường gặp ở bé cùng tuổi' },
+    sleep: { latest: '14 giờ/ngày', sub: 'Ngủ ít hơn chút trong leap là bình thường', band: 'Khoảng thường gặp ở bé cùng tuổi' },
+    diaper: { latest: '6 tã/ngày', sub: 'Tã ướt đều đặn = bé bú đủ', band: 'Khoảng thường gặp ở bé cùng tuổi' },
   };
   const m = META[metric];
   // "today" stats and typical ranges come from the engine - age-appropriate for THIS baby
@@ -180,7 +180,6 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
     const em = EMPTY_META[metric];
     return (
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
-        <ScreenGlow height={260} />
         <LargeTitle title="Lớn khôn" sub={`Đường lớn của bé · ${st.ageLabel}`} right={<AvatarButton onPress={() => ctx.go('me')} />} />
         <View style={{ paddingTop: 20, paddingHorizontal: 20, paddingBottom: 16 }}>
           <MetricChips metric={metric} onPick={setMetric} />
@@ -193,7 +192,6 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
 
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
-      <ScreenGlow height={260} />
       <LargeTitle title="Lớn khôn" sub={`Đường lớn của bé · ${st.ageLabel}`} right={<AvatarButton onPress={() => ctx.go('me')} />} />
       <View style={{ paddingTop: 20, paddingHorizontal: 20 }}>
         {/* Moved from Hôm nay (MVP v2.1): daily tip + EASY rhythm */}
@@ -210,16 +208,16 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
               <IconTile tone={METRIC_TONE[metric]} icon={METRIC_ICON[metric]} size={44} />
               <View style={{ flex: 1, minWidth: 0 }}>
                 <Txt style={{ fontSize: 13, color: colors.textSecondary }}>{stat.label}</Txt>
-                <Txt serif style={{ fontSize: 24, color: colors.textPrimary, marginTop: 2 }}>{stat.value}</Txt>
+                <Txt serif style={{ fontSize: 22, color: colors.textPrimary, marginTop: 2 }}>{stat.value}</Txt>
               </View>
               {inRange ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 6, paddingHorizontal: 11, borderRadius: radii.sm, backgroundColor: colors.successSoft }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 8, paddingHorizontal: 12, borderRadius: radii.sm, backgroundColor: colors.successSoft }}>
                   <Ic name="check" size={13} sw={3} color={colors.success} />
-                  <Txt style={{ fontSize: 12, fontWeight: '600', color: colors.success }}>Trong khoảng</Txt>
+                  <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.success }}>Trong khoảng</Txt>
                 </View>
               ) : null}
             </View>
-            <View style={{ marginTop: 14 }}>
+            <View style={{ marginTop: 12 }}>
               <View style={{ height: 8, borderRadius: 4, backgroundColor: colors.bgSunken }}>
                 <View style={{ position: 'absolute', left: '20%', right: '20%', top: 0, bottom: 0, borderRadius: 4, backgroundColor: colors.successSoft }} />
                 <View
@@ -237,21 +235,21 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
                   }}
                 />
               </View>
-              <Txt style={{ fontSize: 12, color: colors.textMuted, marginTop: 8, lineHeight: 17 }}>{stat.range}</Txt>
+              <Txt style={{ fontSize: 13, color: colors.textMuted, marginTop: 8, lineHeight: 17 }}>{stat.range}</Txt>
             </View>
             <Banner icon="💛" tone="soft" style={{ marginTop: 12 }}>
-              <Txt style={{ fontSize: 12.5, color: colors.textSecondary, lineHeight: 18 }}>{stat.note}</Txt>
+              <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>{stat.note}</Txt>
             </Banner>
           </Card>
         ) : (
           /* Số mới nhất - cho cân nặng / chiều cao */
           <Card pad={20} style={{ marginBottom: 24, borderRadius: radii.xl }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               <BongFace emotion="blissful" size={64} ring />
               <View style={{ flex: 1 }}>
                 <Txt style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 2 }}>Số đo mới nhất</Txt>
                 <Txt serif style={{ fontSize: 34, lineHeight: 40, color: colors.textPrimary }}>{m.latest}</Txt>
-                <Txt style={{ fontSize: 14, color: colors.textSecondary, marginTop: 2 }}>{m.sub}</Txt>
+                <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 2 }}>{m.sub}</Txt>
               </View>
             </View>
           </Card>
@@ -261,16 +259,16 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
         <Card pad={20} style={{ marginBottom: 24 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: colors.activity.diaper.bg, borderWidth: 1, borderColor: colors.activity.diaper.fg }} />
-            <Txt style={{ fontSize: 12.5, color: colors.textSecondary, fontWeight: '600' }}>{m.band}</Txt>
-            <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Txt style={{ fontSize: 13, color: colors.textSecondary, fontWeight: '600' }}>{m.band}</Txt>
+            <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               <View style={{ width: 16, height: 3, borderRadius: 2, backgroundColor: colors.accentPrimary }} />
-              <Txt style={{ fontSize: 12.5, color: colors.textBrand, fontWeight: '600' }}>Bé</Txt>
+              <Txt style={{ fontSize: 13, color: colors.textBrand, fontWeight: '600' }}>Bé</Txt>
             </View>
           </View>
           <GrowthChart metric={metric} />
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingHorizontal: 2 }}>
-            <Txt style={{ fontSize: 11.5, color: colors.textMuted, fontWeight: '600' }}>Mới sinh</Txt>
-            <Txt style={{ fontSize: 11.5, color: colors.textMuted, fontWeight: '600' }}>Hiện tại · {st.ageLabel}</Txt>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4, paddingHorizontal: 2 }}>
+            <Txt style={{ fontSize: 11, color: colors.textMuted, fontWeight: '600' }}>Mới sinh</Txt>
+            <Txt style={{ fontSize: 11, color: colors.textMuted, fontWeight: '600' }}>Hiện tại · {st.ageLabel}</Txt>
           </View>
         </Card>
 
@@ -281,7 +279,7 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
             dailyLog.length ? (
               dailyLog.map((g, gi) => (
                 <View key={gi} style={{ marginBottom: 12 }}>
-                  <Txt style={{ fontSize: 12.5, fontWeight: '600', color: colors.textMuted, marginHorizontal: 2, marginBottom: 8 }}>{g.date}</Txt>
+                  <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textMuted, marginHorizontal: 2, marginBottom: 8 }}>{g.date}</Txt>
                   <Card pad={6}>
                     {g.items.map((it, i) => (
                       <View key={i} style={{ borderTopWidth: i ? 1 : 0, borderTopColor: colors.borderSubtle }}>
@@ -298,7 +296,7 @@ export function GrowthScreen({ initialMetric }: { initialMetric?: Metric } = {})
                   emotion="snug"
                   onesie="cream"
                   heading="Chưa có ghi chép hôm nay"
-                  helper="Cứ thong thả mama 💛 Một chạm là ghi xong."
+                  helper="Cứ thong thả mama. Một chạm là ghi xong."
                   action={<ButtonSecondary onPress={() => ctx.openSheet('quicklog')}>＋ Ghi nhanh</ButtonSecondary>}
                 />
               </Card>
@@ -366,20 +364,19 @@ export function MeasureScreen() {
     setPetals(true);
     setTimeout(() => {
       ctx.back();
-      ctx.toast('Đã lưu. Bé đang phát triển khoẻ mạnh 💚');
+      ctx.toast('Đã lưu. Bé đang phát triển khoẻ mạnh');
     }, 900);
   };
   const dashedBtn = {
     flex: 1,
     height: 80,
     borderRadius: radii.md,
-    borderWidth: 1.5,
-    borderStyle: 'dashed' as const,
-    borderColor: colors.borderDefault,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
     backgroundColor: colors.bgSunken,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
-    gap: 5,
+    gap: 4,
   };
   return (
     <View style={{ flex: 1, overflow: 'hidden' }}>
@@ -392,10 +389,10 @@ export function MeasureScreen() {
         </View>
       ) : null}
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 44, flexGrow: 1 }}>
-        <View style={{ alignItems: 'center', marginBottom: 14 }}>
-          <Bong emotion="happy" onesie="orange" size={100} float />
+        <View style={{ alignItems: 'center', marginBottom: 12 }}>
+          <Bong emotion="happy" onesie="orange" size={100} />
         </View>
-        <View style={{ gap: 14 }}>
+        <View style={{ gap: 12 }}>
           <Input
             label="Ngày đo"
             value={'Hôm nay · ' + todayVN()}
@@ -408,8 +405,7 @@ export function MeasureScreen() {
           <Input label="Vòng đầu (cm) · không bắt buộc" type="tel" value={hd} onChange={setHd} placeholder="40.2" />
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <Pressable style={dashedBtn}>
-              <Txt style={{ fontSize: 18, color: colors.textMuted }}>✎</Txt>
-              <Txt style={{ fontSize: 12.5, fontWeight: '600', color: colors.textMuted }}>Ghi chú</Txt>
+                            <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textMuted }}>Ghi chú</Txt>
             </Pressable>
           </View>
         </View>
@@ -436,14 +432,14 @@ export function HistoryScreen() {
   return (
     <View style={{ flex: 1 }}>
       <AppBar title="Nhật ký của bé" onBack={ctx.back} />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingBottom: 14 }} style={{ flexGrow: 0 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingBottom: 16 }} style={{ flexGrow: 0 }}>
         {chips.map(([id, label]) => (
           <Chip key={id} active={filter === id} onPress={() => setFilter(id)}>{label}</Chip>
         ))}
       </ScrollView>
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}>
         {groups.length === 0 ? (
-          <EmptyState emotion="snug" onesie="cream" heading="Chưa có ghi chép nào" helper="Cứ thong thả mama 💛 Mọi khoảnh khắc sẽ được lưu ở đây." />
+          <EmptyState emotion="snug" onesie="cream" heading="Chưa có ghi chép nào" helper="Cứ thong thả mama. Mọi khoảnh khắc sẽ được lưu ở đây." />
         ) : (
           groups.map((g, gi) => (
             <View key={gi} style={{ marginBottom: 24 }}>
@@ -518,9 +514,9 @@ export function LibraryScreen() {
             <Bong emotion="snug" onesie="lavender" size={104} />
           </View>
           <View style={{ maxWidth: 220 }}>
-            <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.6, color: colors.textBrand }}>CHO TUẦN NÀY CỦA BẠN</Txt>
+            <Txt style={{ fontSize: 13, fontWeight: '600', letterSpacing: 0.2, color: colors.textBrand }}>Cho tuần này của bạn</Txt>
             <Txt serif style={{ fontSize: 22, color: colors.textPrimary, marginTop: 8, lineHeight: 28 }}>Vì sao bé bám mẹ hơn trong Leap 4</Txt>
-            <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 10 }}>4 phút đọc · dành cho mama</Txt>
+            <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 8 }}>4 phút đọc · dành cho mama</Txt>
           </View>
         </Pressable>
         {/* Filter chips */}
@@ -530,7 +526,7 @@ export function LibraryScreen() {
           ))}
         </ScrollView>
         {tab === 'saved' ? (
-          <EmptyState emotion="happy" onesie="sage" heading="Chưa lưu bài nào" helper="Chạm ♥ ở bài viết để đọc lại sau nhé mama." />
+          <EmptyState emotion="happy" onesie="sage" heading="Chưa lưu bài nào" helper="Chạm biểu tượng tim ở bài viết để đọc lại sau." />
         ) : (
           <View style={{ gap: 12 }}>
             {D.LIBRARY.map((a, i) => {
@@ -546,10 +542,10 @@ export function LibraryScreen() {
                         </View>
                       ) : null}
                     </View>
-                    <View style={{ flex: 1, paddingHorizontal: 14 }}>
-                      <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.4, color: colors.textBrand }}>{a.tag}</Txt>
+                    <View style={{ flex: 1, paddingHorizontal: 16 }}>
+                      <Txt style={{ fontSize: 13, fontWeight: '600', letterSpacing: 0.2, color: colors.textBrand }}>{a.tag}</Txt>
                       <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.textPrimary, marginTop: 4, lineHeight: 20 }}>{a.title}</Txt>
-                      <Txt style={{ fontSize: 12, color: colors.textMuted, marginTop: 6 }}>{a.mins} phút đọc</Txt>
+                      <Txt style={{ fontSize: 13, color: colors.textMuted, marginTop: 4 }}>{a.mins} phút đọc</Txt>
                     </View>
                   </View>
                 </Card>
@@ -562,19 +558,19 @@ export function LibraryScreen() {
       {/* ---- Article reader sheet ---- */}
       <Sheet open={!!art} onClose={() => setArt(null)} height="82%" title={art ? art.title : ''} sub={art ? `${art.tag} · ${art.mins} phút đọc` : ''}>
         {art ? (
-          <View style={{ gap: 14, paddingTop: 4 }}>
-            <Txt style={{ fontSize: 14.5, lineHeight: 25, color: colors.textPrimary }}>
+          <View style={{ gap: 12, paddingTop: 4 }}>
+            <Txt style={{ fontSize: 15, lineHeight: 25, color: colors.textPrimary }}>
               Tuần này, não bé đang mở ra một cách nhìn thế giới hoàn toàn mới. Những điều quen thuộc bỗng trở nên lạ lẫm - và người duy nhất con thấy an toàn lúc này chính là mẹ.
             </Txt>
-            <Txt style={{ fontSize: 14.5, lineHeight: 25, color: colors.textPrimary }}>
+            <Txt style={{ fontSize: 15, lineHeight: 25, color: colors.textPrimary }}>
               Đó là lý do bé bám mẹ hơn, khóc khi mẹ rời phòng, và đòi bế nhiều hơn hẳn. Đây không phải thói quen xấu - đây là nhu cầu thật của một bộ não đang lớn rất nhanh.
             </Txt>
             {art.locked ? (
               <Card pad={20} style={{ backgroundColor: colors.aiSubtle, borderWidth: 1, borderColor: colors.aiTonal }}>
-                <Txt style={{ fontSize: 14, lineHeight: 22, color: colors.textPrimary, marginBottom: 12 }}>
-                  Đọc đầy đủ bài này và toàn bộ thư viện - Muby Premium 79.000đ trọn đời 💛
+                <Txt style={{ fontSize: 15, lineHeight: 22, color: colors.textPrimary, marginBottom: 12 }}>
+                  Đọc đầy đủ bài này và toàn bộ thư viện - Muby Premium 79.000đ trọn đời
                 </Txt>
-                <View style={{ flexDirection: 'row', gap: 10 }}>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
                   <ButtonPrimary
                     full={false}
                     onPress={() => {
@@ -592,7 +588,7 @@ export function LibraryScreen() {
               </Card>
             ) : (
               <>
-                <Txt style={{ fontSize: 14.5, lineHeight: 25, color: colors.textPrimary }}>
+                <Txt style={{ fontSize: 15, lineHeight: 25, color: colors.textPrimary }}>
                   Điều mẹ có thể làm: giữ nhịp sinh hoạt quen thuộc, ôm con nhiều hơn, và nhớ rằng giai đoạn này sẽ qua. Sau mỗi leap, bé lại biết thêm một kỹ năng mới - và nụ cười của con sẽ cho mẹ biết ngay.
                 </Txt>
                 <Banner icon="💛" tone="soft">

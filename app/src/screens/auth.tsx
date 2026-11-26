@@ -24,7 +24,7 @@ import {
   DateField,
   Ic,
   Input,
-  ScreenGlow,
+  
   Sheet,
 } from '../components';
 import { parseDobInput, parseDueDateInput } from '../data/leapEngine';
@@ -59,7 +59,6 @@ function AuthScaffold({
   const { colors } = useTheme();
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
-      <ScreenGlow height={flowers ? 520 : 280} />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           style={{ flex: 1 }}
@@ -88,21 +87,21 @@ function A1({ go, ctx, auth }: StepProps) {
   return (
     <AuthScaffold>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, paddingVertical: 20 }}>
-        <Bong emotion="happy" onesie="orange" size={184} float />
-        <Txt serif style={{ fontSize: 48, lineHeight: 56, marginTop: 18, color: colors.textPrimary, textAlign: 'center' }}>
+        <Bong emotion="happy" onesie="orange" size={184} />
+        <Txt serif style={{ fontSize: 48, lineHeight: 56, marginTop: 16, color: colors.textPrimary, textAlign: 'center' }}>
           Muby
         </Txt>
-        <Txt serif italic style={{ fontSize: 20, color: colors.textBrand, marginTop: 4 }}>
+        <Txt serif italic style={{ fontSize: 22, color: colors.textBrand, marginTop: 4 }}>
           Mẹ hiểu bé
         </Txt>
-        <Txt style={{ fontSize: 15.5, color: colors.textSecondary, marginTop: 16, maxWidth: 280, lineHeight: 23, textAlign: 'center' }}>
-          Người chị thân thiết đồng hành cùng mama qua từng tuần của bé 💛
+        <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 16, maxWidth: 280, lineHeight: 23, textAlign: 'center' }}>
+          Người chị thân thiết đồng hành cùng mama qua từng tuần của bé
         </Txt>
       </View>
       <View style={{ paddingHorizontal: 24, paddingBottom: 48 }}>
         <ButtonPrimary onPress={() => go('A2')}>Bắt đầu với số điện thoại</ButtonPrimary>
-        <ButtonText onPress={tryFirst} style={{ alignSelf: 'center', marginTop: 6 }}>Dùng thử, đăng nhập sau</ButtonText>
-        <Txt style={{ fontSize: 13, color: colors.textSecondary, textAlign: 'center', marginTop: 6 }}>Không cần mật khẩu · Dữ liệu của bé là của bạn</Txt>
+        <ButtonText onPress={tryFirst} style={{ alignSelf: 'center', marginTop: 4 }}>Dùng thử, đăng nhập sau</ButtonText>
+        <Txt style={{ fontSize: 13, color: colors.textSecondary, textAlign: 'center', marginTop: 4 }}>Không cần mật khẩu · Dữ liệu của bé là của bạn</Txt>
       </View>
     </AuthScaffold>
   );
@@ -112,7 +111,7 @@ function A1({ go, ctx, auth }: StepProps) {
 function TermsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { colors } = useTheme();
   const P = ({ b, t }: { b: string; t: string }) => (
-    <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+    <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 22 }}>
       <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>{b}</Txt> {t}
     </Txt>
   );
@@ -156,7 +155,7 @@ function A2({ go, ctx, auth, setDraft }: StepProps) {
         <View style={{ marginTop: 8, marginBottom: 28 }}>
           <Txt serif style={{ fontSize: 34, lineHeight: 41, color: colors.textPrimary }}>Số điện thoại{'\n'}của mama</Txt>
           <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginTop: 8 }}>
-            Mình gửi mã xác nhận qua SMS - không cần mật khẩu 💛
+            Mình gửi mã xác nhận qua SMS - không cần mật khẩu
           </Txt>
         </View>
         <Input
@@ -171,7 +170,7 @@ function A2({ go, ctx, auth, setDraft }: StepProps) {
         <View style={{ flex: 1 }} />
         <View style={{ paddingTop: 20, paddingBottom: 44 }}>
           <ButtonPrimary disabled={!phoneOk || busy} onPress={submit}>{busy ? 'Đang gửi mã…' : 'Gửi mã'}</ButtonPrimary>
-          <Txt style={{ fontSize: 12, color: colors.textMuted, textAlign: 'center', marginTop: 14, lineHeight: 18 }}>
+          <Txt style={{ fontSize: 13, color: colors.textMuted, textAlign: 'center', marginTop: 12, lineHeight: 18 }}>
             Khi tiếp tục, bạn đồng ý với{' '}
             <Txt onPress={() => setShowTerms(true)} style={{ color: colors.textBrand, fontWeight: '600' }}>Điều khoản</Txt> &{' '}
             <Txt onPress={() => setShowTerms(true)} style={{ color: colors.textBrand, fontWeight: '600' }}>Quyền riêng tư</Txt>.
@@ -213,7 +212,7 @@ function OtpBoxes({ value, onChange, success }: { value: string; onChange: (v: s
     if (e.nativeEvent.key === 'Backspace' && !value[i] && i > 0) refs.current[i - 1]?.focus();
   };
   return (
-    <View style={{ flexDirection: 'row', gap: 9, justifyContent: 'space-between' }}>
+    <View style={{ flexDirection: 'row', gap: 8, justifyContent: 'space-between' }}>
       {[0, 1, 2, 3, 4, 5].map((i) => {
         const filled = !!value[i];
         return (
@@ -230,7 +229,7 @@ function OtpBoxes({ value, onChange, success }: { value: string; onChange: (v: s
               width: 48,
               height: 60,
               textAlign: 'center',
-              fontSize: 24,
+              fontSize: 22,
               fontFamily: fontFamily(600),
               borderRadius: radii.lg,
               borderWidth: filled || success ? 1.5 : 1,
@@ -250,10 +249,10 @@ function DemoCodeBanner({ code }: { code: string | null }) {
   const { colors } = useTheme();
   if (!code) return null;
   return (
-    <Banner icon="✨" tone="ai" style={{ marginTop: 18, alignSelf: 'stretch' }}>
+    <Banner icon="✨" tone="ai" style={{ marginTop: 16, alignSelf: 'stretch' }}>
       <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 19 }}>
         Chế độ demo (chưa nối SMS): mã của bạn là{' '}
-        <Txt style={{ fontWeight: '600', color: colors.textPrimary, fontSize: 14 }}>{code}</Txt>
+        <Txt style={{ fontWeight: '600', color: colors.textPrimary, fontSize: 15 }}>{code}</Txt>
       </Txt>
     </Banner>
   );
@@ -326,7 +325,7 @@ function A3({ go, ctx, auth, draft, setDraft }: StepProps) {
       const { demoCode } = await auth.sendOtp(draft.phone);
       setDraft((d) => ({ ...d, demoCode: demoCode ?? null }));
       setSecs(299);
-      ctx.toast('Đã gửi lại mã 💛');
+      ctx.toast('Đã gửi lại mã');
     } catch (e: any) {
       ctx.toast(e?.message || 'Mạng lag chút xíu. Mình thử lại nhé.');
     }
@@ -340,15 +339,15 @@ function A3({ go, ctx, auth, draft, setDraft }: StepProps) {
           <Txt serif style={{ fontSize: 28, lineHeight: 34, marginTop: 16, color: colors.textPrimary, textAlign: 'center' }}>
             Dùng Face ID cho lần sau?
           </Txt>
-          <Txt style={{ fontSize: 14.5, color: colors.textSecondary, marginTop: 8, maxWidth: 280, lineHeight: 22, textAlign: 'center' }}>
+          <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 8, maxWidth: 280, lineHeight: 22, textAlign: 'center' }}>
             Lần sau chỉ cần nhìn máy là vào - không cần chờ SMS. Bật/tắt được trong Mama.
           </Txt>
         </View>
-        <View style={{ paddingHorizontal: 24, paddingBottom: 48, gap: 10 }}>
+        <View style={{ paddingHorizontal: 24, paddingBottom: 48, gap: 8 }}>
           <ButtonPrimary onPress={() => finish(true)}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <Ic name="faceid" size={22} color="#FFFFFF" sw={2.2} />
-              <Txt style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>Bật Face ID</Txt>
+              <Txt style={{ fontSize: 17, fontWeight: '600', color: '#FFFFFF' }}>Bật Face ID</Txt>
             </View>
           </ButtonPrimary>
           <ButtonText onPress={() => finish(false)} style={{ alignSelf: 'center' }}>Để sau cũng được</ButtonText>
@@ -363,28 +362,28 @@ function A3({ go, ctx, auth, draft, setDraft }: StepProps) {
     <AuthScaffold flowers={false}>
       <AppBar title="" onBack={() => go('A2')} />
       <View style={{ paddingHorizontal: 24, flex: 1, alignItems: 'center' }}>
-        <Bong emotion={success ? 'excited' : 'curious'} onesie="cream" size={104} float={!success} hop={success} />
-        <Txt serif style={{ fontSize: 28, lineHeight: 34, marginTop: 10, color: colors.textPrimary, textAlign: 'center' }}>Nhập mã xác nhận</Txt>
-        <Txt style={{ fontSize: 14, color: colors.textSecondary, marginTop: 6, marginBottom: 28, textAlign: 'center' }}>
+        <Bong emotion={success ? 'excited' : 'curious'} onesie="cream" size={104} />
+        <Txt serif style={{ fontSize: 28, lineHeight: 34, marginTop: 8, color: colors.textPrimary, textAlign: 'center' }}>Nhập mã xác nhận</Txt>
+        <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 4, marginBottom: 28, textAlign: 'center' }}>
           Nhập 6 số vừa gửi tới <Txt style={{ color: colors.textPrimary, fontWeight: '600' }}>+84 {draft.phone}</Txt>
         </Txt>
         <View style={{ width: '100%' }}>
           <OtpBoxes value={otp} onChange={setOtp} success={success} />
         </View>
-        {err ? <Txt style={{ marginTop: 14, fontSize: 13.5, color: colors.danger, fontWeight: '600' }}>{err}</Txt> : null}
-        <View style={{ marginTop: 22 }}>
+        {err ? <Txt style={{ marginTop: 12, fontSize: 13, color: colors.danger, fontWeight: '600' }}>{err}</Txt> : null}
+        <View style={{ marginTop: 20 }}>
           {success ? (
-            <Txt style={{ fontSize: 13.5, color: colors.success, fontWeight: '600' }}>Xác thực thành công 💚</Txt>
+            <Txt style={{ fontSize: 13, color: colors.success, fontWeight: '600' }}>Xác thực thành công</Txt>
           ) : secs > 0 ? (
-            <Txt style={{ fontSize: 13.5, color: colors.textMuted }}>
+            <Txt style={{ fontSize: 13, color: colors.textMuted }}>
               Mã hết hạn sau <Txt style={{ color: colors.textPrimary, fontWeight: '600' }}>{mm}:{ss}</Txt>
             </Txt>
           ) : (
-            <Txt onPress={resend} style={{ fontSize: 13.5, color: colors.textBrand, fontWeight: '600' }}>Gửi lại mã</Txt>
+            <Txt onPress={resend} style={{ fontSize: 13, color: colors.textBrand, fontWeight: '600' }}>Gửi lại mã</Txt>
           )}
         </View>
         {secs < 240 && !success ? (
-          <ButtonText onPress={resend} style={{ marginTop: 6 }}>Gửi lại mã</ButtonText>
+          <ButtonText onPress={resend} style={{ marginTop: 4 }}>Gửi lại mã</ButtonText>
         ) : null}
         <DemoCodeBanner code={draft.demoCode} />
       </View>
@@ -432,9 +431,9 @@ function OB1({ go }: ObProps) {
   return (
     <AuthScaffold>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, paddingVertical: 20 }}>
-        <Bong emotion="excited" onesie="orange" size={250} float />
+        <Bong emotion="excited" onesie="orange" size={250} />
         <Txt serif style={{ fontSize: 34, lineHeight: 41, marginTop: 16, color: colors.textPrimary, textAlign: 'center' }}>
-          Mừng mama{'\n'}đã đến!
+          Mừng mama{'\n'}đã đến
         </Txt>
         <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 12, maxWidth: 290, lineHeight: 23, textAlign: 'center' }}>
           Mỗi ngày mình sẽ hiểu bé thêm một chút.
@@ -478,8 +477,8 @@ export function DueDateField({
         maxDate={dob ? new Date(dob.getTime() + win) : undefined}
         initialMonth={dob ?? undefined}
       />
-      <Txt style={{ fontSize: 12.5, color: colors.textSecondary, lineHeight: 19, marginTop: 8 }}>
-        Leap tính theo ngày dự sinh vì não bé bắt đầu phát triển từ trong bụng mẹ. Với bé sinh sớm/muộn 2 tuần trở lên, điền ngày dự sinh giúp dự báo đúng hơn nhiều 💛
+      <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 19, marginTop: 8 }}>
+        Leap tính theo ngày dự sinh vì não bé bắt đầu phát triển từ trong bụng mẹ. Với bé sinh sớm/muộn 2 tuần trở lên, điền ngày dự sinh giúp dự báo đúng hơn nhiều
       </Txt>
     </View>
   );
@@ -517,8 +516,8 @@ function OB2({ go, draft, setDraft, finish }: ObProps) {
       <View style={{ paddingHorizontal: 24, flex: 1 }}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: 24, gap: 8 }}>
           <View style={{ flex: 1 }}>
-            <Txt serif style={{ fontSize: 34, lineHeight: 41, color: colors.textPrimary }}>Chào bé yêu!</Txt>
-            <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginTop: 6 }}>Kể mình nghe về bé nhé - chỉ ngày sinh là cần thiết.</Txt>
+            <Txt serif style={{ fontSize: 34, lineHeight: 41, color: colors.textPrimary }}>Chào bé yêu</Txt>
+            <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginTop: 4 }}>Kể mình nghe về bé nhé - chỉ ngày sinh là cần thiết.</Txt>
           </View>
           <Bong emotion="curious" onesie="sage" size={88} />
         </View>
@@ -540,14 +539,14 @@ function OB2({ go, draft, setDraft, finish }: ObProps) {
           />
           <View>
             <Txt style={{ fontSize: 13, fontWeight: '500', color: colors.textSecondary, marginBottom: 8 }}>Giới tính (không bắt buộc)</Txt>
-            <View style={{ flexDirection: 'row', gap: 9 }}>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
               {['Bé gái', 'Bé trai', 'Chưa rõ'].map((g) => (
                 <Chip key={g} active={draft.gender === g} onPress={() => setDraft((d) => ({ ...d, gender: g }))} style={{ flex: 1 }}>{g}</Chip>
               ))}
             </View>
           </View>
         </View>
-        <Banner icon="💛" tone="soft" style={{ marginTop: 18 }}>Chỉ ngày sinh là cần thiết - còn lại để sau cũng được.</Banner>
+        <Banner icon="💛" tone="soft" style={{ marginTop: 16 }}>Chỉ ngày sinh là cần thiết - còn lại để sau cũng được.</Banner>
         <View style={{ paddingTop: 24, paddingBottom: 44 }}>
           <ButtonPrimary disabled={!dobIso || (!!draft.dueInput && !dueIso) || dueFar || busy} onPress={submit}>Tiếp tục</ButtonPrimary>
         </View>
@@ -579,7 +578,7 @@ export function OnboardFlow() {
     }
     ctx.goFlow('app');
     ctx.setTab('today');
-    ctx.toast('Chào mừng hai mẹ con 💛');
+    ctx.toast('Chào mừng hai mẹ con');
   };
 
   const M: Record<string, React.ComponentType<ObProps>> = { ob1: OB1, ob2: OB2, ob3: OB2 };

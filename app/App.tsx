@@ -56,7 +56,7 @@ function Splash() {
   const { colors } = useTheme();
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas, alignItems: 'center', justifyContent: 'center' }}>
-      <Bong emotion="happy" onesie="orange" size={140} float />
+      <Bong emotion="happy" onesie="orange" size={140} />
     </View>
   );
 }
@@ -74,12 +74,12 @@ function LockScreen() {
   }, []);
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas, alignItems: 'center', justifyContent: 'center', padding: 28 }}>
-      <Bong emotion="snug" onesie="orange" size={150} float />
-      <Txt serif style={{ fontSize: 34, marginTop: 18, color: colors.textPrimary }}>Muby</Txt>
-      <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 6 }}>Mở khoá để xem nhật ký của bé</Txt>
-      <View style={{ width: '100%', marginTop: 30, gap: 10 }}>
+      <Bong emotion="snug" onesie="orange" size={150} />
+      <Txt serif style={{ fontSize: 34, marginTop: 16, color: colors.textPrimary }}>Muby</Txt>
+      <Txt style={{ fontSize: 15, color: colors.textSecondary, marginTop: 4 }}>Mở khoá để xem nhật ký của bé</Txt>
+      <View style={{ width: '100%', marginTop: 28, gap: 8 }}>
         <ButtonPrimary onPress={() => auth.unlock()}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Ic name="faceid" size={22} color="#FFFFFF" sw={2.2} />
             <Txt style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>Mở khóa bằng Face ID</Txt>
           </View>

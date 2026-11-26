@@ -4,7 +4,7 @@
    ============================================================ */
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { AvatarButton, ButtonPrimary, ButtonText, Card, Ic, NAV_CLEARANCE, ScreenGlow, Tag } from '../components';
+import { AvatarButton, ButtonPrimary, ButtonText, Card, Ic, NAV_CLEARANCE, Tag } from '../components';
 import type { IconName } from '../components';
 import { Bong } from '../mascot/Bong';
 import { useApp } from '../navigation/AppContext';
@@ -25,13 +25,12 @@ export function CommunityScreen() {
   const leapN = st.leap.n;
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAV_CLEARANCE }}>
-      <ScreenGlow height={340} />
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 12 }}>
         <Txt serif style={{ flex: 1, fontSize: 34, lineHeight: 41 }}>Cộng đồng</Txt>
         <AvatarButton onPress={() => ctx.go('me')} />
       </View>
       <View style={{ paddingHorizontal: 20, paddingTop: 12, alignItems: 'center', gap: 12 }}>
-        <Bong emotion="excited" onesie="orange" size={128} float />
+        <Bong emotion="excited" onesie="orange" size={128} />
         <Tag tone="ai">Sắp ra mắt</Tag>
         <Txt serif style={{ fontSize: 28, lineHeight: 34, textAlign: 'center' }}>Nơi các mẹ cùng leap gặp nhau</Txt>
         <Txt style={{ fontSize: 15, lineHeight: 22, color: colors.textSecondary, textAlign: 'center', maxWidth: 330 }}>
@@ -50,8 +49,8 @@ export function CommunityScreen() {
             </View>
           ))}
         </Card>
-        <View style={{ alignSelf: 'stretch', gap: 6, marginTop: 4 }}>
-          <ButtonPrimary onPress={() => ctx.toast('Mình sẽ báo mama ngay khi Cộng đồng mở 💛')}>Báo cho mình khi mở</ButtonPrimary>
+        <View style={{ alignSelf: 'stretch', gap: 4, marginTop: 4 }}>
+          <ButtonPrimary onPress={() => ctx.toast('Mình sẽ báo mama ngay khi Cộng đồng mở')}>Báo cho mình khi mở</ButtonPrimary>
           <ButtonText onPress={() => ctx.toast(`Link nhóm Zalo Leap ${leapN} sẽ có trong bản tới`)} style={{ alignSelf: 'center' }}>
             {`Tham gia nhóm Zalo Leap ${leapN}`}
           </ButtonText>

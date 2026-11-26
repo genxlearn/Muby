@@ -32,7 +32,7 @@ export function StatusStrip() {
       accessibilityLabel={`${s.status}. ${s.detail}`}
       scaleTo={0.98}
       style={[
-        { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radii.lg, backgroundColor: colors.bgElevated },
+        { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16, borderRadius: radii.lg, backgroundColor: colors.bgElevated },
         shadows[2],
       ]}
     >
@@ -67,12 +67,12 @@ export function ActiveTimerPill() {
       onPress={() => ctx.go(sleep ? 'sleeptimer' : 'feedtimer')}
       accessibilityRole="button"
       accessibilityLabel={`${label}, ${time}. Mở đồng hồ`}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, paddingLeft: 14, paddingRight: 10, borderRadius: 999, backgroundColor: bg }}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingLeft: 16, paddingRight: 12, borderRadius: 999, backgroundColor: bg }}
     >
       <Pulse active={live} from={1} to={1.35} fade style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: fg }} />
       <Txt numberOfLines={1} style={{ flex: 1, fontSize: 15, fontWeight: '600' }}>{label}</Txt>
       <Txt style={{ fontSize: 17, fontWeight: '600', color: fg, fontVariant: ['tabular-nums'] }}>{time}</Txt>
-      <View style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, backgroundColor: colors.bgElevated }}>
+      <View style={{ paddingVertical: 8, paddingHorizontal: 16, borderRadius: 999, backgroundColor: colors.bgElevated }}>
         <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textBrand }}>Mở</Txt>
       </View>
     </Pressable>
@@ -156,7 +156,7 @@ export function FeedTimerScreen() {
     ctx.addLog({ type: 'feed', label: 'Bú mẹ', detail: parts.join(', '), at: t.startAt, side });
     ctx.setTimer(null);
     ctx.back();
-    ctx.toast(`Đã ghi cữ bú ${duration(totals.total)}. Bạn đang làm rất tốt ❤️`);
+    ctx.toast(`Đã ghi cữ bú ${duration(totals.total)}. Bạn đang làm rất tốt`);
   };
   const saveManual = (m: number) => {
     ctx.addLog({ type: 'feed', label: 'Bú mẹ', detail: `${sideName(manualSide)} ${m} phút`, at: Date.now() - m * 60000, side: manualSide });
@@ -181,7 +181,7 @@ export function FeedTimerScreen() {
   return (
     <View style={{ flex: 1 }}>
       <AppBar title="Cữ ăn" onBack={ctx.back} />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, alignItems: 'center', gap: 18 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, alignItems: 'center', gap: 16 }}>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <Chip active>Bú mẹ</Chip>
           <Chip onPress={otherType}>Bú bình</Chip>
@@ -197,7 +197,7 @@ export function FeedTimerScreen() {
           <SideButton side="R" state={stateOf('R')} ms={totals.R} onPress={() => tap('R')} />
         </View>
 
-        <View style={{ alignSelf: 'stretch', gap: 10, marginTop: 8 }}>
+        <View style={{ alignSelf: 'stretch', gap: 8, marginTop: 8 }}>
           <ButtonPrimary disabled={!t || totals.total < 1000} onPress={save}>Lưu cữ bú</ButtonPrimary>
           {t ? (
             <ButtonText onPress={() => { ctx.setTimer(null); ctx.toast('Đã huỷ cữ bú này'); }} style={{ alignSelf: 'center' }}>Huỷ cữ này</ButtonText>
@@ -207,7 +207,7 @@ export function FeedTimerScreen() {
         </View>
 
         {manual && !t ? (
-          <View style={{ alignSelf: 'stretch', gap: 10, padding: 16, borderRadius: radii.lg, backgroundColor: colors.bgElevated }}>
+          <View style={{ alignSelf: 'stretch', gap: 8, padding: 16, borderRadius: radii.lg, backgroundColor: colors.bgElevated }}>
             <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>Bên nào?</Txt>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               <Chip active={manualSide === 'L'} onPress={() => setManualSide('L')}>Bên trái</Chip>
@@ -253,17 +253,16 @@ export function SleepTimerScreen() {
     ctx.addLog({ type: 'sleep', label: 'Giấc ngủ', detail: duration(end - t.startAt), at: t.startAt, endAt: end });
     ctx.setTimer(null);
     ctx.back();
-    ctx.toast(`${displayName} đã ngủ ${duration(end - t.startAt)} 💤`);
+    ctx.toast(`${displayName} đã ngủ ${duration(end - t.startAt)}`);
   };
 
   return (
     <View style={{ flex: 1 }}>
       <AppBar title="Giấc ngủ" onBack={ctx.back} />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, alignItems: 'center', gap: 18 }}>
-        {/* slow 4s breathing while the baby sleeps - calming, not attention-grabbing */}
-        <Pulse active={!!t} from={1} to={1.04} duration={4000} style={{ width: 200, height: 200, borderRadius: 100, backgroundColor: colors.activity.sleep.bg, alignItems: 'center', justifyContent: 'center' }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, alignItems: 'center', gap: 16 }}>
+        <View style={{ width: 200, height: 200, borderRadius: 100, backgroundColor: colors.activity.sleep.bg, alignItems: 'center', justifyContent: 'center' }}>
           <BongFace emotion="sleeping" size={130} />
-        </Pulse>
+        </View>
         <Txt style={{ fontSize: 15, fontWeight: '600', color: colors.activity.sleep.fg }}>{t ? `${displayName} đang ngủ` : `${displayName} chuẩn bị ngủ`}</Txt>
         <Txt style={{ fontSize: 56, lineHeight: 62, fontWeight: '600', letterSpacing: -1, fontVariant: ['tabular-nums'] }}>
           {t ? stopwatch(now - t.startAt) : '00:00'}
@@ -271,7 +270,7 @@ export function SleepTimerScreen() {
 
         {t ? (
           <View style={{ flexDirection: 'row', gap: 12, alignSelf: 'stretch' }}>
-            <View style={{ flex: 1, padding: 14, borderRadius: radii.lg, backgroundColor: colors.bgElevated, borderWidth: 1, borderColor: colors.borderDefault, gap: 6 }}>
+            <View style={{ flex: 1, padding: 16, borderRadius: radii.lg, backgroundColor: colors.bgElevated, borderWidth: 1, borderColor: colors.borderDefault, gap: 4 }}>
               <Txt style={{ fontSize: 13, color: colors.textSecondary }}>Bắt đầu</Txt>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Txt style={{ flex: 1, fontSize: 17, fontWeight: '600', fontVariant: ['tabular-nums'] }}>{clock(t.startAt)}</Txt>
@@ -283,7 +282,7 @@ export function SleepTimerScreen() {
                 </Pressable>
               </View>
             </View>
-            <View style={{ flex: 1, padding: 14, borderRadius: radii.lg, backgroundColor: colors.bgElevated, borderWidth: 1, borderColor: colors.borderDefault, gap: 6 }}>
+            <View style={{ flex: 1, padding: 16, borderRadius: radii.lg, backgroundColor: colors.bgElevated, borderWidth: 1, borderColor: colors.borderDefault, gap: 4 }}>
               <Txt style={{ fontSize: 13, color: colors.textSecondary }}>Thức dậy</Txt>
               <Txt style={{ fontSize: 17, fontWeight: '600', color: colors.textMuted }}>-</Txt>
             </View>
@@ -302,7 +301,7 @@ export function SleepTimerScreen() {
         <Txt style={{ fontSize: 13, color: colors.textSecondary, textAlign: 'center', lineHeight: 18, maxWidth: 320 }}>
           Muby tính tổng giờ ngủ trong ngày và dùng nó cho dự báo leap.
         </Txt>
-        <View style={{ alignSelf: 'stretch', gap: 10, marginTop: 8 }}>
+        <View style={{ alignSelf: 'stretch', gap: 8, marginTop: 8 }}>
           {t ? (
             <>
               <ButtonPrimary onPress={wake}>Bé dậy rồi</ButtonPrimary>

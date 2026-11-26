@@ -14,7 +14,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { fontFamily } from '../theme/tokens';
 import { Txt } from '../theme/Txt';
 import { Ic } from './Icon';
-import { hasIcon3D, Icon3D } from './Icon3D';
+import { emojiIcon } from './emojiIcon';
 
 /* ---------- Buttons (Peachy: pill 52px · label 15 SemiBold) ---------- */
 export function ButtonPrimary({
@@ -201,14 +201,15 @@ export function HeroCard({
 }
 
 /** Soft peach → pink glow behind the top of a screen (Peachy screen background). */
-export function ScreenGlow({ height = 380 }: { height?: number }) {
+/* Peach-pink wash, Today only (unslop: kept by choice, toned down). */
+export function ScreenGlow({ height = 280 }: { height?: number }) {
   const { colors } = useTheme();
   return (
     <LinearGradient
       pointerEvents="none"
       colors={colors.glow}
       locations={[0, 0.5, 1]}
-      style={{ position: 'absolute', left: 0, right: 0, top: 0, height }}
+      style={{ position: 'absolute', left: 0, right: 0, top: 0, height, opacity: 0.55 }}
     />
   );
 }
@@ -231,7 +232,7 @@ export function Chip({
       onPress={onPress}
       style={({ pressed }) => [
         {
-          paddingHorizontal: 14,
+          paddingHorizontal: 16,
           minHeight: 36,
           alignItems: 'center',
           justifyContent: 'center',
@@ -263,7 +264,7 @@ export function Tag({ children, tone = 'neutral', style }: { children: React.Rea
   };
   const [bg, fg] = map[tone];
   return (
-    <View style={[{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: radii.sm, backgroundColor: bg }, style]}>
+    <View style={[{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 4, borderRadius: radii.sm, backgroundColor: bg }, style]}>
       <Txt style={{ fontSize: 13, fontWeight: '500', color: fg }}>{children as any}</Txt>
     </View>
   );
@@ -297,7 +298,10 @@ export function IconTile({
   const [bg, fg] = tileColors(colors, tone);
   return (
     <View style={{ width: size, height: size, borderRadius: radii.md, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
-      {icon ? <Ic name={icon} size={Math.round(size * 0.55)} sw={1.6} color={fg} /> : emoji ? <Txt style={{ fontSize: size * 0.48 }}>{emoji}</Txt> : null}
+      {(() => {
+        const name = icon ?? emojiIcon(emoji);
+        return name ? <Ic name={name} size={Math.round(size * 0.55)} sw={1.6} color={fg} /> : null;
+      })()}
     </View>
   );
 }
@@ -337,10 +341,10 @@ export function InsightCard({
   return (
     <View style={[{ flexDirection: 'row', gap: 12, padding: 16, borderRadius: radii.lg, backgroundColor: colors.aiSubtle }, style]}>
       <View style={{ width: 3, borderRadius: 2, backgroundColor: colors.aiPrimary }} />
-      <View style={{ flex: 1, gap: 10 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <View style={{ flex: 1, gap: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Ic name="sparkle" size={14} sw={1.8} color={colors.aiText} />
-          <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 1, color: colors.aiText, textTransform: 'uppercase' }}>{eyebrow}</Txt>
+          <Txt style={{ fontSize: 13, fontWeight: '600', letterSpacing: 0.2, color: colors.aiText }}>{eyebrow}</Txt>
         </View>
         <Txt italic style={{ fontSize: 17, lineHeight: 24, color: colors.textPrimary }}>{children}</Txt>
         {meta || link ? (
@@ -393,7 +397,7 @@ export function StatTile({
         <Txt style={{ flex: 1, fontSize: 15, fontWeight: '500', color: colors.textPrimary }} numberOfLines={1}>{label}</Txt>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Txt style={{ fontSize: 20, lineHeight: 26, fontWeight: '600', letterSpacing: -0.2, color: colors.textPrimary }}>{value}</Txt>
+        <Txt style={{ fontSize: 22, lineHeight: 26, fontWeight: '600', letterSpacing: -0.2, color: colors.textPrimary }}>{value}</Txt>
         {badge}
       </View>
       {sub ? (
@@ -481,8 +485,8 @@ export function Input({
         ) : null}
         {rightSlot}
       </View>
-      {error ? <Txt style={{ fontSize: 13, color: colors.danger, marginTop: 6 }}>{error}</Txt> : null}
-      {hint && !error ? <Txt style={{ fontSize: 12.5, color: colors.textMuted, marginTop: 6 }}>{hint}</Txt> : null}
+      {error ? <Txt style={{ fontSize: 13, color: colors.danger, marginTop: 4 }}>{error}</Txt> : null}
+      {hint && !error ? <Txt style={{ fontSize: 13, color: colors.textMuted, marginTop: 4 }}>{hint}</Txt> : null}
     </View>
   );
 }
@@ -511,7 +515,7 @@ export function ListRow({
     <Container onPress={onPress} style={[{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 }, style]}>
       {icon != null ? (
         <View style={{ width: 40, height: 40, borderRadius: radii.md, backgroundColor: iconBg || colors.bgSunken, alignItems: 'center', justifyContent: 'center' }}>
-          {typeof icon === 'string' ? <Txt style={{ fontSize: 19 }}>{icon}</Txt> : icon}
+          {typeof icon === 'string' ? (emojiIcon(icon) ? <Ic name={emojiIcon(icon)!} size={20} sw={1.6} color={colors.textPrimary} /> : null) : icon}
         </View>
       ) : null}
       <View style={{ flex: 1, minWidth: 0 }}>
@@ -540,8 +544,8 @@ export function Banner({
   const { colors, radii } = useTheme();
   const bg = tone === 'soft' ? colors.bgAccentSoft : tone === 'ai' ? colors.aiSubtle : tone === 'warning' ? colors.warningSoft : colors.bgSunken;
   return (
-    <View style={[{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: bg, borderRadius: radii.lg }, style]}>
-      {icon ? (hasIcon3D(icon) ? <Icon3D emo={icon} size={28} /> : <Txt style={{ fontSize: 16 }}>{icon}</Txt>) : null}
+    <View style={[{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: bg, borderRadius: radii.lg }, style]}>
+      {emojiIcon(icon) ? <Ic name={emojiIcon(icon)!} size={20} sw={1.6} color={tone === 'ai' ? colors.aiText : colors.textBrand} /> : null}
       <View style={{ flex: 1 }}>
         {typeof children === 'string' ? (
           <Txt style={{ fontSize: 13, color: colors.textPrimary, lineHeight: 18 }}>{children}</Txt>

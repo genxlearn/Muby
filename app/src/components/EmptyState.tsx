@@ -23,8 +23,8 @@ export function EmptyState({
   const { colors } = useTheme();
   const sm = size === 'sm';
   return (
-    <View style={{ alignItems: 'center', paddingVertical: sm ? 18 : 40, paddingHorizontal: sm ? 16 : 24, gap: 6 }}>
-      <Bong emotion={emotion} onesie={onesie} size={sm ? 96 : 160} float={!sm} />
+    <View style={{ alignItems: 'center', paddingVertical: sm ? 18 : 40, paddingHorizontal: sm ? 16 : 24, gap: 4 }}>
+      <Bong emotion={emotion} onesie={onesie} size={sm ? 96 : 160} />
       <Txt serif style={{ fontSize: sm ? 20 : 28, lineHeight: sm ? 26 : 34, color: colors.textPrimary, marginTop: 8, textAlign: 'center' }}>
         {heading}
       </Txt>

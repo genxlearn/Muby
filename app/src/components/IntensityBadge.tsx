@@ -21,7 +21,7 @@ export function IntensityBadge({ level = 2, size = 'md' }: { level?: number; siz
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'flex-start',
-        gap: 6,
+        gap: 4,
         paddingVertical: pad.pv,
         paddingHorizontal: pad.ph,
         borderRadius: 999,

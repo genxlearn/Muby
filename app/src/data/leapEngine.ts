@@ -167,10 +167,10 @@ function bracketFor(ageMonths: number): { label: string; b: { feed: [number, num
 
 /* magic weekly facts for the sunny daily card */
 const MAGIC: Record<number, string> = {
-  15: 'Tuần này mắt bé bắt đầu nhìn rõ ở khoảng 40cm - đúng khoảng cách từ mặt mẹ khi cho bú. Không phải ngẫu nhiên đâu 💛',
+  15: 'Tuần này mắt bé bắt đầu nhìn rõ ở khoảng 40cm - đúng khoảng cách từ mặt mẹ khi cho bú. Không phải ngẫu nhiên đâu',
   16: 'Não bé tuần này tạo hàng triệu kết nối mới mỗi ngày - mỗi lần mama nói chuyện với con là một lần "xây đường" cho não bé.',
   17: 'Bé giờ nghe được sự khác nhau giữa giọng vui và giọng mệt của mẹ - con đang học cảm xúc qua tai đấy.',
-  18: 'Tay bé tuần này bắt đầu "biết nghe lời" hơn - con nhìn vật, rồi nhìn tay mình, rồi với. Cả một dây chuyền điều khiển!',
+  18: 'Tay bé tuần này bắt đầu "biết nghe lời" hơn - con nhìn vật, rồi nhìn tay mình, rồi với. Cả một dây chuyền điều khiển',
 };
 
 /* ---------- main ---------- */
@@ -248,10 +248,10 @@ export function computeBabyState(dobIso: string, dueDateIso?: string | null, now
   const dw = now.getDay(); // 0 = CN
   const daily: DailyCard =
     dw === 0
-      ? { kind: 'photo', label: '📸 Khoảnh khắc tuần này', text: 'Tuần này nhiều bé bắt đầu cười thành tiếng. Nếu bé cười, mama quay lại 10 giây bằng camera điện thoại nhé.', action: null }
+      ? { kind: 'photo', label: 'Khoảnh khắc tuần này', text: 'Tuần này nhiều bé bắt đầu cười thành tiếng. Nếu bé cười, mama quay lại 10 giây bằng camera điện thoại nhé.', action: null }
       : dw % 2 === 1
-        ? { kind: 'fact', label: '✨ Điều kỳ diệu hôm nay', text: magicText, action: null }
-        : { kind: 'game', label: '🎲 Trò 5 phút', text: game ? `Bé vừa học ${game.skill}. Thử: ${game.game}` : `Chơi ú òa với khăn - con đang luyện kỹ năng ${refLeap.skill}.`, action: null };
+        ? { kind: 'fact', label: 'Điều kỳ diệu hôm nay', text: magicText, action: null }
+        : { kind: 'game', label: 'Trò 5 phút', text: game ? `Bé vừa học ${game.skill}. Thử: ${game.game}` : `Chơi ú òa với khăn - con đang luyện kỹ năng ${refLeap.skill}.`, action: null };
 
   const sunny: SunnyState = {
     daysToNext,
@@ -265,7 +265,7 @@ export function computeBabyState(dobIso: string, dueDateIso?: string | null, now
           signs: next.prepSigns ?? next.symptoms.slice(0, 2).map((s) => s.toLowerCase()),
           tips: [
             'Tuần tới hạn chế xáo trộn lịch - hoãn việc lớn nếu được.',
-            'Sạc pin cho mama: tranh thủ ngủ bù tuần này, tuần sau con cần mẹ nhiều hơn ☕',
+            'Sạc pin cho mama: tranh thủ ngủ bù tuần này, tuần sau con cần mẹ nhiều hơn',
           ],
         }
       : null,

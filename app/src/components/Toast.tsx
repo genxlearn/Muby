@@ -28,7 +28,7 @@ export function Toast({ toast, topInset = 0 }: { toast: ToastData | null; topIns
           flexDirection: 'row',
           alignItems: 'center',
           paddingVertical: 12,
-          paddingHorizontal: 18,
+          paddingHorizontal: 20,
           backgroundColor: colors.bgInverse,
           borderRadius: 999,
           opacity: v,

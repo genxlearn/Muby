@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { LayoutAnimation, Pressable, View } from 'react-native';
-import { PressScale, useReducedMotion } from './anim/motion';
+import { Pressable, View } from 'react-native';
+import { FadeInUp, PressScale } from './anim/motion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { Txt } from '../theme/Txt';
@@ -36,17 +36,13 @@ export function BottomNav({
   const fadeTop = colors.bgCanvas + '00';
   const fadeBottom = colors.bgCanvas + 'E6';
 
-  const reduce = useReducedMotion();
   const tab = (it: (typeof TABS)[number]) => {
     const on = active === it.id;
     return (
       <Pressable
         key={it.id}
-        onPress={() => {
-          // The active pill widens and its label fades in; others shrink to icons.
-          if (!on && !reduce) LayoutAnimation.configureNext(LayoutAnimation.create(220, 'easeInEaseOut', 'opacity'));
-          onNav(it.id);
-        }}
+        // Width switches instantly; only the label fades in (unslop: no animated width).
+        onPress={() => onNav(it.id)}
         accessibilityRole="tab"
         accessibilityLabel={it.label}
         accessibilityState={{ selected: on }}
@@ -65,9 +61,11 @@ export function BottomNav({
       >
         <Ic name={it.icon} size={24} sw={on ? 2 : 1.6} color={on ? colors.accentPrimary : colors.textPrimary} />
         {on ? (
-          <Txt numberOfLines={1} style={{ fontSize: 11, fontWeight: '600', color: colors.textBrand }}>
-            {it.label}
-          </Txt>
+          <FadeInUp key={it.id} distance={0} duration={180}>
+            <Txt numberOfLines={1} style={{ fontSize: 11, fontWeight: '600', color: colors.textBrand }}>
+              {it.label}
+            </Txt>
+          </FadeInUp>
         ) : null}
       </Pressable>
     );
@@ -86,7 +84,7 @@ export function BottomNav({
       >
         <View
           style={[
-            { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2, padding: 6, backgroundColor: colors.bgElevated, borderRadius: 999 },
+            { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2, padding: 8, backgroundColor: colors.bgElevated, borderRadius: 999 },
             shadows[3],
           ]}
         >

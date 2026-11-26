@@ -5,7 +5,7 @@
    ============================================================ */
 import React, { useState } from 'react';
 import { LayoutAnimation, Pressable, ScrollView, View } from 'react-native';
-import { Banner, Card, Ic, Icon3D, IconTile, Sheet } from '../components';
+import { Banner, Card, Ic, IconTile, Sheet } from '../components';
 import type { IconName, TileTone } from '../components';
 import * as D from '../data/sampleData';
 import { LeapAction, Leap } from '../data/sampleData';
@@ -55,7 +55,7 @@ export function ForecastStrip({ data, onPick }: { data: D.ForecastDay[]; onPick?
               alignItems: 'center',
               gap: 8,
               paddingTop: 8,
-              paddingBottom: 10,
+              paddingBottom: 12,
               borderRadius: radii.lg,
               backgroundColor: d.today ? colors.bgAccentSoft : 'transparent',
               borderWidth: 1,
@@ -74,7 +74,7 @@ export function ForecastStrip({ data, onPick }: { data: D.ForecastDay[]; onPick?
   );
 }
 
-/* Action card - Icon3D badge + progressive disclosure (Muby App Final) */
+/* Action card - line-icon tile + progressive disclosure (Muby App Final) */
 export function ActionCard({
   action,
   onSound,
@@ -97,7 +97,7 @@ export function ActionCard({
       <Pressable
         onPress={toggle}
         accessibilityState={{ expanded: open }}
-        style={{ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 14, paddingLeft: 16, paddingRight: 14, minHeight: 56 }}
+        style={{ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 16, paddingLeft: 16, paddingRight: 16, minHeight: 56 }}
       >
         <IconTile tone="brand" emoji={action.emoji} />
         <Txt style={{ flex: 1, fontSize: 15, fontWeight: '600', color: colors.textPrimary, lineHeight: 20 }}>{action.title}</Txt>
@@ -111,7 +111,7 @@ export function ActionCard({
             <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Vì sao? </Txt>
             {action.why}
           </Txt>
-          <View style={{ marginTop: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12, backgroundColor: colors.bgAccentSoft }}>
+          <View style={{ marginTop: 8, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12, backgroundColor: colors.bgAccentSoft }}>
             <Txt style={{ fontSize: 13, color: colors.textPrimary, lineHeight: 18 }}>
               <Txt style={{ fontWeight: '600' }}>Nên làm: </Txt>
               {action.what}
@@ -120,9 +120,9 @@ export function ActionCard({
           {action.hasSound && onSound ? (
             <Pressable
               onPress={onSound}
-              style={{ marginTop: 12, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', paddingVertical: 9, paddingHorizontal: 16, minHeight: 36, borderRadius: 999, backgroundColor: colors.accentSoftBg }}
+              style={{ marginTop: 12, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 16, minHeight: 36, borderRadius: 999, backgroundColor: colors.accentSoftBg }}
             >
-              <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textBrand }}>🎵 Bật tiếng ồn trắng</Txt>
+              <Txt style={{ fontSize: 13, fontWeight: '600', color: colors.textBrand }}>Bật tiếng ồn trắng</Txt>
             </Pressable>
           ) : null}
         </View>
@@ -145,8 +145,8 @@ export function EasyEducationCard() {
   const { state: st } = useBaby();
   return (
     <Card pad={16} onPress={() => ctx.go('easy')}>
-      <View style={{ gap: 14 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+      <View style={{ gap: 12 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <View style={{ flex: 1 }}>
             <Txt style={{ fontSize: 17, fontWeight: '600', color: colors.textPrimary }}>Nhịp sinh hoạt EASY</Txt>
             <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>{st.easyVariant} · phù hợp bé {st.ageLabel}</Txt>
@@ -155,7 +155,7 @@ export function EasyEducationCard() {
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {EASY_BLOCKS.map((b) => (
-            <View key={b.k} style={{ flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, paddingHorizontal: 4, borderRadius: radii.md, backgroundColor: colors.bgSunken }}>
+            <View key={b.k} style={{ flex: 1, alignItems: 'center', gap: 4, paddingVertical: 12, paddingHorizontal: 4, borderRadius: radii.md, backgroundColor: colors.bgSunken }}>
               <IconTile tone={b.tone} icon={b.icon} size={32} />
               <Txt style={{ fontSize: 11, fontWeight: '600', color: colors.textPrimary }}>{b.k} · {b.label}</Txt>
             </View>
@@ -176,7 +176,7 @@ export function SunnyPlaySection({ leap }: { leap: Leap }) {
   if (plays.length === 0) return null;
   return (
     <View>
-      <Txt serif style={{ fontSize: 22, lineHeight: 28, marginBottom: 4 }}>Sunny Play 🌼</Txt>
+      <Txt serif style={{ fontSize: 22, lineHeight: 28, marginBottom: 4 }}>Sunny Play</Txt>
       <Txt style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 12 }}>Bé sẵn sàng học · hoạt động nhẹ nhàng cho Leap {leap.n}</Txt>
       <ScrollView
         horizontal
@@ -185,13 +185,13 @@ export function SunnyPlaySection({ leap }: { leap: Leap }) {
         snapToAlignment="start"
         decelerationRate="fast"
         style={{ marginHorizontal: -20 }}
-        contentContainerStyle={{ gap: 12, paddingHorizontal: 20, paddingBottom: 10, paddingTop: 4 }}
+        contentContainerStyle={{ gap: 12, paddingHorizontal: 20, paddingBottom: 12, paddingTop: 4 }}
       >
         {plays.map((a, i) => (
           <View
             key={i}
             style={[
-              { width: PLAY_CARD_W, borderRadius: radii.lg, backgroundColor: colors.bgElevated, padding: 16, gap: 10 },
+              { width: PLAY_CARD_W, borderRadius: radii.lg, backgroundColor: colors.bgElevated, padding: 16, gap: 8 },
               shadows[2],
             ]}
           >
@@ -220,7 +220,7 @@ export function SymptomSheet({ symptom, leap, open, onClose }: { symptom: string
   const action = leap.actions.find((a) => a.title.toLowerCase().includes(symptom.toLowerCase().slice(0, 6)));
   return (
     <Sheet open={open} onClose={onClose} height="58%" title={symptom}>
-      <View style={{ gap: 14 }}>
+      <View style={{ gap: 12 }}>
         {action ? (
           <>
             <Txt style={{ fontSize: 15, lineHeight: 24, color: colors.textPrimary }}>
@@ -234,7 +234,7 @@ export function SymptomSheet({ symptom, leap, open, onClose }: { symptom: string
           </>
         ) : (
           <Txt style={{ fontSize: 15, lineHeight: 24, color: colors.textSecondary }}>
-            Đây là biểu hiện bình thường ở Leap {leap.n}. Bé đang học {leap.skill}. Ôm bé nhiều hơn và kiên nhẫn nhé mama 💛
+            Đây là biểu hiện bình thường ở Leap {leap.n}. Bé đang học {leap.skill}. Ôm bé nhiều hơn và kiên nhẫn nhé mama
           </Txt>
         )}
         <Banner icon="💛" tone="soft">Mỗi leap rồi sẽ qua. Bé đang lớn lên ngay trong vòng tay mama.</Banner>
@@ -254,7 +254,7 @@ export function SymptomPills({ symptoms, onPick }: { symptoms: string[]; onPick?
         );
         const style = {
           paddingVertical: 8,
-          paddingHorizontal: 14,
+          paddingHorizontal: 16,
           minHeight: 36,
           justifyContent: 'center' as const,
           borderRadius: 8,

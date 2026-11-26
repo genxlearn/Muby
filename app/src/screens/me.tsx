@@ -18,7 +18,7 @@ import {
   Ic,
   IconTile,
   Input,
-  ScreenGlow,
+  
   Sheet,
   Tag,
   Toggle,
@@ -52,7 +52,7 @@ function NotifGroup({ title, items }: { title: string; items: D.Notif[] }) {
               flexDirection: 'row',
               gap: 12,
               alignItems: 'flex-start',
-              paddingVertical: 14,
+              paddingVertical: 16,
               paddingHorizontal: 12,
               borderTopWidth: i ? 1 : 0,
               borderTopColor: colors.borderSubtle,
@@ -60,11 +60,11 @@ function NotifGroup({ title, items }: { title: string; items: D.Notif[] }) {
           >
             <IconTile emoji={nt.icon} tone={nt.unread ? 'brand' : 'neutral'} />
             <View style={{ flex: 1 }}>
-              <Txt style={{ fontSize: 14, lineHeight: 20, color: colors.textPrimary }}>{nt.text}</Txt>
-              <Txt style={{ fontSize: 12, color: colors.textMuted, marginTop: 4 }}>{nt.time}</Txt>
+              <Txt style={{ fontSize: 15, lineHeight: 20, color: colors.textPrimary }}>{nt.text}</Txt>
+              <Txt style={{ fontSize: 13, color: colors.textMuted, marginTop: 4 }}>{nt.time}</Txt>
             </View>
             {nt.unread ? (
-              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accentPrimary, marginTop: 6 }} />
+              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accentPrimary, marginTop: 4 }} />
             ) : null}
           </View>
         ))}
@@ -84,14 +84,14 @@ export function NotificationsScreen() {
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, flexGrow: 1 }}>
         {empty ? (
           <View style={{ flex: 1, justifyContent: 'center' }}>
-            <EmptyState emotion="happy" onesie="orange" heading="Hết rồi" helper="Dành chút thời gian cho mama nhé ☕" />
+            <EmptyState emotion="happy" onesie="orange" heading="Hết rồi" helper="Dành chút thời gian cho mama nhé" />
           </View>
         ) : (
           <>
             {NOTIFS.today.length > 0 ? <NotifGroup title="Hôm nay" items={NOTIFS.today} /> : null}
             {NOTIFS.earlier.length > 0 ? <NotifGroup title="Trước đó" items={NOTIFS.earlier} /> : null}
             <Txt style={{ textAlign: 'center', paddingVertical: 16, color: colors.textMuted, fontSize: 13 }}>
-              Hết rồi. Dành chút thời gian cho mama nhé ☕
+              Hết rồi. Dành chút thời gian cho mama nhé
             </Txt>
           </>
         )}
@@ -208,7 +208,7 @@ export function MeScreen() {
       dueDate: dueIso ?? undefined,
     });
     setSheet(null);
-    ctx.toast('Đã lưu. Mọi dự báo đã tính lại theo bé 💚');
+    ctx.toast('Đã lưu. Mọi dự báo đã tính lại theo bé');
   };
 
   const toggleFaceId = async () => {
@@ -218,7 +218,7 @@ export function MeScreen() {
       ctx.toast('Chưa bật được Face ID - thử lại nhé.');
       return;
     }
-    ctx.toast(next ? 'Đã bật Face ID 💚' : 'Đã tắt Face ID. Lần sau đăng nhập bằng mã SMS nhé.');
+    ctx.toast(next ? 'Đã bật Face ID' : 'Đã tắt Face ID. Lần sau đăng nhập bằng mã SMS nhé.');
   };
 
   const logout = async () => {
@@ -231,7 +231,7 @@ export function MeScreen() {
   };
   const restore = async () => {
     const r = await ctx.restorePurchase();
-    ctx.toast(r === 'ok' ? 'Đã khôi phục Muby Premium 💛' : r === 'none' ? 'Chưa tìm thấy giao dịch mua Premium trên tài khoản này.' : 'Cửa hàng chưa sẵn sàng. Thử lại sau ít phút nhé.');
+    ctx.toast(r === 'ok' ? 'Đã khôi phục Muby Premium' : r === 'none' ? 'Chưa tìm thấy giao dịch mua Premium trên tài khoản này.' : 'Cửa hàng chưa sẵn sàng. Thử lại sau ít phút nhé.');
   };
   const deleteAll = async () => {
     setDeleting(true);
@@ -249,8 +249,7 @@ export function MeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
-    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 6, paddingHorizontal: 20, paddingBottom: 140 }}>
-      <ScreenGlow height={300} />
+    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 20, paddingBottom: 140 }}>
       {/* Profile header (E1) */}
       <View style={{ alignItems: 'center', paddingTop: 16, marginBottom: 20 }}>
         <Pressable onPress={openBabySheet} accessibilityLabel="Sửa thông tin bé">
@@ -269,23 +268,23 @@ export function MeScreen() {
         ].map(([v, l]) => (
           <Card key={l} pad={14} style={{ flex: 1, alignItems: 'center' }}>
             <Txt serif style={{ fontSize: 22, lineHeight: 28, color: colors.textPrimary }}>{v}</Txt>
-            <Txt style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>{l}</Txt>
+            <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>{l}</Txt>
           </Card>
         ))}
       </View>
 
       {/* Premium / trial state */}
       {ctx.purchased ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 11, paddingHorizontal: 16, minHeight: 44, borderRadius: 999, backgroundColor: colors.accentSoftBg, marginBottom: 24, alignSelf: 'center' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, minHeight: 44, borderRadius: 999, backgroundColor: colors.accentSoftBg, marginBottom: 24, alignSelf: 'center' }}>
           <Ic name="check" size={17} sw={2.6} color={colors.accentPrimary} />
-          <Txt style={{ fontWeight: '600', fontSize: 14, color: colors.textPrimary }}>Muby Premium ✓</Txt>
+          <Txt style={{ fontWeight: '600', fontSize: 15, color: colors.textPrimary }}>Muby Premium</Txt>
         </View>
       ) : (
         <>
           {ctx.trial ? (
             <Banner icon="✨" tone="ai" style={{ marginBottom: 12 }}>
-              <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 20 }}>
-                7 ngày đầu: mọi thứ đang mở · còn <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>{ctx.trial.daysLeft} ngày</Txt> · sau đó về gói Miễn phí - không trừ tiền 💛
+              <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 20 }}>
+                7 ngày đầu: mọi thứ đang mở · còn <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>{ctx.trial.daysLeft} ngày</Txt> · sau đó về gói Miễn phí - không trừ tiền
               </Txt>
             </Banner>
           ) : null}
@@ -295,23 +294,23 @@ export function MeScreen() {
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <Ic name="crown" size={20} color={colors.leap[3]} />
-              <Txt serif style={{ fontSize: 24, color: colors.textInverse }}>Muby Premium</Txt>
+              <Txt serif style={{ fontSize: 22, color: colors.textInverse }}>Muby Premium</Txt>
             </View>
-            <Txt style={{ fontSize: 13.5, color: colors.textInverse, opacity: 0.7, marginTop: 4 }}>{ctx.priceLabel} · Một lần · Trọn đời</Txt>
+            <Txt style={{ fontSize: 13, color: colors.textInverse, opacity: 0.7, marginTop: 4 }}>{ctx.priceLabel} · Một lần · Trọn đời</Txt>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
               {['10 leaps đầy đủ', 'Sunny Play từng bước', '3 âm thanh dỗ bé', 'Đồng bộ gia đình (sắp có)'].map((p) => (
-                <View key={p} style={{ backgroundColor: 'rgba(255,255,255,0.12)', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8 }}>
-                  <Txt style={{ fontSize: 12, fontWeight: '500', color: colors.textInverse }}>{p}</Txt>
+                <View key={p} style={{ backgroundColor: 'rgba(255,255,255,0.12)', paddingVertical: 4, paddingHorizontal: 12, borderRadius: 8 }}>
+                  <Txt style={{ fontSize: 13, fontWeight: '500', color: colors.textInverse }}>{p}</Txt>
                 </View>
               ))}
             </View>
             <Pressable
               onPress={() => ctx.openPaywall('Mở khóa Muby Premium')}
-              style={{ alignSelf: 'flex-start', marginTop: 16, paddingVertical: 13, paddingHorizontal: 22, minHeight: 48, justifyContent: 'center', borderRadius: 999, backgroundColor: colors.accentPrimary }}
+              style={{ alignSelf: 'flex-start', marginTop: 16, paddingVertical: 12, paddingHorizontal: 24, minHeight: 48, justifyContent: 'center', borderRadius: 999, backgroundColor: colors.accentPrimary }}
             >
               <Txt style={{ fontWeight: '600', fontSize: 15, color: '#fff' }}>{`Mở khóa trọn đời - ${ctx.priceLabel}`}</Txt>
             </Pressable>
-            <Txt style={{ fontSize: 12, color: colors.textInverse, opacity: 0.55, marginTop: 12, maxWidth: 235 }}>
+            <Txt style={{ fontSize: 13, color: colors.textInverse, opacity: 0.55, marginTop: 12, maxWidth: 235 }}>
               Trả một lần. Không gia hạn. Không trừ tiền tự động.
             </Txt>
           </View>
@@ -320,7 +319,7 @@ export function MeScreen() {
 
       {/* Baby card */}
       <Card pad={16} style={{ marginBottom: 24 }}>
-        <Pressable onPress={openBabySheet} style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', gap: 14, opacity: pressed ? 0.7 : 1 }]}>
+        <Pressable onPress={openBabySheet} style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', gap: 12, opacity: pressed ? 0.7 : 1 }]}>
           <BongFace emotion="happy" size={48} ring />
           <View style={{ flex: 1 }}>
             <Txt style={{ fontSize: 17, fontWeight: '600', color: colors.textPrimary }}>{displayName}</Txt>
@@ -337,7 +336,7 @@ export function MeScreen() {
           icon="users" tone="sleep"
           label="Mời bố vào cùng"
           sub="Đồng bộ gia đình - sắp có"
-          onPress={() => ctx.toast('Sắp có rồi, mình sẽ báo mama khi mở nhé 💛')}
+          onPress={() => ctx.toast('Sắp có rồi, mình sẽ báo mama khi mở nhé')}
           right={<Ic name="chevron" size={18} color={colors.textMuted} />}
         />
       </SettingsGroup>
@@ -384,23 +383,23 @@ export function MeScreen() {
 
       {/* About */}
       <SettingsGroup title="Về Muby">
-        <SettingRow first icon="heart" tone="brand" label="Đánh giá ứng dụng" onPress={() => ctx.toast('Cảm ơn mama! Chờ chút để mở App Store nhé 💛')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
+        <SettingRow first icon="heart" tone="brand" label="Đánh giá ứng dụng" onPress={() => ctx.toast('Cảm ơn mama. Chờ chút để mở App Store nhé')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
         <SettingRow icon="shield" tone="diaper" label="Điều khoản & Quyền riêng tư" onPress={() => setSheet('terms')} right={<Ic name="chevron" size={18} color={colors.textMuted} />} />
       </SettingsGroup>
 
       <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 4 }}>
-        <Pressable onPress={logout} style={{ padding: 10 }}>
-          <Txt style={{ color: colors.danger, fontWeight: '600', fontSize: 14.5 }}>{auth.isGuest ? 'Thoát chế độ dùng thử' : 'Đăng xuất'}</Txt>
+        <Pressable onPress={logout} style={{ padding: 12 }}>
+          <Txt style={{ color: colors.danger, fontWeight: '600', fontSize: 15 }}>{auth.isGuest ? 'Thoát chế độ dùng thử' : 'Đăng xuất'}</Txt>
         </Pressable>
       </View>
-      <Pressable onPress={() => ctx.go('designsystem')} style={{ alignSelf: 'center', padding: 6 }}>
-        <Txt style={{ textAlign: 'center', color: colors.textMuted, fontSize: 12 }}>Muby · 1.0.0</Txt>
+      <Pressable onPress={() => ctx.go('designsystem')} style={{ alignSelf: 'center', padding: 8 }}>
+        <Txt style={{ textAlign: 'center', color: colors.textMuted, fontSize: 13 }}>Muby · 1.0.0</Txt>
       </Pressable>
     </ScrollView>
 
     {/* --- Sheets --- */}
     <Sheet open={sheet === 'baby'} onClose={() => setSheet(null)} height="72%" title={displayName} sub="Thông tin bé">
-      <View style={{ gap: 14, paddingTop: 6 }}>
+      <View style={{ gap: 12, paddingTop: 8 }}>
         <View style={{ alignItems: 'center' }}>
           <BongFace emotion="happy" size={72} ring />
         </View>
@@ -419,7 +418,7 @@ export function MeScreen() {
     </Sheet>
 
     <Sheet open={sheet === 'delete'} onClose={() => setSheet(null)} height="52%" title="Xoá tài khoản?">
-      <View style={{ gap: 14, paddingTop: 4 }}>
+      <View style={{ gap: 12, paddingTop: 4 }}>
         <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 22 }}>
           Muby sẽ xoá vĩnh viễn tài khoản, hồ sơ bé và mọi ghi chép (cữ ăn, giấc ngủ, đo lường, kỹ năng). Không khôi phục lại được.
         </Txt>
@@ -432,7 +431,7 @@ export function MeScreen() {
     </Sheet>
 
     <Sheet open={sheet === 'units'} onClose={() => setSheet(null)} height="38%" title="Đơn vị đo">
-      <View style={{ gap: 10, paddingTop: 6 }}>
+      <View style={{ gap: 8, paddingTop: 8 }}>
         {['kg · cm', 'lb · in'].map((u) => (
           <Pressable
             key={u}
@@ -442,7 +441,7 @@ export function MeScreen() {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                paddingVertical: 15,
+                paddingVertical: 16,
                 paddingHorizontal: 16,
                 minHeight: 52,
                 borderRadius: radii.md,
@@ -462,16 +461,16 @@ export function MeScreen() {
 
     <Sheet open={sheet === 'terms'} onClose={() => setSheet(null)} height="62%" title="Điều khoản & Quyền riêng tư">
       <View style={{ gap: 12, paddingTop: 4 }}>
-        <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+        <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 22 }}>
           <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Dữ liệu của bé là của bạn.</Txt> Mọi ghi chép (cữ ăn, giấc ngủ, đo lường, kỹ năng của bé) thuộc về bạn mãi mãi - kể cả khi không dùng Premium.
         </Txt>
-        <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+        <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 22 }}>
           <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Không bán dữ liệu.</Txt> Chúng mình không chia sẻ thông tin của bạn và bé cho bên thứ ba.
         </Txt>
-        <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+        <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 22 }}>
           <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Nội dung tham khảo.</Txt> Dự báo leap và gợi ý EASY mang tính tham khảo, không thay thế tư vấn y khoa. Khi lo lắng về sức khoẻ của bé, hãy hỏi bác sĩ nhi.
         </Txt>
-        <Txt style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 22 }}>
+        <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 22 }}>
           <Txt style={{ fontWeight: '600', color: colors.textPrimary }}>Muby Premium.</Txt> 7 ngày đầu sau đăng ký, mọi tính năng đều mở - không cần thẻ, không trừ tiền. Sau đó về gói Miễn phí. Premium là khoản mua một lần 79.000đ, trọn đời, không gia hạn.
         </Txt>
       </View>
@@ -506,7 +505,7 @@ export function Paywall() {
     setBusy('buy');
     const r = await ctx.purchase();
     setBusy(null);
-    if (r === 'ok') { ctx.closePaywall(); ctx.toast('Muby Premium là của bạn mãi mãi 💛'); }
+    if (r === 'ok') { ctx.closePaywall(); ctx.toast('Muby Premium là của bạn mãi mãi'); }
     else if (r === 'pending') ctx.toast('Giao dịch đang chờ xác nhận. Premium sẽ mở khi thanh toán xong.');
     else if (r === 'unavailable') ctx.toast('Cửa hàng chưa sẵn sàng. Thử lại sau ít phút nhé.');
     else if (r === 'error') ctx.toast('Chưa mua được. Mama thử lại nhé, chưa bị trừ tiền.');
@@ -515,7 +514,7 @@ export function Paywall() {
     setBusy('restore');
     const r = await ctx.restorePurchase();
     setBusy(null);
-    if (r === 'ok') { ctx.closePaywall(); ctx.toast('Đã khôi phục Muby Premium 💛'); }
+    if (r === 'ok') { ctx.closePaywall(); ctx.toast('Đã khôi phục Muby Premium'); }
     else if (r === 'none') ctx.toast('Chưa tìm thấy giao dịch mua Premium trên tài khoản này.');
     else ctx.toast('Cửa hàng chưa sẵn sàng. Thử lại sau ít phút nhé.');
   };
@@ -523,12 +522,12 @@ export function Paywall() {
   return (
     <Sheet open={open} onClose={ctx.closePaywall} height="80%" title="Muby Premium" sub={`${ctx.priceLabel} · Một lần · Trọn đời`}>
       <View style={{ alignItems: 'center', paddingTop: 4 }}>
-        <Bong emotion="excited" onesie="orange" size={124} float />
-        <Tag tone="brand" style={{ marginTop: 10 }}>Ưu đãi trọn đời</Tag>
-        <Txt style={{ fontSize: 13.5, color: colors.textSecondary, marginTop: 8 }}>{ctx.paywall?.title || ''}</Txt>
+        <Bong emotion="excited" onesie="orange" size={124} />
+        <Tag tone="brand" style={{ marginTop: 8 }}>Ưu đãi trọn đời</Tag>
+        <Txt style={{ fontSize: 13, color: colors.textSecondary, marginTop: 8 }}>{ctx.paywall?.title || ''}</Txt>
       </View>
 
-      <View style={{ gap: 10, marginTop: 18 }}>
+      <View style={{ gap: 8, marginTop: 16 }}>
         {PAYWALL_BENEFITS.map(([ic, tone, t, d], i) => (
           <View key={i} style={{ flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 4, paddingHorizontal: 2 }}>
             <IconTile icon={ic} tone={tone} size={44} />
@@ -540,7 +539,7 @@ export function Paywall() {
         ))}
       </View>
 
-      <View style={{ gap: 10, marginTop: 22 }}>
+      <View style={{ gap: 8, marginTop: 20 }}>
         <ButtonPrimary disabled={!!busy} onPress={buy}>{busy === 'buy' ? 'Đang mở cửa hàng…' : `Mở khóa trọn đời - ${ctx.priceLabel}`}</ButtonPrimary>
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
           <ButtonText onPress={ctx.closePaywall}>Để sau</ButtonText>
@@ -548,7 +547,7 @@ export function Paywall() {
         </View>
       </View>
 
-      <Txt style={{ textAlign: 'center', fontSize: 11.5, color: colors.textMuted, marginTop: 8, paddingBottom: 8, lineHeight: 17 }}>
+      <Txt style={{ textAlign: 'center', fontSize: 11, color: colors.textMuted, marginTop: 8, paddingBottom: 8, lineHeight: 17 }}>
         Trả một lần qua App Store hoặc Google Play. Không gia hạn, không trừ tiền tự động. Nhật ký của bé luôn miễn phí.
       </Txt>
     </Sheet>

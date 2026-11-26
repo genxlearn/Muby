@@ -4,6 +4,7 @@
    Day header + white hero (leap progress + 7-day forecast),
    "Bống nhận thấy", today's stats, symptoms, actions, recent logs.
    ============================================================ */
+import { emojiIcon } from '../components/emojiIcon';
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import {
@@ -41,10 +42,6 @@ import { ago, clock } from '../state/care';
 let _todayLoaded = false;
 
 const DOW = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-const greeting = () => {
-  const h = new Date().getHours();
-  return h < 11 ? 'Chào buổi sáng, mama 💛' : h < 18 ? 'Chào buổi chiều, mama 💛' : 'Chào buổi tối, mama 💛';
-};
 const ddmm = (d: Date) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
 
 const LOG_TONE: Record<string, [TileTone, IconName]> = {
@@ -55,18 +52,18 @@ const LOG_TONE: Record<string, [TileTone, IconName]> = {
   milestone: ['ai', 'sparkle'],
 };
 
-/* ---- Header: avatar · greeting · bell / "Thứ Năm của Bống" ---- */
+/* ---- Header: avatar · bell / "Thứ Năm của Bống" ---- */
 function TodayHeader() {
   const { colors, shadows } = useTheme();
   const ctx = useApp();
   const { state, displayName } = useBaby();
   return (
     <View style={{ paddingHorizontal: 20, paddingTop: 8, gap: 8 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <Pressable onPress={() => ctx.go('me')} accessibilityLabel="Trang của mama">
           <BabyAvatar size={44} />
         </Pressable>
-        <Txt style={{ flex: 1, fontSize: 13, fontWeight: '500', color: colors.textSecondary }}>{greeting()}</Txt>
+        <View style={{ flex: 1 }} />
         <Pressable
           onPress={() => ctx.go('notifications')}
           accessibilityLabel="Thông báo"
@@ -125,11 +122,11 @@ export function TodayOfBabyCard() {
     <View>
       <SectionHeader title="Hôm nay của bé" />
       <Card>
-        <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 1, color: colors.textBrand, marginBottom: 8, textTransform: 'uppercase' }}>{d.label}</Txt>
+        <Txt style={{ fontSize: 13, fontWeight: '600', letterSpacing: 0.2, color: colors.textBrand, marginBottom: 8 }}>{d.label}</Txt>
         <Txt style={{ fontSize: 17, lineHeight: 24, color: colors.textPrimary }}>{d.text}</Txt>
         {d.action ? (
-          <ButtonTonal onPress={() => ctx.toast('Đã lưu vào Khoảnh khắc 🎉')} style={{ marginTop: 12 }}>
-            {`📸  ${d.action}`}
+          <ButtonTonal onPress={() => ctx.toast('Đã lưu vào Khoảnh khắc')} style={{ marginTop: 12 }}>
+            {`${d.action}`}
           </ButtonTonal>
         ) : null}
       </Card>
@@ -150,7 +147,7 @@ export function BloomSection() {
   if (!S.bloom.length) return null;
   return (
     <View>
-      <SectionHeader title={`Kỹ năng đang nở 🌱`} />
+      <SectionHeader title={`Kỹ năng đang nở`} />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -169,10 +166,10 @@ export function BloomSection() {
                 disabled={!!saved[i]}
                 onPress={() => {
                   setSaved((x) => ({ ...x, [i]: true }));
-                  ctx.toast(`Đã ghi nhận: con ${b.skill} 🎉`);
+                  ctx.toast(`Đã ghi nhận: con ${b.skill}`);
                 }}
               >
-                {saved[i] ? '✓ Đã lưu vào Nhật ký' : '🎉 Con làm được rồi!'}
+                {saved[i] ? 'Đã lưu vào Nhật ký' : 'Con làm được rồi'}
               </ButtonTonal>
               {!ctx.premium ? (
                 <Pressable onPress={() => ctx.openPaywall('Mở khóa hướng dẫn từng bước')} hitSlop={6}>
@@ -195,8 +192,8 @@ export function PrepCard() {
   const S = state.sunny;
   if (!S.prep || !S.nextLeap) return null;
   return (
-    <View style={{ padding: 20, gap: 10, borderRadius: radii.lg, backgroundColor: colors.bgAccentSoft }}>
-      <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 1, color: colors.textBrand }}>☁️  CHUẨN BỊ CHO LEAP {S.nextLeap.n}</Txt>
+    <View style={{ padding: 20, gap: 8, borderRadius: radii.lg, backgroundColor: colors.bgAccentSoft }}>
+      <Txt style={{ fontSize: 13, fontWeight: '600', letterSpacing: 0.2, color: colors.textBrand }}>Chuẩn bị cho Leap {S.nextLeap.n}</Txt>
       <Txt style={{ fontSize: 15, lineHeight: 20, color: colors.textPrimary }}>
         Leap {S.nextLeap.n} sắp đến (dự kiến ngày {S.nextDate}). Vài dấu hiệu sớm:{' '}
         <Txt style={{ fontWeight: '600' }}>{S.prep.signs.join(', ')}</Txt>.
@@ -226,16 +223,16 @@ export function PostLeapCard({ onDismiss }: { onDismiss: () => void }) {
     <Card>
       <View style={{ flexDirection: 'row', gap: 12 }}>
         <Bong emotion="blissful" onesie="sage" size={60} />
-        <View style={{ flex: 1, gap: 6 }}>
+        <View style={{ flex: 1, gap: 4 }}>
           <Txt style={{ fontSize: 15, fontWeight: '600', lineHeight: 20 }}>
-            Leap {done.n} đã qua rồi 🌼 Mama và {displayName} đã cùng nhau vượt qua.
+            Leap {done.n} đã qua rồi. Mama và {displayName} đã cùng nhau vượt qua.
           </Txt>
           <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>
             {S.nextLeap
               ? `Leap ${S.nextLeap.n} sẽ đến trong khoảng ${Math.max(1, Math.round((S.daysToNext || 7) / 7))} tuần nữa. Mở khóa toàn bộ 10 leap để luôn sẵn sàng nhé.`
               : 'Mở khóa toàn bộ 10 leap để luôn sẵn sàng nhé.'}
           </Txt>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 4 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 4 }}>
             <ButtonTonal onPress={() => ctx.openPaywall('Luôn sẵn sàng cho leap tiếp theo')}>Xem Muby Premium</ButtonTonal>
             <Pressable onPress={onDismiss} hitSlop={6}>
               <Txt style={{ fontSize: 13, fontWeight: '500', color: colors.textSecondary }}>Để sau</Txt>
@@ -293,7 +290,7 @@ export function TodayScreen() {
         <View style={{ paddingTop: 20, paddingHorizontal: 20, gap: 20 }}>
           <Banner tone="warning" icon="☁️">
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Txt style={{ flex: 1, fontSize: 13, fontWeight: '500', color: colors.textPrimary }}>Không tải được. Thử lại nhé 💛</Txt>
+              <Txt style={{ flex: 1, fontSize: 13, fontWeight: '500', color: colors.textPrimary }}>Không tải được. Thử lại nhé</Txt>
               <Txt onPress={() => { ctx.toast('Đang tải lại…'); reloadBaby(); }} style={{ fontSize: 13, fontWeight: '600', color: colors.textBrand }}>
                 Thử lại
               </Txt>
@@ -301,7 +298,7 @@ export function TodayScreen() {
           </Banner>
           <View style={{ opacity: 0.55 }}>
             <HeroCard>
-              <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 1, color: colors.textSecondary }}>BẢN LƯU GẦN NHẤT</Txt>
+              <Txt style={{ fontSize: 13, fontWeight: '600', letterSpacing: 0.2, color: colors.textSecondary }}>Bản lưu gần nhất</Txt>
               <Txt serif style={{ fontSize: 22, lineHeight: 28, marginTop: 8, color: colors.textPrimary }}>
                 {inLeap ? `Bé đang ở ${PHASE.name} của Leap ${CURRENT_LEAP.n}` : `Bé đang giữa hai leap - Leap ${CURRENT_LEAP.n} sắp tới`}
               </Txt>
@@ -322,7 +319,7 @@ export function TodayScreen() {
           emotion="snug"
           onesie="lavender"
           heading="Chưa có gì hôm nay"
-          helper="Cứ thong thả mama 💛 Khi nào sẵn sàng, mình ghi lại khoảnh khắc đầu tiên nhé."
+          helper="Cứ thong thả mama. Khi nào sẵn sàng, mình ghi lại khoảnh khắc đầu tiên nhé."
           action={<ButtonPrimary full={false} style={{ alignSelf: 'center' }} onPress={() => ctx.openSheet('quicklog')}>Ghi nhanh</ButtonPrimary>}
         />
       </ScrollView>
@@ -350,7 +347,7 @@ export function TodayScreen() {
         <TodayHeader />
         <View style={{ paddingTop: 20, paddingHorizontal: 20, gap: 28 }}>
           {/* ===== LIVE STATUS + RUNNING TIMER (MVP v2.1) ===== */}
-          <FadeInUp index={0} onceKey="today-0" style={{ gap: 10 }}>
+          <FadeInUp index={0} onceKey="today-0" style={{ gap: 8 }}>
             <StatusStrip />
             <ActiveTimerPill />
           </FadeInUp>
@@ -363,9 +360,9 @@ export function TodayScreen() {
                 {sunny ? (
                   <>
                     <IntensityBadge level={intensity} size="sm" />
-                    <Txt serif style={{ fontSize: 22, lineHeight: 28, color: colors.textPrimary }}>Tuần nắng của {displayName} 🌼</Txt>
+                    <Txt serif style={{ fontSize: 22, lineHeight: 28, color: colors.textPrimary }}>Tuần nắng của {displayName}</Txt>
                     {S.nextLeap && S.daysToNext != null ? (
-                      <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4, flexWrap: 'wrap' }}>
                         <Txt style={{ fontSize: 28, lineHeight: 34, fontWeight: '600', letterSpacing: -0.3 }}>còn {S.daysToNext} ngày</Txt>
                         <Txt style={{ fontSize: 15, fontWeight: '500', color: colors.textSecondary }}>tới Leap {S.nextLeap.n}</Txt>
                       </View>
@@ -377,11 +374,11 @@ export function TodayScreen() {
                       <Txt style={{ fontSize: 15, fontWeight: '500', color: colors.textSecondary }}>Leap {CURRENT_LEAP.n}</Txt>
                       <IntensityBadge level={intensity} size="sm" />
                     </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
                       <Txt style={{ fontSize: 40, lineHeight: 44, fontWeight: '600', letterSpacing: -0.8 }}>Ngày {st.leapDay}</Txt>
                       <Txt style={{ fontSize: 17, fontWeight: '600', color: colors.textSecondary }}>/ {st.leapTotal}</Txt>
                     </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                       <Ic name="cloud" size={16} color={colors.textBrand} />
                       <Txt style={{ flex: 1, fontSize: 13, fontWeight: '500', color: colors.textBrand }}>
                         {PHASE.name[0].toUpperCase() + PHASE.name.slice(1)} · còn khoảng {st.leapTotal - st.leapDay} ngày
@@ -413,7 +410,7 @@ export function TodayScreen() {
               </View>
             ) : null}
             {sunny && S.nextLeap ? (
-              <View style={{ marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 12, borderRadius: radii.md, backgroundColor: colors.warningSoft }}>
+              <View style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 12, borderRadius: radii.md, backgroundColor: colors.warningSoft }}>
                 <Ic name="sun" size={16} color={colors.warning} />
                 <Txt style={{ flex: 1, fontSize: 13, color: colors.textPrimary, lineHeight: 18 }}>
                   Leap {S.nextLeap.n} dự kiến bắt đầu ngày {S.nextDate} - tranh thủ chơi cùng con nhé
@@ -421,7 +418,7 @@ export function TodayScreen() {
               </View>
             ) : null}
             {intensity >= 4 ? (
-              <ButtonTonal onPress={() => ctx.openSheet('soothing')} style={{ marginTop: 14 }}>🎵  Bật tiếng ồn trắng</ButtonTonal>
+              <ButtonTonal onPress={() => ctx.openSheet('soothing')} style={{ marginTop: 12 }}>Bật tiếng ồn trắng</ButtonTonal>
             ) : null}
 
             <View style={{ height: 1, backgroundColor: colors.borderDefault, marginVertical: 16 }} />
@@ -442,7 +439,7 @@ export function TodayScreen() {
                 size="sm"
                 emotion="blissful"
                 onesie="sage"
-                heading="10 leaps đã trọn vẹn 🎉"
+                heading="10 leaps đã trọn vẹn"
                 helper="Bé đã đi qua mọi tuần kỳ diệu. Giờ mình cùng dõi theo bé lớn lên mỗi ngày nhé."
                 action={<ButtonSecondary onPress={() => ctx.setTab('growth')}>Xem bé lớn lên</ButtonSecondary>}
               />
@@ -470,13 +467,13 @@ export function TodayScreen() {
                   <Txt style={{ flex: 1, fontSize: 17, fontWeight: '600', lineHeight: 22 }}>{todoItem.title}</Txt>
                 </View>
                 {todoItem.why ? <Txt style={{ fontSize: 15, color: colors.textSecondary, lineHeight: 20 }}>Vì sao? {todoItem.why}</Txt> : null}
-                <View style={{ paddingVertical: 12, paddingHorizontal: 14, borderRadius: radii.md, backgroundColor: colors.bgAccentSoft }}>
+                <View style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: radii.md, backgroundColor: colors.bgAccentSoft }}>
                   <Txt style={{ fontSize: 13, color: colors.textPrimary, lineHeight: 18 }}>
                     <Txt style={{ fontWeight: '600' }}>Nên làm: </Txt>
                     {todoItem.what}
                   </Txt>
                 </View>
-                {todoItem.hasSound ? <ButtonTonal onPress={() => ctx.openSheet('soothing')}>🎵  Bật tiếng ồn trắng</ButtonTonal> : null}
+                {todoItem.hasSound ? <ButtonTonal onPress={() => ctx.openSheet('soothing')}>Bật tiếng ồn trắng</ButtonTonal> : null}
               </View>
             </FadeInUp>
           ) : null}
@@ -528,7 +525,7 @@ export function EasyScreen() {
     <View style={{ flex: 1 }}>
       <AppBar title="Phương pháp EASY" onBack={ctx.back} />
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 48, gap: 24 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colors.successSoft, alignItems: 'center', justifyContent: 'center' }}>
             <BongFace emotion="snug" size={54} />
           </View>
@@ -537,15 +534,15 @@ export function EasyScreen() {
           </Txt>
         </View>
 
-        <View style={{ padding: 20, gap: 10, borderRadius: radii.lg, backgroundColor: colors.bgAccentSoft }}>
-          <Txt style={{ fontSize: 12, fontWeight: '600', letterSpacing: 1, color: colors.textBrand }}>EASY GIÚP GÌ TRONG LEAP {st.leap.n}?</Txt>
+        <View style={{ padding: 20, gap: 8, borderRadius: radii.lg, backgroundColor: colors.bgAccentSoft }}>
+          <Txt style={{ fontSize: 13, fontWeight: '600', letterSpacing: 0.2, color: colors.textBrand }}>EASY giúp gì trong Leap {st.leap.n}</Txt>
           {([
             ['🍼', 'Bé có thể bú ít mỗi cữ nhưng đòi ăn nhiều lần - cứ theo nhịp E, không ép đủ lượng.'],
             ['🌙', 'Trong leap bé dễ mệt sớm - đặt ngủ sớm hơn 30 phút so với lịch quen.'],
             ['✨', 'Giữ nguyên trình tự Ăn → Chơi → Ngủ - sự quen thuộc chính là điểm tựa của con lúc này.'],
           ] as [string, string][]).map(([e, t], i) => (
-            <View key={i} style={{ flexDirection: 'row', gap: 10 }}>
-              <Txt style={{ fontSize: 13, lineHeight: 18 }}>{e}</Txt>
+            <View key={i} style={{ flexDirection: 'row', gap: 8 }}>
+              <Ic name={emojiIcon(e) ?? 'info'} size={16} sw={1.6} color={colors.textBrand} />
               <Txt style={{ flex: 1, fontSize: 13, color: colors.textPrimary, lineHeight: 18 }}>{t}</Txt>
             </View>
           ))}
@@ -564,7 +561,7 @@ export function EasyScreen() {
         </Card>
 
         <Card>
-          <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: radii.sm, backgroundColor: colors.successSoft, marginBottom: 8 }}>
+          <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 4, borderRadius: radii.sm, backgroundColor: colors.successSoft, marginBottom: 8 }}>
             <Txt style={{ fontSize: 13, fontWeight: '500', color: colors.success }}>{st.easyVariant} · bé {st.ageLabel}</Txt>
           </View>
           <Txt style={{ fontSize: 15, color: colors.textPrimary, lineHeight: 20 }}>{st.easyDetail}</Txt>
@@ -573,7 +570,7 @@ export function EasyScreen() {
         <Banner icon="☁️" tone="sunken">{info.note}</Banner>
 
         <Txt style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18, textAlign: 'center' }}>
-          EASY là khung tham khảo, không phải lịch cứng.{'\n'}Bé của bạn luôn là người dẫn nhịp 💛
+          EASY là khung tham khảo, không phải lịch cứng.{'\n'}Bé của bạn luôn là người dẫn nhịp
         </Txt>
       </ScrollView>
     </View>
